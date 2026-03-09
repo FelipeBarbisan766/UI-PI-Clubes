@@ -1,0 +1,8 @@
+.navbar{
+    background: var(--base-gradient);
+}
+
+.btn {
+    background: var(--gradient-button);
+    box-shadow: none;
+}
