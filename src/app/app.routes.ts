@@ -11,11 +11,11 @@ export const routes: Routes = [
         children: [
             {
                 path: '',
-                component: HomePage,
+                loadComponent: () => import('./pages/home-page/home-page').then((m) => HomePage)  
             },
             {
                 path: 'clubs',
-                component: Clubs,
+                loadComponent: () => import('./pages/clubs/clubs').then((m) => Clubs)
             }
         ]
     }

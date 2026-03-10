@@ -1,1 +1,57 @@
-<p>footer works!</p>
+<footer class="border-t border-base-300 bg-base-100 fixed bottom-0 w-full">
+  <div class="container mx-auto px-4 py-6">
+    <div class="grid gap-4 md:grid-cols-3">
+      <div>
+        <a
+          routerLink="/"
+          class="text-sm font-bold text-primary hover:opacity-80 transition-opacity"
+        >
+            Clubera
+        </a>
+        <p class="mt-1 text-xs text-base-content/60">
+          A plataforma mais fácil para reservar quadras esportivas.
+        </p>
+      </div>
+
+      <div>
+        <h4 class="text-xs font-bold uppercase tracking-wide text-base-content">
+          Navegação
+        </h4>
+        <nav aria-label="Links do rodapé" class="mt-1 flex flex-col gap-0.5">
+          <a
+            routerLink="/"
+            class="text-xs text-base-content/60 hover:text-primary hover:underline transition-colors"
+          >
+            Início
+          </a>
+          <a
+            routerLink="/clubs"
+            class="text-xs text-base-content/60 hover:text-primary hover:underline transition-colors"
+          >
+            Clubes
+          </a>
+          <a
+            
+            class="text-xs text-base-content/60 hover:text-primary hover:underline transition-colors"
+          >
+            Matchmaking
+          </a>
+        </nav>
+      </div>
+
+      <div>
+        <h4 class="text-xs font-bold uppercase tracking-wide text-base-content">
+          Para Clubes
+        </h4>
+        <div class="mt-1 flex flex-col gap-0.5">
+          <span class="text-xs text-base-content/60">Cadastre seu clube</span>
+          <span class="text-xs text-base-content/60">Gerencie suas quadras</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-4 border-t border-base-300 pt-3 text-center text-[11px] text-base-content/60">
+      © 2026 Clubes. Todos os direitos reservados.
+    </div>
+  </div>
+</footer>
