@@ -1,9 +1,8 @@
 import { Component } from '@angular/core';
-import { SearchHome } from "../../shared/components/search-home/search-home";
 
 @Component({
   selector: 'app-home-page',
-  imports: [SearchHome],
+  imports: [],
   templateUrl: './home-page.html',
   styleUrl: './home-page.css',
 })

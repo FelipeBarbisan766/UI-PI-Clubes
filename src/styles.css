@@ -1,8 +1,10 @@
 /* You can add global styles to this file, and also import other style files */
 
 @import 'tailwindcss';
+@plugin "daisyui" {
+  themes: light --default;
+}
 
-   
 :root {
     --base-gradient: linear-gradient(180deg, hsl(210, 80%, 48%) 0%, hsl(210, 80%, 32%) 100%);
     --gradient-button: linear-gradient(180deg, hsl(35, 100%, 55%) 0%, hsl(30, 100%, 42%) 100%);

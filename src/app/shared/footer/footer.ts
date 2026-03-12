@@ -3,7 +3,7 @@ import { Navbar } from '../navbar/navbar';
 
 @Component({
   selector: 'app-footer',
-  imports: [Navbar],
+  imports: [],
   templateUrl: './footer.html',
   styleUrl: './footer.css',
 })
