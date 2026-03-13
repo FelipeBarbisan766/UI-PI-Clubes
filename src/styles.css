@@ -1,4 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Space+Grotesk:wght@300..700&display=swap');
 
 @import 'tailwindcss';
 @plugin "daisyui" {
@@ -6,9 +7,8 @@
 }
 
 :root {
-    --base-gradient: linear-gradient(180deg, hsl(210, 80%, 48%) 0%, hsl(210, 80%, 32%) 100%);
-    --gradient-button: linear-gradient(180deg, hsl(35, 100%, 55%) 0%, hsl(30, 100%, 42%) 100%);
-}
+    
+  }
 
 
 #root {

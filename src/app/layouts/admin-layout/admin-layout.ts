@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
-import { SearchHome } from "../../shared/components/search-home/search-home";
+import { RouterOutlet } from '@angular/router';
+
 
 @Component({
   selector: 'app-admin-layout',
-  imports: [SearchHome],
+  imports: [RouterOutlet],
   templateUrl: './admin-layout.html',
   styleUrl: './admin-layout.css',
 })
