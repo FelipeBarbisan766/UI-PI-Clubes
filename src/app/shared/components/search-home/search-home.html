@@ -1,1 +1,52 @@
-<p>testando</p>
+<div class="w-full max-w-4xl mx-auto bg-[#111]/80 backdrop-blur-xl border border-white/10 p-1.5 rounded-xl flex flex-col md:flex-row items-center gap-1 shadow-2xl transition-all relative z-30">
+
+  <label class="flex-1 w-full flex items-center gap-3 px-3 h-12 bg-transparent hover:bg-white/5 rounded-lg cursor-text group transition-colors">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5 text-gray-500 group-focus-within:text-primary transition-colors">
+      <path fill-rule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 00-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+    </svg>
+    <input type="text" placeholder="Onde você vai jogar?" class="w-full bg-transparent border-none outline-none text-white placeholder-gray-500 text-sm font-medium truncate min-w-0" />
+  </label>
+
+  <div class="hidden md:block w-px h-8 bg-white/10 shrink-0"></div>
+
+  <!-- CALLY CALENDAR do DaisyUI (testar depois) -->
+  <div class="flex-1 w-full relative group">
+    <button popovertarget="cally-popover1" id="cally1" style="anchor-name:--cally1" class="w-full h-12 flex items-center gap-3 px-3 bg-transparent hover:bg-white/5 rounded-lg text-left transition-colors cursor-pointer border-none outline-none">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5 text-gray-500 group-hover:text-primary transition-colors">
+        <path d="M12.75 12.75a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM7.5 15.75a.75.75 0 100-1.5 .75.75 0 000 1.5zM8.25 17.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM9.75 15.75a.75.75 0 100-1.5 .75.75 0 000 1.5zM9.75 17.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM11.25 15.75a.75.75 0 100-1.5 .75.75 0 000 1.5zM11.25 17.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM13.5 15.75a.75.75 0 100-1.5 .75.75 0 000 1.5zM13.5 17.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM14.25 15.75a.75.75 0 100-1.5 .75.75 0 000 1.5z" />
+        <path fill-rule="evenodd" d="M6.75 2.25A.75.75 0 017.5 3v1.5h9V3A.75.75 0 0118 3v1.5h.75a3 3 0 013 3v11.25a3 3 0 01-3 3H5.25a3 3 0 01-3-3V7.5a3 3 0 013-3H6V3a.75.75 0 01.75-.75zm13.5 9a1.5 1.5 0 00-1.5-1.5H5.25a1.5 1.5 0 00-1.5 1.5v7.5a1.5 1.5 0 001.5 1.5h13.5a1.5 1.5 0 001.5-1.5v-7.5z" clip-rule="evenodd" />
+      </svg>
+
+      <span class="text-sm font-medium text-white truncate min-w-0" [class.text-gray-500]="selectedDate() === 'Quando?'">
+        {{ selectedDate() }}
+      </span>
+    </button>
+    
+
+    <div popover id="cally-popover1" class="dropdown bg-white text-base-content rounded-xl shadow-2xl mt-2 border border-gray-100 p-0 overflow-hidden" style="position-anchor:--cally1; inset-area: bottom span-right;">
+      <calendar-date class="cally w-full border-none shadow-none" (change)="onDateChange($event)">
+
+        <svg aria-label="Previous" class="fill-current size-4 text-gray-600 hover:text-primary" slot="previous" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.75 19.5 8.25 12l7.5-7.5"></path></svg>
+        <svg aria-label="Next" class="fill-current size-4 text-gray-600 hover:text-primary" slot="next" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m8.25 4.5 7.5 7.5-7.5 7.5"></path></svg>
+        
+        <calendar-month></calendar-month>
+      </calendar-date>
+    </div>
+  </div>
+
+  <div class="hidden md:block w-px h-8 bg-white/10 shrink-0"></div>
+
+  <div class="flex-1 w-full flex items-center px-2 h-12 bg-transparent hover:bg-white/5 rounded-lg group transition-colors">
+    <select class="select select-ghost select-sm w-full border-none focus:bg-transparent focus:text-white text-sm font-medium text-white/90 focus:outline-none focus:shadow-none pl-2">
+      <option disabled selected class="text-gray-500 bg-[#222]">Modalidade</option>
+      <option class="text-white bg-[#222]">Futebol</option>
+      <option class="text-white bg-[#222]">Tênis</option>
+      <option class="text-white bg-[#222]">Vôlei</option>
+    </select>
+  </div>
+
+  <button class="btn btn-primary text-white border-none rounded-lg px-6 h-12 min-h-[3rem] font-bold text-sm shadow-md md:w-auto w-full">
+    Buscar
+  </button>
+
+</div>

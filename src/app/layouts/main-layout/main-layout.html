@@ -1,4 +1,7 @@
-<app-navbar />
-        <router-outlet />
-<app-footer />
-
+<div class="min-h-screen flex flex-col relative">
+  <app-navbar />
+        <main class="flex-grow w-full">
+                <router-outlet />
+        </main>
+  <app-footer />
+</div>

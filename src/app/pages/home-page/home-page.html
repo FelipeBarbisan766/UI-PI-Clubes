@@ -1,1 +1,154 @@
-<p>home</p>
+<main class="w-full bg-base-100 text-base-content">
+  
+  <section class="relative w-full bg-primary text-white py-24 lg:py-32 px-4 overflow-hidden">
+
+    <div class="container mx-auto max-w-7xl relative z-10 flex flex-col items-start gap-6">
+      <h1 class="font-destaque text-4xl md:text-5xl lg:text-6xl font-bold max-w-2xl leading-[1.1] tracking-tight">
+        Encontre quadras e <span class="text-neutral">reserve agora</span>
+      </h1>
+      <p class="text-lg md:text-xl font-light">
+        Clubes, quadras e horários perto de você.
+      </p>
+      
+      
+      <app-search-home></app-search-home>
+    </div>
+  </section>
+
+  <section class="py-24 px-4 bg-white">
+    <div class="container mx-auto max-w-6xl text-center">
+      <h2 class="font-destaque text-3xl font-bold mb-3 text-gray-900">Como funciona</h2>
+      <p class="text-gray-500 mb-16 font-light">Simples, rápido e prático.</p>
+
+      <div class="relative grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+        
+        <div class="hidden md:block absolute top-12 left-[28%] w-24 text-zinc-300 z-0">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-full h-auto">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
+          </svg>
+        </div>
+
+        <div class="hidden md:block absolute top-12 right-[28%] w-24 text-zinc-300 z-0">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-full h-auto">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
+          </svg>
+        </div>
+
+        <div class="flex flex-col items-center relative z-10">
+          <div class="w-20 h-20 rounded-full bg-primary/8 flex items-center justify-center text-primary mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search-icon lucide-search size-10"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
+          </div>
+          <h3 class="font-destaque text-xl font-bold mb-3 text-gray-900">Encontre</h3>
+          <p class="text-gray-500 text-base leading-relaxed max-w-[250px]">
+            Busque clubes e quadras esportivas na sua região.
+          </p>
+        </div>
+
+        <div class="flex flex-col items-center relative z-10">
+          <div class="w-20 h-20 rounded-full bg-primary/8 flex items-center justify-center text-primary mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-10 lucide lucide-calendar-icon lucide-calendar"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
+          </div>
+          <h3 class="font-destaque text-xl font-bold mb-3 text-gray-900">Reserve</h3>
+          <p class="text-gray-500 text-base leading-relaxed max-w-[250px]">
+            Escolha o horário disponível e faça sua reserva online.
+          </p>
+        </div>
+
+        <div class="flex flex-col items-center relative z-10">
+          <div class="w-20 h-20 rounded-full bg-primary/8 flex items-center justify-center text-primary mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-smile-icon lucide-smile size-10"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" x2="9.01" y1="9" y2="9"/><line x1="15" x2="15.01" y1="9" y2="9"/></svg>
+          </div>
+          <h3 class="font-destaque text-xl font-bold mb-3 text-gray-900">Jogue</h3>
+          <p class="text-gray-500 text-base leading-relaxed max-w-[250px]">
+            Confirme sua reserva e aproveite o jogo com tranquilidade.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="py-24 px-4 bg-gray-50">
+    <div class="container mx-auto max-w-6xl">
+      <div class="flex justify-between items-end mb-12">
+        <div>
+          <h2 class="font-destaque text-3xl font-bold mb-2 text-gray-900">Clubes em destaque</h2>
+          <p class="text-gray-500 font-light">Os melhores espaços esportivos.</p>
+        </div>
+        <a [routerLink]="['/clubs']" class="btn btn-sm btn-link no-underline text-gray-900 hover:text-primary flex items-center gap-1 group">
+          Ver todos 
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4 group-hover:translate-x-1 transition-transform"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" /></svg>
+        </a>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        @for (club of featuredClubs(); track club.id) {
+          <div class="card bg-white shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group">
+            <figure class="h-56 w-full bg-gray-200 relative overflow-hidden">
+
+              <img 
+                    [ngSrc]="club.image" 
+                    [alt]="club.name" 
+                    fill 
+                    class="object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+              
+            </figure>
+            
+            <div class="card-body p-6">
+              <div class="flex justify-between items-start mb-1">
+                <h3 class="font-bold text-lg text-gray-900 line-clamp-1">{{ club.name }}</h3>
+                <div class="flex items-center gap-1 text-primary font-bold text-sm bg-primary/8 px-2 py-1 rounded-md">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-4">
+                    <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006Z" clip-rule="evenodd" />
+                  </svg>
+                  {{ club.rating }}
+                </div>
+              </div>
+              
+              <div class="flex items-center gap-2 text-gray-500 text-sm mb-5">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4 shrink-0">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                </svg>
+                <span class="truncate">{{ club.location }}</span>
+              </div>
+
+              <div class="flex flex-wrap gap-2 mb-6">
+                @for (tag of club.tags; track tag) {
+                  <span class="badge badge-soft bg-gray-100 text-gray-600 border-none font-medium px-3 py-3">{{ tag }}</span>
+                }
+              </div>
+
+              <div class="pt-4 border-t border-gray-100 mt-auto flex items-center justify-between">
+                <span class="text-xs text-gray-400 uppercase font-semibold">Aluguel</span>
+                <span class="text-sm font-bold text-gray-900">A partir de <span class="text-base">R$ {{ club.price }}</span>/h</span>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </section>  
+
+<section class="py-12 px-4 bg-white">
+
+  <div class="container mx-auto max-w-4xl">
+    <div class="bg-zinc-900 rounded-3xl p-8 md:p-12 text-center text-white relative overflow-hidden shadow-xl">  
+      
+        <div class="relative z-10 flex flex-col items-center gap-4">
+            <h2 class="text-2xl md:text-3xl font-bold tracking-tight">Tem um clube esportivo?</h2>
+            <p class="text-gray-400 text-base md:text-lg max-w-lg font-light mb-2">
+            Cadastre suas quadras e receba reservas de jogadores da sua região com a nossa plataforma completa.
+            </p>
+            <button class="btn btn-primary btn-md border-none text-white px-8 rounded-full font-bold">
+            Cadastrar meu clube
+            </button>
+        </div>
+
+    </div>
+  </div>
+
+</section>
+
+</main>
