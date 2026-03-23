@@ -6,6 +6,7 @@ import { Clubs } from './pages/clubs/clubs';
 import { AdminLayout } from './layouts/admin-layout/admin-layout';
 import { SearchHome } from './shared/components/search-home/search-home';
 import { Login } from './login/login';
+import { SignUp } from './pages/register/sign-up/sign-up';
 
 export const routes: Routes = [
   {
@@ -22,7 +23,11 @@ export const routes: Routes = [
       },
       {
         path: 'login',
-        loadComponent: () => import('.//login/login').then(() => Login),
+        loadComponent: () => import('./login/login').then(() => Login),
+      },
+      {
+        path: 'sign-up',
+        loadComponent: () => import('./pages/register/sign-up/sign-up').then(() => SignUp),
       }
     ],
   },
@@ -35,9 +40,5 @@ export const routes: Routes = [
         component: SearchHome,
       },
     ],
-  },
-  {
-    path: 'login',
-    component: Login,
-  },
+  }
 ];

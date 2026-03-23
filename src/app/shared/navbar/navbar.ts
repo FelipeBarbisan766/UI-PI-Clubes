@@ -19,4 +19,8 @@ export class Navbar {
     this.router.navigate(['/clubs']);
   }
 
+  goToSignUp(){
+    this.router.navigate(['/sign-up']);
+  }
+
 }
