@@ -16,8 +16,8 @@ export class Navbar {
     this.router.navigate(['']);
   }
 
-  goToClubs(){
-    this.router.navigate(['/clubs']);
+  goToClubsList(){
+    this.router.navigate(['/clubs-list']);
   }
 
   goToSignUp(){
