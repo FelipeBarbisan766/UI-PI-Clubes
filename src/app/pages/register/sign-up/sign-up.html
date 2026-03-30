@@ -1,3 +1,11 @@
+@if (errorMessage(); as msg) {
+  <app-toast-alert 
+    [message]="msg" 
+    type="error" 
+    (dismiss)="errorMessage.set(null)"
+  />
+}
+
 <main class="min-h-screen w-full pattern-background flex items-center justify-center py-12 px-4 pt-20">
   
   <div class="card w-full max-w-lg bg-white shadow-xl rounded-3xl overflow-hidden border border-gray-100">
@@ -107,7 +115,7 @@
         </div>
 
         <div class="form-group">
-          <label for="phone" class="label text-gray-700 font-medium px-0 pb-2">
+          <label for="phoneNumber" class="label text-gray-700 font-medium px-0 pb-2">
             <span class="label-text font-medium">Telefone</span>
           </label>
           
@@ -129,22 +137,22 @@
             </svg>
             
             <input 
-              id="phone"
+              id="phoneNumber"
               type="tel" 
-              formControlName="phone" 
+              formControlName="phoneNumber" 
               class="grow px-3 py-2 bg-transparent outline-none text-sm"
-              [attr.aria-invalid]="form.controls.phone.invalid && form.controls.phone.touched"
-              [attr.aria-describedby]="(form.controls.phone.invalid && form.controls.phone.touched) ? 'phone-error' : null"
+              [attr.aria-invalid]="form.controls.phoneNumber.invalid && form.controls.phoneNumber.touched"
+              [attr.aria-describedby]="(form.controls.phoneNumber.invalid && form.controls.phoneNumber.touched) ? 'phoneNumber-error' : null"
               placeholder="(00) 00000-0000" 
             />
           </div>
           
           <div class="h-5 mt-1 px-3">
-            @if (form.controls.phone.invalid && form.controls.phone.touched) {
-              <p id="phone-error" class="text-error text-xs" role="alert">
-                @if (form.controls.phone.hasError('required')) {
+            @if (form.controls.phoneNumber.invalid && form.controls.phoneNumber.touched) {
+              <p id="phoneNumber-error" class="text-error text-xs" role="alert">
+                @if (form.controls.phoneNumber.hasError('required')) {
                   O telefone é obrigatório.
-                } @else if (form.controls.phone.hasError('pattern')) {
+                } @else if (form.controls.phoneNumber.hasError('pattern')) {
                   Formato inválido. Use (DD) 99999-9999.
                 }
               </p>
