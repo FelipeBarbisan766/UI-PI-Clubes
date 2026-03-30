@@ -6,6 +6,7 @@ import { SearchHome } from './shared/components/search-home/search-home';
 import { Login } from './login/login';
 import { SignUp } from './pages/register/sign-up/sign-up';
 import { ClubsList } from './pages/clubs/clubs-list/clubs-list';
+import { SelectRole } from './pages/select-role/select-role';
 
 export const routes: Routes = [
   {
@@ -39,5 +40,9 @@ export const routes: Routes = [
         component: SearchHome,
       },
     ],
+  },
+  {
+    path: 'select',
+    component: SelectRole,
   }
 ];
