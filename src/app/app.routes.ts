@@ -3,7 +3,7 @@ import { HomePage } from './pages/home-page/home-page';
 import { MainLayout } from './layouts/main-layout/main-layout';
 import { AdminLayout } from './layouts/admin-layout/admin-layout';
 import { SearchHome } from './shared/components/search-home/search-home';
-import { Login } from './login/login';
+import { Login } from './pages/login/login';
 import { SignUp } from './pages/register/sign-up/sign-up';
 import { ClubsList } from './pages/clubs/clubs-list/clubs-list';
 import { SelectRole } from './pages/select-role/select-role';
@@ -23,7 +23,7 @@ export const routes: Routes = [
       },
       {
         path: 'login',
-        loadComponent: () => import('./login/login').then(() => Login),
+        loadComponent: () => import('./pages/login/login').then(() => Login),
       },
       {
         path: 'sign-up',
