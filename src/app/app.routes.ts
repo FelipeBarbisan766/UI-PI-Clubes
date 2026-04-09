@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { HomePage } from './pages/home-page/home-page';
-import { MainLayout } from './layouts/main-layout/main-layout';
-import { AdminLayout } from './layouts/admin-layout/admin-layout';
+import { MainLayout } from './layout/main-layout/main-layout';
+import { AdminLayout } from './layout/admin-layout/admin-layout';
 import { SearchHome } from './shared/components/search-home/search-home';
 import { Login } from './pages/login/login';
 import { SignUp } from './pages/register/sign-up/sign-up';
@@ -17,11 +17,11 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        loadComponent: () => import('./pages/home-page/home-page').then((m) => HomePage),
+        loadComponent: () => import('./pages/home-page/home-page').then(() => HomePage),
       },
       {
         path: 'clubs-list',
-        loadComponent: () => import('./pages/clubs/clubs-list/clubs-list').then((m) => ClubsList),
+        loadComponent: () => import('./pages/clubs/clubs-list/clubs-list').then(() => ClubsList),
       },
       {
         path: 'login',
