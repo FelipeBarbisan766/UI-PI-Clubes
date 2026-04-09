@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { ServiceSignUp } from '../services/service-sign-up';
+import { ServiceSignUp } from '../../services/service-sign-up';
 import { ToastAlert } from '../../../../shared/components/toast-alert/toast-alert';
 
 @Component({
