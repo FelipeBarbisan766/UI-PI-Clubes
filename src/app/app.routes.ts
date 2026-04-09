@@ -7,6 +7,8 @@ import { Login } from './pages/login/login';
 import { SignUp } from './pages/register/sign-up/sign-up';
 import { ClubsList } from './pages/clubs/clubs-list/clubs-list';
 import { SelectRole } from './pages/select-role/select-role';
+import { AdminForm } from './pages/form-roles/admin-form/admin-form';
+import { PlayerForm } from './pages/form-roles/player-form/player-form';
 
 export const routes: Routes = [
   {
@@ -28,6 +30,14 @@ export const routes: Routes = [
       {
         path: 'sign-up',
         loadComponent: () => import('./pages/register/sign-up/sign-up').then(() => SignUp),
+      },
+      {
+        path: 'player-form',
+        loadComponent: () => import('./pages/form-roles/player-form/player-form').then(() => PlayerForm),
+      },
+      {
+        path: 'admin-form',
+        loadComponent: () => import('./pages/form-roles/admin-form/admin-form').then(() => AdminForm),
       }
     ],
   },

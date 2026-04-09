@@ -1,29 +1,52 @@
-<main class="min-h-screen w-full pattern-background flex items-center justify-center py-12 px-4 pt-20">
-    <div class="card bg-base-100 w-auto shadow-sm">
-        <div class="card-body">
+<main class="min-h-screen w-full pattern-background flex items-center justify-center px-4 py-12 pt-20">
+  <section class="card bg-base-100 shadow-sm w-full max-w-4xl" aria-labelledby="welcome-title">
+    <div class="card-body">
+      <header class="text-center mb-8 max-w-2xl mx-auto">
+        <h1 id="welcome-title" class="text-3xl md:text-4xl font-bold mb-3">
+          Bem-vindo!
+        </h1>
+        <p class="text-sm md:text-base">
+          Para personalizar sua experiência, conta pra gente: como você pretende usar a plataforma?
+        </p>
+      </header>
 
-            <div class="text-center mb-10 max-w-lg">
-                <h1 class="text-3xl md:text-4xl font-bold mb-3">
-                    Bem-vindo!
-                </h1>
-                <p class="text-sm md:text-base">
-                    Para personalizar sua experiência, conta pra gente: como você pretende usar a plataforma?
-                </p>
-            </div>
-
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl">
-
-                  
-                  <input type="radio" name="radio-3" class="radio radio-neutral" />
-                  <input type="radio" name="radio-3" class="radio radio-neutral" />
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+        <article class="card bg-base-200 border border-base-300">
+          <div class="card-body items-center text-center">
+                <div class="mb-2 rounded-full bg-primary/10 p-3" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-icon lucide-user text-primary"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                 </div>
-            
-            
-            <div class="card-actions justify-center">
-                <button class="btn btn-primary text-white rounded-full">Selecionar</button>
+            <h2 class="card-title">Jogador</h2>
+            <p class="text-sm">
+              Encontre quadras, reserve e jogue! 
+            </p>
+            <div class="card-actions mt-2">
+              <button type="button" class="btn btn-primary rounded-full text-white" aria-label="Selecionar perfil de Jogador"
+              (click)="goToPlayerForm()">
+                Sou Jogador
+              </button>
             </div>
-        
-        </div>
-    </div>
+          </div>
+        </article>
 
+        <article class="card bg-base-200 border border-base-300">
+          <div class="card-body items-center text-center">
+            <div class="mb-2 rounded-full bg-primary/10 p-3" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cog-icon lucide-cog text-primary"><path d="M11 10.27 7 3.34"/><path d="m11 13.73-4 6.93"/><path d="M12 22v-2"/><path d="M12 2v2"/><path d="M14 12h8"/><path d="m17 20.66-1-1.73"/><path d="m17 3.34-1 1.73"/><path d="M2 12h2"/><path d="m20.66 17-1.73-1"/><path d="m20.66 7-1.73 1"/><path d="m3.34 17 1.73-1"/><path d="m3.34 7 1.73 1"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="12" r="8"/></svg>
+            </div>
+            <h2 class="card-title">Dono de Quadra</h2>  
+            <p class="text-sm">
+              Gerencie quadras, reservas! Tudo para seu clube.
+            </p>
+            <div class="card-actions mt-2">
+              <button type="button" class="btn btn-primary rounded-full text-white" aria-label="Selecionar perfil de Admin" 
+              (click)="goToAdminForm()">
+                Sou Dono de Quadra
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
 </main>
