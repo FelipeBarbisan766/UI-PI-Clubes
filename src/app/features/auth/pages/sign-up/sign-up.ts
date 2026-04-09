@@ -1,16 +1,18 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ServiceSignUp } from '../../register/services/service-sign-up';
-import { Router } from '@angular/router';
-import { ToastAlert } from "../../../shared/components/toast-alert/toast-alert";
+import { Router, RouterLink } from '@angular/router';
+import { ServiceSignUp } from '../services/service-sign-up';
+import { ToastAlert } from '../../../../shared/components/toast-alert/toast-alert';
 
 @Component({
-  selector: 'app-player-form',
-  imports: [ToastAlert, ReactiveFormsModule],
-  templateUrl: './player-form.html',
-  styleUrl: './player-form.css',
+  selector: 'app-sign-up',
+  standalone: true,
+  imports: [ReactiveFormsModule, RouterLink, ToastAlert],
+  templateUrl: './sign-up.html',
+  styleUrl: './sign-up.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PlayerForm {
+export class SignUp {
   private fb = inject(NonNullableFormBuilder);
   private signUpService = inject(ServiceSignUp);
   private router = inject(Router);
@@ -51,7 +53,7 @@ export class PlayerForm {
     this.signUpService.signUp(payload).subscribe({
       next: () => {
         this.isSubmitting.set(false);
-        this.router.navigate(['/clubs']);
+        this.router.navigate(['/login']);
       },
       error: (error) => {
         this.isSubmitting.set(false);
