@@ -1,15 +1,9 @@
 import { Routes } from '@angular/router';
-import { HomePage } from './features/home-page/home-page';
 import { MainLayout } from './layout/main-layout/main-layout';
 import { AdminLayout } from './layout/admin-layout/admin-layout';
 import { SearchHome } from './shared/components/search-home/search-home';
-import { Login } from './features/auth/pages/login/login';
-import { SignUp } from './features/auth/pages/sign-up/sign-up';
-import { ClubsList } from './features/clubs/clubs-list/clubs-list';
-import { SelectRole } from './features/auth/pages/select-role/select-role';
-import { AdminForm } from './features/auth/pages/form-roles/admin-form/admin-form';
-import { PlayerForm } from './features/auth/pages/form-roles/player-form/player-form';
-import { VerifyMail } from './features/auth/pages/verify-mail/verify-mail';
+import { guestGuard } from './core/guards/guest-guard';
+import { authGuard } from './core/guards/auth-guard';
 
 export const routes: Routes = [
   {
@@ -18,32 +12,43 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        loadComponent: () => import('./features/home-page/home-page').then(() => HomePage),
+        loadComponent: () =>
+          import('./features/home-page/home-page').then((m) => m.HomePage),
       },
       {
         path: 'clubs-list',
-        loadComponent: () => import('./features/clubs/clubs-list/clubs-list').then(() => ClubsList),
+        loadComponent: () =>
+          import('./features/clubs/clubs-list/clubs-list').then((m) => m.ClubsList),
       },
       {
         path: 'login',
-        loadComponent: () => import('./features/auth/pages/login/login').then(() => Login),
+        canActivate: [guestGuard],
+        loadComponent: () =>
+          import('./features/auth/pages/login/login').then((m) => m.Login),
       },
       {
         path: 'sign-up',
-        loadComponent: () => import('./features/auth/pages/sign-up/sign-up').then(() => SignUp),
+        canActivate: [guestGuard],
+        loadComponent: () =>
+          import('./features/auth/pages/sign-up/sign-up').then((m) => m.SignUp),
       },
       {
         path: 'verify-mail',
-        loadComponent: () => import('./features/auth/pages/verify-mail/verify-mail').then(() => VerifyMail),
+        loadComponent: () =>
+          import('./features/auth/pages/verify-mail/verify-mail').then((m) => m.VerifyMail),
       },
       {
         path: 'player-form',
-        loadComponent: () => import('./features/auth/pages/form-roles/player-form/player-form').then(() => PlayerForm),
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/auth/pages/form-roles/player-form/player-form').then((m) => m.PlayerForm),
       },
       {
         path: 'admin-form',
-        loadComponent: () => import('./features/auth/pages/form-roles/admin-form/admin-form').then(() => AdminForm),
-      }
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/auth/pages/form-roles/admin-form/admin-form').then((m) => m.AdminForm),
+      },
     ],
   },
   {
@@ -58,6 +63,12 @@ export const routes: Routes = [
   },
   {
     path: 'select',
-    component: SelectRole,
-  }
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/auth/pages/select-role/select-role').then((m) => m.SelectRole),
+  },
+  {
+    path: '**',
+    redirectTo: '',
+  },
 ];
