@@ -9,7 +9,7 @@ import { Observable } from 'rxjs';
 })
 export class ServiceSignUp {
   private http = inject(HttpClient);
-  private apiUrl = `${environment.apiUrl}/User`;
+  private apiUrl = `${environment.apiUrl}/Auth/register`;
 
   signUp(data: SignUpPayload): Observable<void>{
     return this.http.post<void>(this.apiUrl, data);
