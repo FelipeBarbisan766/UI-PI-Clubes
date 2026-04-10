@@ -9,6 +9,7 @@ import { ClubsList } from './features/clubs/clubs-list/clubs-list';
 import { SelectRole } from './features/auth/pages/select-role/select-role';
 import { AdminForm } from './features/auth/pages/form-roles/admin-form/admin-form';
 import { PlayerForm } from './features/auth/pages/form-roles/player-form/player-form';
+import { VerifyMail } from './features/auth/pages/verify-mail/verify-mail';
 
 export const routes: Routes = [
   {
@@ -30,6 +31,10 @@ export const routes: Routes = [
       {
         path: 'sign-up',
         loadComponent: () => import('./features/auth/pages/sign-up/sign-up').then(() => SignUp),
+      },
+      {
+        path: 'verify-mail',
+        loadComponent: () => import('./features/auth/pages/verify-mail/verify-mail').then(() => VerifyMail),
       },
       {
         path: 'player-form',
