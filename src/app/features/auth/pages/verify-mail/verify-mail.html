@@ -34,7 +34,7 @@
       <div class="grid grid-cols-1 gap-4 w-full max-w-md mx-auto">
         @if (status() === 'pending') {
           <a
-            routerLink="/login"
+            (click)="goToLogin()"
             class="btn btn-outline rounded-full w-full"
             aria-label="Ir para login"
           >
@@ -56,7 +56,7 @@
 
         @if (status() === 'success') {
           <a
-            routerLink="/login"
+            (click)="goToLogin()"
             class="btn btn-primary rounded-full text-white w-full"
             aria-label="Ir para login"
           >
@@ -66,7 +66,7 @@
 
         @if (status() === 'error') {
           <a
-            routerLink="/reenviar-verificacao"
+            
             class="btn btn-primary rounded-full text-white w-full"
             aria-label="Reenviar verificação"
           >
@@ -74,7 +74,7 @@
           </a>
 
           <a
-            routerLink="/login"
+            (click)="goToLogin()"
             class="btn btn-outline rounded-full w-full"
             aria-label="Voltar para login"
           >
