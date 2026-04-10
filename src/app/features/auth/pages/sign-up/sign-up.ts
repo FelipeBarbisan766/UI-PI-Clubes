@@ -4,6 +4,7 @@ import { Router, RouterLink } from '@angular/router';
 import { ServiceSignUp } from '../../services/service-sign-up';
 import { ToastAlert } from '../../../../shared/components/toast-alert/toast-alert';
 
+
 @Component({
   selector: 'app-sign-up',
   standalone: true,
@@ -13,6 +14,7 @@ import { ToastAlert } from '../../../../shared/components/toast-alert/toast-aler
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SignUp {
+   
   private fb = inject(NonNullableFormBuilder);
   private signUpService = inject(ServiceSignUp);
   private router = inject(Router);
@@ -48,12 +50,15 @@ export class SignUp {
     this.isSubmitting.set(true);
     this.errorMessage.set(null);
 
+
     const payload = this.form.getRawValue();
 
     this.signUpService.signUp(payload).subscribe({
       next: () => {
         this.isSubmitting.set(false);
-        this.router.navigate(['/login']);
+        this.errorMessage.set(null);
+        console.log('Cadastro realizado com sucesso!');
+        this.router.navigate(['/verify-mail']);
       },
       error: (error) => {
         this.isSubmitting.set(false);

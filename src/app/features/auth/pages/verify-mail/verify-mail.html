@@ -1,0 +1,87 @@
+<main class="min-h-screen w-full pattern-background flex items-center justify-center px-4 py-12 pt-20">
+  <section class="card bg-base-100 shadow-sm w-full max-w-2xl" aria-labelledby="verify-mail-title">
+    <div class="card-body">
+      <header class="text-center mb-6 max-w-xl mx-auto">
+        <h1 id="verify-mail-title" class="text-3xl md:text-4xl font-bold mb-3">
+          Verificação de e-mail
+        </h1>
+
+        @if (status() === 'pending') {
+          <p class="text-sm md:text-base" aria-live="polite">
+            Enviamos um link de verificação para seu e-mail. Acesse sua caixa de entrada e clique no link para ativar sua conta.
+          </p>
+        }
+
+        @if (status() === 'loading') {
+          <p class="text-sm md:text-base" aria-live="polite">
+            Validando seu link de verificação...
+          </p>
+        }
+
+        @if (status() === 'success') {
+          <p class="text-sm md:text-base text-success" aria-live="polite">
+            {{ successMessage() }}
+          </p>
+        }
+
+        @if (status() === 'error') {
+          <p class="text-sm md:text-base text-error" aria-live="assertive">
+            {{ errorMessage() }}
+          </p>
+        }
+      </header>
+
+      <div class="grid grid-cols-1 gap-4 w-full max-w-md mx-auto">
+        @if (status() === 'pending') {
+          <a
+            routerLink="/login"
+            class="btn btn-outline rounded-full w-full"
+            aria-label="Ir para login"
+          >
+            Ir para login
+          </a>
+        }
+
+        @if (status() === 'loading') {
+          <button
+            type="button"
+            class="btn btn-primary rounded-full text-white w-full"
+            disabled
+            aria-busy="true"
+            aria-label="Validação em andamento"
+          >
+            Validando...
+          </button>
+        }
+
+        @if (status() === 'success') {
+          <a
+            routerLink="/login"
+            class="btn btn-primary rounded-full text-white w-full"
+            aria-label="Ir para login"
+          >
+            Ir para login
+          </a>
+        }
+
+        @if (status() === 'error') {
+          <a
+            routerLink="/reenviar-verificacao"
+            class="btn btn-primary rounded-full text-white w-full"
+            aria-label="Reenviar verificação"
+          >
+            Reenviar verificação
+          </a>
+
+          <a
+            routerLink="/login"
+            class="btn btn-outline rounded-full w-full"
+            aria-label="Voltar para login"
+          >
+            Voltar para login
+          </a>
+        }
+      </div>
+    </div>
+  </section>
+</main>
