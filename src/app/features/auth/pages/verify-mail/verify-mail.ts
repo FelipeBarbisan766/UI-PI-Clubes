@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { take } from 'rxjs';
 import { ServiceVerifymail } from '../../services/service-verifymail';
 
@@ -12,6 +12,7 @@ type VerifyStatus = 'pending' | 'loading' | 'success' | 'error';
   styleUrl: './verify-mail.css',
 })
 export class VerifyMail {
+  private router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly verifyMailService = inject(ServiceVerifymail);
 
@@ -36,6 +37,7 @@ export class VerifyMail {
     next: (result) => {
       this.status.set('success');
       this.successMessage.set(result.message);
+      this.router.navigate(['/login']);
     },
     error: (error: unknown) => {
       this.status.set('error');
@@ -44,5 +46,9 @@ export class VerifyMail {
       );
     },
   });
+  }
+
+  goToLogin() {
+    this.router.navigate(['/login']);
   }
 }
