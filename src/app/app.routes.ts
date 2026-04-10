@@ -4,6 +4,7 @@ import { AdminLayout } from './layout/admin-layout/admin-layout';
 import { SearchHome } from './shared/components/search-home/search-home';
 import { guestGuard } from './core/guards/guest-guard';
 import { authGuard } from './core/guards/auth-guard';
+import { Dashboard } from './features/admin/pages/dashboard/dashboard';
 
 export const routes: Routes = [
   {
@@ -56,9 +57,15 @@ export const routes: Routes = [
     component: AdminLayout,
     children: [
       {
-        path: 'teste',
-        component: SearchHome,
+        path: 'dashboard',
+        loadComponent: () => 
+          import('./features/admin/pages/dashboard/dashboard').then((m) => m.Dashboard),
       },
+      {
+        path: 'quadras',
+        loadComponent: () => 
+          import('./features/admin/pages/quadras/quadras').then((m) => m.Quadras),
+      }
     ],
   },
   {

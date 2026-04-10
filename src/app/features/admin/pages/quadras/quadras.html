@@ -1,0 +1,28 @@
+<h3>Quadras</h3>
+<p class="text-lg md:text-xl ">
+        Gerencie as quadras dos seus clubes por aqui
+    </p>
+
+<button class="btn-novo">
+  + Nova Quadra
+</button>
+
+<div class="card">
+  <div class="header">
+    <span class="titulo"> titulo </span>
+    <div class="acoes">
+      <button class="icon">✏️</button>
+      <button class="icon">🗑️</button>
+    </div>
+  </div>
+
+  <div class="tags">
+    <span class="tag" *ngFor="let cat of categorias">
+      {{ cat }}
+    </span>
+  </div>
+
+  <p class="descricao"> descricao </p>
+
+  <p class="preco">R$ preco /h</p>
+</div>
