@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { environment } from '../../../../environments/environmnets.development';
+import { environment } from '../../../../environments/environment';
 import { SignUpPayload } from '../models/model-sign-up';
 import { Observable } from 'rxjs';
 
