@@ -1,8 +1,10 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
-import { Observable, tap, catchError, throwError, map } from 'rxjs';
+import { Observable, tap, catchError, throwError, map, shareReplay, of } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { MeResponse, LoginPayload } from '../models/auth-model';
+
+type AuthStatus = 'unknown' | 'authenticated' | 'unauthenticated';
 
 @Injectable({
   providedIn: 'root',
@@ -13,6 +15,9 @@ export class AuthService {
 
   readonly me = signal<MeResponse | null>(null);
   readonly isAuthenticated = signal(false);
+  readonly authStatus = signal<AuthStatus>('unknown');
+
+  private meRequest$: Observable<MeResponse | null> | null = null;
 
   login(payload: LoginPayload): Observable<string> {
     return this.http
@@ -64,4 +69,61 @@ export class AuthService {
       })
     );
 }
+
+  resolveSession(): Observable<MeResponse | null> {
+    if (this.authStatus() === 'authenticated') {
+      return of(this.me());
+    }
+
+    if (this.authStatus() === 'unauthenticated') {
+      return of(null);
+    }
+
+    if (!this.meRequest$) {
+      this.meRequest$ = this.http
+        .get<MeResponse>(`${this.baseUrl}/me`, { withCredentials: true })
+        .pipe(
+          tap((user) => {
+            this.me.set(user);
+            this.authStatus.set('authenticated');
+          }),
+          map((user) => user),
+          catchError(() => {
+            this.me.set(null);
+            this.authStatus.set('unauthenticated');
+            return of(null);
+          }),
+          shareReplay(1)
+        );
+    }
+
+    return this.meRequest$;
+  }
+
+  markAuthenticated(user: MeResponse): void {
+    this.me.set(user);
+    this.authStatus.set('authenticated');
+    this.meRequest$ = null;
+  }
+
+  clearSession(): void {
+    this.me.set(null);
+    this.authStatus.set('unauthenticated');
+    this.meRequest$ = null;
+  }
+
+  // opcional: após login com sucesso
+  refreshMe(): Observable<MeResponse> {
+    this.meRequest$ = null;
+    return this.http.get<MeResponse>(`${this.baseUrl}/me`, { withCredentials: true }).pipe(
+      tap((user) => this.markAuthenticated(user)),
+      catchError((error: unknown) => {
+        this.clearSession();
+        if (error instanceof HttpErrorResponse && typeof error.error === 'string' && error.error.trim()) {
+          return throwError(() => new Error(error.error));
+        }
+        return throwError(() => new Error('Não foi possível carregar usuário.'));
+      })
+    );
+  }
 }
