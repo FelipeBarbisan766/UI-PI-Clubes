@@ -59,9 +59,9 @@ export const routes: Routes = [
           import('./features/admin/pages/dashboard/dashboard').then((m) => m.Dashboard),
       },
       {
-        path: 'quadras',
+        path: 'courts',
         loadComponent: () => 
-          import('./features/admin/pages/quadras/quadras').then((m) => m.Quadras),
+          import('./features/admin/pages/courts/courts').then((m) => m.Courts),
       }
     ],
   },
