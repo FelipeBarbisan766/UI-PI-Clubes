@@ -1,60 +1,37 @@
 @if (errorMessage(); as msg) {
-  <app-toast-alert 
-    [message]="msg" 
-    type="error" 
+  <app-toast-alert
+    [message]="msg"
+    type="error"
     (dismiss)="errorMessage.set(null)"
   />
 }
 
-<main class="min-h-screen w-full pattern-background flex items-center justify-center py-12 px-4 pt-20">
-  
+<main class="min-h-screen w-full pattern-background flex items-center justify-center px-4">
   <div class="card w-full max-w-lg bg-white shadow-xl rounded-3xl overflow-hidden border border-gray-100">
     <div class="card-body p-6 md:p-8">
-      
       <div class="text-center mb-6">
-        <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-          Crie sua conta
-        </h1>
-        <p class="text-gray-500 text-sm">
-          Preencha seus dados para reservar as melhores quadras.
-        </p>
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Crie sua conta</h1>
+        <p class="text-gray-500 text-sm">Preencha seus dados para reservar as melhores quadras.</p>
       </div>
 
       <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
-        
         <div class="form-group">
           <label for="name" class="label text-gray-700 font-medium px-0 pb-2">
             <span class="label-text font-medium">Nome completo</span>
           </label>
-          
+
           <div class="input-wrapper flex items-center gap-2 bg-white border border-gray-200 rounded-lg focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-colors">
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              width="20" 
-              height="20" 
-              viewBox="0 0 24 24" 
-              fill="none" 
-              stroke="currentColor" 
-              stroke-width="2" 
-              stroke-linecap="round" 
-              stroke-linejoin="round" 
-              class="ml-3 opacity-50 flex-shrink-0"
-              aria-hidden="true"
-            >
-              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-            </svg>
-            
-            <input 
+            <input
               id="name"
-              type="text" 
-              formControlName="name" 
+              type="text"
+              formControlName="name"
               class="grow px-3 py-2 bg-transparent outline-none text-sm"
               [attr.aria-invalid]="form.controls.name.invalid && form.controls.name.touched"
               [attr.aria-describedby]="(form.controls.name.invalid && form.controls.name.touched) ? 'name-error' : null"
-              placeholder="Ex: Vitor Fanelli" 
+              placeholder="Ex: Vitor Fanelli"
             />
           </div>
-          
+
           <div class="h-5 mt-1 px-3">
             @if (form.controls.name.invalid && form.controls.name.touched) {
               <p id="name-error" class="text-error text-xs" role="alert">
@@ -62,6 +39,8 @@
                   O nome é obrigatório.
                 } @else if (form.controls.name.hasError('minlength')) {
                   O nome deve ter pelo menos 3 caracteres.
+                } @else if (form.controls.name.hasError('pattern')) {
+                  O nome deve conter apenas letras.
                 }
               </p>
             }
@@ -72,35 +51,17 @@
           <label for="email" class="label text-gray-700 font-medium px-0 pb-2">
             <span class="label-text font-medium">E-mail</span>
           </label>
-          
           <div class="input-wrapper flex items-center gap-2 bg-white border border-gray-200 rounded-lg focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-colors">
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              width="20" 
-              height="20" 
-              viewBox="0 0 24 24" 
-              fill="none" 
-              stroke="currentColor" 
-              stroke-width="2" 
-              stroke-linecap="round" 
-              stroke-linejoin="round" 
-              class="ml-3 opacity-50 flex-shrink-0"
-              aria-hidden="true"
-            >
-              <rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
-            </svg>
-            
-            <input 
+            <input
               id="email"
-              type="email" 
-              formControlName="email" 
+              type="email"
+              formControlName="email"
               class="grow px-3 py-2 bg-transparent outline-none text-sm"
               [attr.aria-invalid]="form.controls.email.invalid && form.controls.email.touched"
               [attr.aria-describedby]="(form.controls.email.invalid && form.controls.email.touched) ? 'email-error' : null"
-              placeholder="seu@email.com" 
+              placeholder="seu@email.com"
             />
           </div>
-          
           <div class="h-5 mt-1 px-3">
             @if (form.controls.email.invalid && form.controls.email.touched) {
               <p id="email-error" class="text-error text-xs" role="alert">
@@ -118,35 +79,17 @@
           <label for="phoneNumber" class="label text-gray-700 font-medium px-0 pb-2">
             <span class="label-text font-medium">Telefone</span>
           </label>
-          
           <div class="input-wrapper flex items-center gap-2 bg-white border border-gray-200 rounded-lg focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-colors">
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              width="20" 
-              height="20" 
-              viewBox="0 0 24 24" 
-              fill="none" 
-              stroke="currentColor" 
-              stroke-width="2" 
-              stroke-linecap="round" 
-              stroke-linejoin="round" 
-              class="ml-3 opacity-50 flex-shrink-0"
-              aria-hidden="true"
-            >
-              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-            </svg>
-            
-            <input 
+            <input
               id="phoneNumber"
-              type="tel" 
-              formControlName="phoneNumber" 
+              type="tel"
+              formControlName="phoneNumber"
               class="grow px-3 py-2 bg-transparent outline-none text-sm"
               [attr.aria-invalid]="form.controls.phoneNumber.invalid && form.controls.phoneNumber.touched"
               [attr.aria-describedby]="(form.controls.phoneNumber.invalid && form.controls.phoneNumber.touched) ? 'phoneNumber-error' : null"
-              placeholder="(00) 00000-0000" 
+              placeholder="(00) 00000-0000"
             />
           </div>
-          
           <div class="h-5 mt-1 px-3">
             @if (form.controls.phoneNumber.invalid && form.controls.phoneNumber.touched) {
               <p id="phoneNumber-error" class="text-error text-xs" role="alert">
@@ -164,51 +107,65 @@
           <label for="password" class="label text-gray-700 font-medium px-0 pb-2">
             <span class="label-text font-medium">Senha</span>
           </label>
-          
           <div class="input-wrapper flex items-center gap-2 bg-white border border-gray-200 rounded-lg focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-colors">
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              width="20" 
-              height="20" 
-              viewBox="0 0 24 24" 
-              fill="none" 
-              stroke="currentColor" 
-              stroke-width="2" 
-              stroke-linecap="round" 
-              stroke-linejoin="round" 
-              class="ml-3 opacity-50 flex-shrink-0"
-              aria-hidden="true"
-            >
-              <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-            </svg>
-            
-            <input 
+            <input
               id="password"
-              type="password" 
-              formControlName="password" 
+              type="password"
+              formControlName="password"
               class="grow px-3 py-2 bg-transparent outline-none text-sm"
               [attr.aria-invalid]="form.controls.password.invalid && form.controls.password.touched"
               [attr.aria-describedby]="(form.controls.password.invalid && form.controls.password.touched) ? 'password-error' : null"
-              placeholder="●●●●●●" 
+              placeholder="●●●●●●"
             />
           </div>
-          
           <div class="h-5 mt-1 px-3">
             @if (form.controls.password.invalid && form.controls.password.touched) {
-              <p id="password-error" class="text-error text-xs" role="alert">
-                @if (form.controls.password.hasError('required')) {
-                  A senha é obrigatória.
-                } @else if (form.controls.password.hasError('minlength')) {
-                  A senha deve ter no mínimo 6 caracteres.
+            <p id="password-error" class="text-error text-xs" role="alert">
+              @if (form.controls.password.hasError('required')) {
+                A senha é obrigatória.
+              } @else if (form.controls.password.hasError('pattern')) {
+                A senha deve ter no mínimo 8 caracteres, incluindo letra maiúscula, letra minúscula, número e caractere especial.
+              }
+            </p>
+          }
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword" class="label text-gray-700 font-medium px-0 pb-2">
+            <span class="label-text font-medium">Confirmar senha</span>
+          </label>
+          <div class="input-wrapper flex items-center gap-2 bg-white border border-gray-200 rounded-lg focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-colors">
+            <input
+              id="confirmPassword"
+              type="password"
+              formControlName="confirmPassword"
+              class="grow px-3 py-2 bg-transparent outline-none text-sm"
+              [attr.aria-invalid]="(form.controls.confirmPassword.invalid && form.controls.confirmPassword.touched) || (form.hasError('passwordMismatch') && form.controls.confirmPassword.touched)"
+              [attr.aria-describedby]="((form.controls.confirmPassword.invalid && form.controls.confirmPassword.touched) || (form.hasError('passwordMismatch') && form.controls.confirmPassword.touched)) ? 'confirmPassword-error' : null"
+              placeholder="●●●●●●"
+            />
+          </div>
+          <div class="h-5 mt-1 px-3">
+            @if (form.controls.confirmPassword.invalid && form.controls.confirmPassword.touched) {
+              <p id="confirmPassword-error" class="text-error text-xs" role="alert">
+                @if (form.controls.confirmPassword.hasError('required')) {
+                  A confirmação de senha é obrigatória.
+                } @else if (form.controls.confirmPassword.hasError('minlength')) {
+                  A confirmação deve ter no mínimo 6 caracteres.
                 }
+              </p>
+            } @else if (form.hasError('passwordMismatch') && form.controls.confirmPassword.touched) {
+              <p id="confirmPassword-error" class="text-error text-xs" role="alert">
+                As senhas não coincidem.
               </p>
             }
           </div>
         </div>
 
         <div class="mt-2 pt-2">
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             class="btn btn-primary w-full rounded-full font-semibold text-white shadow-lg hover:shadow-primary/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             [disabled]="form.invalid || isSubmitting()"
             [attr.aria-busy]="isSubmitting()"
@@ -224,13 +181,12 @@
 
         <div class="text-center pt-1">
           <p class="text-gray-500 text-xs md:text-sm">
-            Já tem uma conta? 
+            Já tem uma conta?
             <a routerLink="/login" class="link link-primary no-underline font-semibold hover:underline">
               Fazer login
             </a>
           </p>
         </div>
-
       </form>
     </div>
   </div>
