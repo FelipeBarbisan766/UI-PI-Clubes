@@ -1,35 +1,44 @@
 <nav class="fixed top-0 start-0 z-50 w-full transition-all duration-300 border-b border-white/5 bg-neutral/80 backdrop-blur-md">
-  
   <div class="container mx-auto max-w-6xl px-4">
-    
     <div class="navbar min-h-4 px-0">
-
       <div class="flex-1">
-        <p class="font-destaque text-xl text-white font-bold">
-          Clubera
-        </p>
+        <p class="font-destaque text-xl text-white font-bold">Clubera</p>
       </div>
-      
+
       <div class="hidden md:flex flex-none">
         <ul class="menu menu-horizontal px-1 gap-1">
-          <li><a (click)="goToHome()" class="text-gray-300 hover:text-white hover:bg-white/10 rounded-lg font-medium text-sm transition-colors">Início</a></li>
-          <li><a (click)="goToClubsList()" class="text-gray-300 hover:text-white hover:bg-white/10 rounded-lg font-medium text-sm transition-colors">Clubes</a></li>
-          <li><a [routerLink]="['/login']" class="text-gray-300 hover:text-white hover:bg-white/10 rounded-lg font-medium text-sm transition-colors">Entrar</a></li>
+          <li>
+            <a (click)="goToHome()" class="text-gray-300 hover:text-white hover:bg-white/10 rounded-lg font-medium text-sm transition-colors">Início</a>
+          </li>
+          <li>
+            <a (click)="goToClubsList()" class="text-gray-300 hover:text-white hover:bg-white/10 rounded-lg font-medium text-sm transition-colors">Clubes</a>
+          </li>
 
+          @if (!isAuthenticated()) {
+            <li>  
+              <a [routerLink]="['/login']" class="text-gray-300 hover:text-white hover:bg-white/10 rounded-lg font-medium text-sm transition-colors">Entrar</a>
+            </li>
+          }
         </ul>
       </div>
 
       <div class="flex-none ml-4">
-
-        <a (click)="goToSignUp()" class="btn btn-sm rounded-full btn-primary border-none text-white shadow-none font-bold">
-          Cadastrar-se
-        </a>
+        @if (!isAuthenticated()) {
+          <a (click)="goToSignUp()" class="btn btn-sm rounded-full btn-primary border-none text-white shadow-none font-bold">
+            Cadastrar-se
+          </a>
+        } @else {
+          <button
+            type="button"
+            class="btn btn-sm rounded-full btn-outline text-white border-white/30 hover:bg-white/10"
+            aria-label="Conta do usuário logado"
+          >
+            {{ displayName() }}
+          </button>
+        }
       </div>
 
-      
-        <app-themeselector />
-      
-
+      <app-themeselector />
     </div>
   </div>
 </nav>

@@ -1,7 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { Themeselector } from "../components/themeselector/themeselector";
+import { AuthService } from '../../core/services/auth-service';
 
 @Component({
   selector: 'app-navbar',
@@ -11,6 +12,12 @@ import { Themeselector } from "../components/themeselector/themeselector";
 })
 export class Navbar {
   private router = inject(Router);
+
+  private readonly authService = inject(AuthService);
+
+  readonly me = this.authService.me;
+  readonly isAuthenticated = computed(() => this.authService.authStatus() === 'authenticated');
+  readonly displayName = computed(() => this.me()?.name?.trim() || 'Minha conta');
 
   goToHome(){
     this.router.navigate(['']);
