@@ -2,7 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common'
-import { take } from 'rxjs';
+import { catchError, EMPTY, switchMap, take, tap } from 'rxjs';
 import { AuthService } from '../../../../core/services/auth-service';
 
 @Component({
@@ -35,27 +35,20 @@ export class Login {
 
     this.authService
       .login(this.form.getRawValue())
-      .pipe(take(1))
+      .pipe(
+        take(1),
+        switchMap(() => this.authService.refreshMe()),
+        tap(() => void this.router.navigateByUrl('/select')),
+        catchError((error: unknown) => {
+          this.errorMessage.set(
+            error instanceof Error ? error.message : 'Erro ao realizar login.'
+          );
+          return EMPTY;
+        }),
+        tap(() => this.isSubmitting.set(false))
+      )
       .subscribe({
-        next: () => {
-          this.authService
-            .getMe()
-            .pipe(take(1))
-            .subscribe({
-              next: () => {
-                this.isSubmitting.set(false);
-                void this.router.navigateByUrl('/select');
-              },
-              error: () => {
-                this.isSubmitting.set(false);
-                this.errorMessage.set('Login realizado, mas não foi possível carregar seu perfil.');
-              },
-            });
-        },
-        error: (error: unknown) => {
-          this.isSubmitting.set(false);
-          this.errorMessage.set(error instanceof Error ? error.message : 'Erro ao realizar login.');
-        },
+        complete: () => this.isSubmitting.set(false),
       });
   }
 }
