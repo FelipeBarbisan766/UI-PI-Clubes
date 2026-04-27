@@ -1,15 +1,17 @@
 import { Routes } from '@angular/router';
 import { MainLayout } from './layout/main-layout/main-layout';
 import { AdminLayout } from './layout/admin-layout/admin-layout';
-import { SearchHome } from './shared/components/search-home/search-home';
 import { guestGuard } from './core/guards/guest-guard';
 import { authGuard } from './core/guards/auth-guard';
-import { Dashboard } from './features/admin/pages/dashboard/dashboard';
+import { SignUp } from './features/auth/pages/sign-up/sign-up';
+import { adminGuard } from './core/guards/admin-guard';
+import { selectRoleGuard } from './core/guards/selectRole-guard';
 
 export const routes: Routes = [
   {
     path: '',
     component: MainLayout,
+    
     children: [
       {
         path: '',
@@ -26,12 +28,6 @@ export const routes: Routes = [
         canActivate: [guestGuard],
         loadComponent: () =>
           import('./features/auth/pages/login/login').then((m) => m.Login),
-      },
-      {
-        path: 'sign-up',
-        canActivate: [guestGuard],
-        loadComponent: () =>
-          import('./features/auth/pages/sign-up/sign-up').then((m) => m.SignUp),
       },
       {
         path: 'verify-mail',
@@ -55,6 +51,7 @@ export const routes: Routes = [
   {
     path: 'admin',
     component: AdminLayout,
+    canActivate: [adminGuard],
     children: [
       {
         path: 'dashboard',
@@ -69,8 +66,13 @@ export const routes: Routes = [
     ],
   },
   {
+    path: 'sign-up',
+    canActivate: [guestGuard],
+    component: SignUp,
+  },
+  {
     path: 'select',
-    canActivate: [authGuard],
+    canActivate: [selectRoleGuard],
     loadComponent: () =>
       import('./features/auth/pages/select-role/select-role').then((m) => m.SelectRole),
   },

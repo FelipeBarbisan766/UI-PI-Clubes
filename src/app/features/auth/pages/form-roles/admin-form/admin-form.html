@@ -1,1 +1,90 @@
-<p>admin-form works!</p>
+<main class="min-h-screen w-full pattern-background flex items-center justify-center py-12 px-4 pt-20">
+  <div class="card w-full max-w-2xl bg-white shadow-xl rounded-3xl overflow-hidden border border-gray-100">
+    <div class="card-body p-6 md:p-8">
+      <div class="text-center mb-6">
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Perfil do Administrador</h1>
+        <p class="text-gray-500 text-sm">Preencha seus dados para concluir o cadastro.</p>
+      </div>
+
+      @if (errorMessage()) {
+        <div role="alert" class="alert alert-error alert-soft mb-4">
+          <span>{{ errorMessage() }}</span>
+        </div>
+      }
+
+      @if (successMessage()) {
+        <div role="status" class="alert alert-success alert-soft mb-4">
+          <span>{{ successMessage() }}</span>
+        </div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+        <div class="form-group">
+          <label for="userName" class="label text-gray-700 font-medium px-0 pb-2">
+            <span class="label-text font-medium">Nome de usuário</span>
+          </label>
+          <input
+            id="userName"
+            type="text"
+            formControlName="userName"
+            class="input input-bordered w-full"
+            placeholder="Seu nome"
+            [attr.aria-invalid]="hasError('userName')"
+          />
+          @if (hasError('userName')) {
+            <p class="text-error text-xs mt-1">Informe um nome válido (mín. 2 caracteres).</p>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="contactNumber" class="label text-gray-700 font-medium px-0 pb-2">
+            <span class="label-text font-medium">Telefone</span>
+          </label>
+          <input
+            id="contactNumber"
+            type="text"
+            formControlName="contactNumber"
+            class="input input-bordered w-full"
+            placeholder="(11) 99999-9999"
+            [attr.aria-invalid]="hasError('contactNumber')"
+          />
+          @if (hasError('contactNumber')) {
+            <p class="text-error text-xs mt-1">Informe um telefone válido.</p>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="description" class="label text-gray-700 font-medium px-0 pb-2">
+            <span class="label-text font-medium">Descrição</span>
+          </label>
+          <textarea
+            id="description"
+            formControlName="description"
+            class="textarea textarea-bordered w-full min-h-28"
+            placeholder="Fale um pouco sobre seu clube"
+            [attr.aria-invalid]="hasError('description')"
+          ></textarea>
+          @if (hasError('description')) {
+            <p class="text-error text-xs mt-1">A descrição deve ter ao menos 10 caracteres.</p>
+          }
+        </div>
+
+        <div class="mt-2 pt-2">
+          <button
+            type="submit"
+            class="btn btn-primary w-full rounded-full font-semibold text-white shadow-lg hover:shadow-primary/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            [disabled]="isSubmitting()"
+            [attr.aria-busy]="isSubmitting()"
+          >
+            @if (isSubmitting()) {
+              <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+              <span class="sr-only">Salvando...</span>
+            } @else {
+              Salvar perfil
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</main>
