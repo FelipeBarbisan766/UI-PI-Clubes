@@ -1,6 +1,8 @@
 import { Component, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+// Importe o toSignal
+import { toSignal } from '@angular/core/rxjs-interop'; 
 import { ServiceCourt } from '../../services/service-court';
 import { TypeEnum, SurfaceEnum } from '../../models/model-court';
 
@@ -33,7 +35,9 @@ export class Courts {
     clubId:       ['', Validators.required],
   });
 
-  isFormValid = computed(() => this.form.valid && this.selectedFiles().length > 0);
+  formStatus = toSignal(this.form.statusChanges, { initialValue: this.form.status });
+
+  isFormValid = computed(() => this.formStatus() === 'VALID' && this.selectedFiles().length > 0);
 
   onFilesSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
