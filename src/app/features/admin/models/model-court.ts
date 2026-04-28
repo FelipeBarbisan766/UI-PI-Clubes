@@ -51,10 +51,10 @@ export interface CreateCourtDTO {
   type: TypeEnum;
   surface: SurfaceEnum;
   isCovered: boolean;
-  pricePerHour: number;       
+  pricePerHour: number;
   description: string;
-  clubId: string;             
-  images: File[];            
+  clubId: string;
+  images: File[];
 }
 
 export interface UpdateCourtDTO {
@@ -67,6 +67,7 @@ export interface UpdateCourtDTO {
 }
 
 export interface ResponseCourtDTO {
+  id : string;
   name: string;
   type: TypeEnum;
   surface: SurfaceEnum;
@@ -74,5 +75,5 @@ export interface ResponseCourtDTO {
   pricePerHour: number;
   description: string;
   clubId: string;
-  imagesUrls: string[];       
+  imagesUrls: string[];
 }

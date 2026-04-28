@@ -1,134 +1,130 @@
-<h3>Quadras</h3>
-<p class="text-lg md:text-xl ">
-        Gerencie as quadras dos seus clubes por aqui
-    </p>
+<h1>Gestão de Quadras</h1>
 
-<button class="btn-novo">
-  + Nova Quadra
-</button>
+@if (courtService.error()) {
+  <p style="color: red;">Erro: {{ courtService.error() }}</p>
+}
+@if (courtService.loading()) {
+  <p>Carregando...</p>
+}
 
-<div class="card">
-  <div class="header">
-    <span class="titulo"> titulo </span>
-    <div class="acoes">
-      <button class="icon">✏️</button>
-      <button class="icon">🗑️</button>
-    </div>
-  </div>
+@if (!isFormOpen()) {
+  <button (click)="openCreate()">+ Nova Quadra</button>
+  <hr>
 
-  <div class="tags">
-    <span class="tag" *ngFor="let cat of categorias">
-      {{ cat }}
-    </span>
-  </div> 
+  @if (courtService.isEmpty()) {
+    <p>Nenhuma quadra cadastrada para este clube ainda.</p>
+  } @else {
+    <ul>
+      @for (court of courtService.courts(); track court.id) {
+        <li>
+          <strong>{{ court.name }}</strong>
+          <small>({{ getTypeName(court.type) }} - {{ getSurfaceName(court.surface) }})</small>
 
-  <p class="descricao"> descricao </p>
+          <p>{{ court.description }}</p>
+          <p>R$ {{ court.pricePerHour }} por hora | Status: {{ court.isCovered ? 'Coberta' : 'Descoberta' }}</p>
 
-  <p class="preco">R$ preco /h</p>
+          <button (click)="openEdit(court)">Editar</button>
+          <button (click)="requestDelete(court.id)">Excluir</button>
 
-
-  <section class="create-court">
-  <h1>Cadastrar Quadra</h1>
-
-  <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
-
-    <!-- Nome -->
-    <div class="field">
-      <label for="name">Nome</label>
-      <input id="name" type="text" formControlName="name" placeholder="Nome da quadra" />
-      @if (form.get('name')?.invalid && form.get('name')?.touched) {
-        <span class="error" role="alert">Nome é obrigatório (mínimo 3 caracteres).</span>
-      }
-    </div>
-
-    <!-- Tipo -->
-    <div class="field">
-      <label for="type">Tipo</label>
-      <select id="type" formControlName="type">
-        <option [value]="null" disabled>Selecione o tipo</option>
-        @for (option of typeOptions; track option) {
-          <option [value]="option">{{ option }}</option>
-        }
-      </select>
-      @if (form.get('type')?.invalid && form.get('type')?.touched) {
-        <span class="error" role="alert">Tipo é obrigatório.</span>
-      }
-    </div>
-
-    <!-- Superfície -->
-    <div class="field">
-      <label for="surface">Superfície</label>
-      <select id="surface" formControlName="surface">
-        <option [value]="null" disabled>Selecione a superfície</option>
-        @for (option of surfaceOptions; track option) {
-          <option [value]="option">{{ option }}</option>
-        }
-      </select>
-      @if (form.get('surface')?.invalid && form.get('surface')?.touched) {
-        <span class="error" role="alert">Superfície é obrigatória.</span>
-      }
-    </div>
-
-    <!-- Coberta -->
-    <div class="field field--checkbox">
-      <input id="isCovered" type="checkbox" formControlName="isCovered" />
-      <label for="isCovered">Quadra coberta?</label>
-    </div>
-
-    <!-- Preço por hora -->
-    <div class="field">
-      <label for="pricePerHour">Preço por hora (R$)</label>
-      <input id="pricePerHour" type="number" formControlName="pricePerHour" min="0" step="0.01" placeholder="0,00" />
-      @if (form.get('pricePerHour')?.invalid && form.get('pricePerHour')?.touched) {
-        <span class="error" role="alert">Preço válido é obrigatório.</span>
-      }
-    </div>
-
-    <!-- Descrição -->
-    <div class="field">
-      <label for="description">Descrição</label>
-      <textarea id="description" formControlName="description" rows="4" placeholder="Descreva a quadra..."></textarea>
-      @if (form.get('description')?.invalid && form.get('description')?.touched) {
-        <span class="error" role="alert">Descrição é obrigatória.</span>
-      }
-    </div>
-
-    <!-- Club ID -->
-    <div class="field">
-      <label for="clubId">ID do Clube</label>
-      <input id="clubId" type="text" formControlName="clubId" placeholder="UUID do clube" />
-      @if (form.get('clubId')?.invalid && form.get('clubId')?.touched) {
-        <span class="error" role="alert">ID do clube é obrigatório.</span>
-      }
-    </div>
-
-    <!-- Imagens -->
-    <div class="field">
-      <label for="images">Imagens</label>
-      <input id="images" type="file" multiple accept="image/*" (change)="onFilesSelected($event)" />
-
-      @if (selectedFiles().length > 0) {
-        <ul class="file-list" aria-label="Arquivos selecionados">
-          @for (file of selectedFiles(); track file.name; let i = $index) {
-            <li>
-              {{ file.name }}
-              <button type="button" (click)="removeFile(i)" aria-label="Remover {{ file.name }}">✕</button>
-            </li>
+          @if (deleteConfirmId() === court.id) {
+            <div style="border: 1px solid red; padding: 10px; margin-top: 5px;">
+              <p>Tem certeza que deseja excluir esta quadra?</p>
+              <button (click)="confirmDelete()">Sim, excluir</button>
+              <button (click)="cancelDelete()">Cancelar</button>
+            </div>
           }
-        </ul>
+        </li>
       }
-    </div>
+    </ul>
+  }
+}
 
-    <!-- Erro geral -->
-    @if (errorMessage()) {
-      <p class="error" role="alert">{{ errorMessage() }}</p>
+@if (isFormOpen()) {
+  <h2>{{ isEditing() ? 'Editar Quadra' : 'Cadastrar Quadra' }}</h2>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+    <div>
+      <label for="name">Nome: </label>
+      <input id="name" type="text" formControlName="name">
+      @if (fieldInvalid('name')) { <span>(Nome é obrigatório, mín. 3 letras)</span> }
+    </div>
+    <br>
+
+    <div>
+      <label for="type">Tipo: </label>
+      <select id="type" formControlName="type">
+        <option [value]="null" disabled>Selecione</option>
+        @for (option of typeOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+      @if (fieldInvalid('type')) { <span>(Selecione um tipo)</span> }
+    </div>
+    <br>
+
+    <div>
+      <label for="surface">Superfície: </label>
+      <select id="surface" formControlName="surface">
+        <option [value]="null" disabled>Selecione</option>
+        @for (option of surfaceOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+      @if (fieldInvalid('surface')) { <span>(Selecione uma superfície)</span> }
+    </div>
+    <br>
+
+    <div>
+      <label>
+        <input type="checkbox" formControlName="isCovered"> Quadra é coberta?
+      </label>
+    </div>
+    <br>
+
+    <div>
+      <label for="pricePerHour">Preço por Hora (R$): </label>
+      <input id="pricePerHour" type="number" formControlName="pricePerHour">
+      @if (fieldInvalid('pricePerHour')) { <span>(Preço inválido)</span> }
+    </div>
+    <br>
+
+    <div>
+      <label for="description">Descrição: </label><br>
+      <textarea id="description" formControlName="description"></textarea>
+      @if (fieldInvalid('description')) { <span>(Descrição obrigatória)</span> }
+    </div>
+    <br>
+
+    <div>
+      <label for="clubId">ID do Clube: </label>
+      <input id="clubId" type="text" formControlName="clubId">
+      @if (fieldInvalid('clubId')) { <span>(Clube é obrigatório)</span> }
+    </div>
+    <br>
+
+    @if (!isEditing()) {
+      <div>
+        <label for="images">Imagens: </label>
+        <input id="images" type="file" multiple accept="image/*" (change)="onFilesSelected($event)">
+
+        @if (selectedFiles().length > 0) {
+          <ul>
+            @for (file of selectedFiles(); track file.name; let i = $index) {
+              <li>{{ file.name }} <button type="button" (click)="removeFile(i)">Remover</button></li>
+            }
+          </ul>
+        }
+      </div>
+      <br>
     }
 
-    <!-- Submit -->
-    <button type="submit" [disabled]="!isFormValid() || isLoading()">
-      {{ isLoading() ? 'Salvando...' : 'Criar Quadra' }}
+    <button type="submit" [disabled]="!isSubmitEnabled() || courtService.loading()">
+      Salvar
+    </button>
+    <button type="button" (click)="closeForm()">
+      Cancelar
     </button>
 
   </form>
-</section>
-</div>
+}
