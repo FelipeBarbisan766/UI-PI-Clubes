@@ -11,7 +11,7 @@ export const routes: Routes = [
   {
     path: '',
     component: MainLayout,
-    
+
     children: [
       {
         path: '',
@@ -55,13 +55,18 @@ export const routes: Routes = [
     children: [
       {
         path: 'dashboard',
-        loadComponent: () => 
+        loadComponent: () =>
           import('./features/admin/pages/dashboard/dashboard').then((m) => m.Dashboard),
       },
       {
         path: 'courts',
-        loadComponent: () => 
+        loadComponent: () =>
           import('./features/admin/pages/courts/courts').then((m) => m.Courts),
+      },
+      {
+        path: 'clubs',
+        loadComponent: () =>
+          import('./features/admin/pages/clubs/clubs').then((m) => m.Clubs),
       }
     ],
   },
