@@ -1,0 +1,156 @@
+<h1>Gestão de Clubes</h1>
+
+@if (clubService.error()) {
+  <p style="color: red;">Erro: {{ clubService.error() }}</p>
+}
+@if (clubService.loading()) {
+  <p>Carregando...</p>
+}
+
+@if (!isFormOpen()) {
+  <button (click)="openCreate()">+ Novo Clube</button>
+  <hr>
+
+  @if (clubService.isEmpty()) {
+    <p>Nenhum clube cadastrado ainda.</p>
+  } @else {
+    <ul>
+      @for (club of clubService.clubs(); track club.id) {
+        <li>
+          <strong>{{ club.name }}</strong>
+          <small>({{ club.city }}/{{ club.state }} - {{ club.country }})</small>
+
+          <p>{{ club.description }}</p>
+          <p>{{ club.phoneNumber }} | A partir de R$ {{ club.minPrice }} | {{ club.courtCount }} quadra(s)</p>
+
+          <button (click)="openEdit(club.id)">Editar</button>
+          <button (click)="requestDelete(club.id)">Excluir</button>
+
+          @if (deleteConfirmId() === club.id) {
+            <div style="border: 1px solid red; padding: 10px; margin-top: 5px;">
+              <p>Tem certeza que deseja excluir este clube?</p>
+              <button (click)="confirmDelete()">Sim, excluir</button>
+              <button (click)="cancelDelete()">Cancelar</button>
+            </div>
+          }
+        </li>
+      }
+    </ul>
+  }
+}
+
+@if (isFormOpen()) {
+  <h2>{{ isEditing() ? 'Editar Clube' : 'Cadastrar Clube' }}</h2>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+    @if (!isEditing()) {
+      <div>
+        <label for="adminId">ID do Admin: </label>
+        <input id="adminId" type="text" formControlName="adminId">
+        @if (fieldInvalid('adminId')) { <span>(Admin é obrigatório)</span> }
+      </div>
+      <br>
+    }
+
+    <div>
+      <label for="name">Nome: </label>
+      <input id="name" type="text" formControlName="name">
+      @if (fieldInvalid('name')) { <span>(Nome é obrigatório, mín. 3 letras)</span> }
+    </div>
+    <br>
+
+    <div>
+      <label for="phoneNumber">Telefone: </label>
+      <input id="phoneNumber" type="text" formControlName="phoneNumber">
+      @if (fieldInvalid('phoneNumber')) { <span>(Telefone é obrigatório)</span> }
+    </div>
+    <br>
+
+    <div>
+      <label for="description">Descrição: </label><br>
+      <textarea id="description" formControlName="description"></textarea>
+      @if (fieldInvalid('description')) { <span>(Descrição é obrigatória)</span> }
+    </div>
+    <br>
+
+    <div>
+      <label for="zipCode">CEP: </label>
+      <input id="zipCode" type="text" formControlName="zipCode">
+      @if (fieldInvalid('zipCode')) { <span>(CEP é obrigatório)</span> }
+    </div>
+    <br>
+
+    <div>
+      <label for="street">Rua: </label>
+      <input id="street" type="text" formControlName="street">
+      @if (fieldInvalid('street')) { <span>(Rua é obrigatória)</span> }
+    </div>
+    <br>
+
+    <div>
+      <label for="number">Número: </label>
+      <input id="number" type="text" formControlName="number">
+      @if (fieldInvalid('number')) { <span>(Número é obrigatório)</span> }
+    </div>
+    <br>
+
+    <div>
+      <label for="neighborhood">Bairro: </label>
+      <input id="neighborhood" type="text" formControlName="neighborhood">
+      @if (fieldInvalid('neighborhood')) { <span>(Bairro é obrigatório)</span> }
+    </div>
+    <br>
+
+    <div>
+      <label for="complement">Complemento: </label>
+      <input id="complement" type="text" formControlName="complement">
+    </div>
+    <br>
+
+    <div>
+      <label for="city">Cidade: </label>
+      <input id="city" type="text" formControlName="city">
+      @if (fieldInvalid('city')) { <span>(Cidade é obrigatória)</span> }
+    </div>
+    <br>
+
+    <div>
+      <label for="state">Estado: </label>
+      <input id="state" type="text" formControlName="state">
+      @if (fieldInvalid('state')) { <span>(Estado é obrigatório)</span> }
+    </div>
+    <br>
+
+    <div>
+      <label for="country">País: </label>
+      <input id="country" type="text" formControlName="country">
+      @if (fieldInvalid('country')) { <span>(País é obrigatório)</span> }
+    </div>
+    <br>
+
+    @if (!isEditing()) {
+      <div>
+        <label for="images">Imagens: </label>
+        <input id="images" type="file" multiple accept="image/*" (change)="onFilesSelected($event)">
+
+        @if (selectedFiles().length > 0) {
+          <ul>
+            @for (file of selectedFiles(); track file.name; let i = $index) {
+              <li>{{ file.name }} <button type="button" (click)="removeFile(i)">Remover</button></li>
+            }
+          </ul>
+        }
+      </div>
+      <br>
+    }
+
+    <button type="submit" [disabled]="!isSubmitEnabled() || clubService.loading()">
+      Salvar
+    </button>
+    <button type="button" (click)="closeForm()">
+      Cancelar
+    </button>
+
+  </form>
+}
