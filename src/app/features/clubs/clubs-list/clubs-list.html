@@ -1,1 +1,107 @@
-<p>clubs-list works!</p>
+<!-- Estado de carregamento -->
+@if (loading()) {
+  <div class="clubs-loading" role="status" aria-live="polite" aria-label="Carregando clubes">
+    <div class="clubs-loading__spinner" aria-hidden="true"></div>
+    <p class="clubs-loading__text">Carregando clubes...</p>
+  </div>
+}
+
+<!-- Estado de erro -->
+@if (error() && !loading()) {
+  <div class="clubs-error" role="alert" aria-live="assertive">
+    <span class="clubs-error__icon" aria-hidden="true">&#9888;</span>
+    <p class="clubs-error__message">{{ error() }}</p>
+    <button
+      class="clubs-error__retry"
+      type="button"
+      (click)="loadClubs()"
+    >
+      Tentar novamente
+    </button>
+  </div>
+}
+
+<!-- Estado vazio -->
+@if (isEmpty() && !loading() && !error()) {
+  <div class="clubs-empty" role="status">
+    <span class="clubs-empty__icon" aria-hidden="true">&#127333;</span>
+    <p class="clubs-empty__title">Nenhum clube encontrado</p>
+    <p class="clubs-empty__subtitle">Tente novamente mais tarde.</p>
+  </div>
+}
+
+<!-- Listagem de clubes -->
+@if (!isEmpty() && !loading()) {
+  <section class="clubs" aria-label="Lista de clubes">
+    <header class="clubs__header">
+      <h1 class="clubs__title">Clubes</h1>
+      <span class="clubs__count" aria-live="polite">
+        {{ clubsCount() }} {{ clubsCount() === 1 ? 'clube' : 'clubes' }} encontrado{{ clubsCount() === 1 ? '' : 's' }}
+      </span>
+    </header>
+
+    <ul class="clubs__list" role="list">
+      @for (club of clubs(); track trackById($index, club)) {
+        <li class="clubs__item" role="listitem">
+          <button
+            class="club-card"
+            type="button"
+            (click)="selectClub(club)"
+            [attr.aria-label]="'Ver detalhes do clube ' + club.name"
+          >
+            <!-- Imagem -->
+            <div class="club-card__image-wrapper">
+              @if (getFirstImage(club); as imgUrl) {
+                <img
+                  class="club-card__image"
+                  [ngSrc]="imgUrl"
+                  [alt]="'Foto do clube ' + club.name"
+                  width="400"
+                  height="220"
+                  loading="lazy"
+                />
+              } @else {
+                <div class="club-card__image-placeholder" aria-hidden="true">
+                  <span>&#127333;</span>
+                </div>
+              }
+            </div>
+
+            <!-- Conteúdo -->
+            <div class="club-card__content">
+              <h2 class="club-card__name">{{ club.name }}</h2>
+
+              <p class="club-card__location">
+                <span aria-hidden="true">&#128205;</span>
+                {{ club.city }}, {{ club.state }} &mdash; {{ club.country }}
+              </p>
+
+              <p class="club-card__description">{{ club.description }}</p>
+
+              <!-- Tags de tipos de quadra -->
+              @if (club.types && club.types.length > 0) {
+                <ul class="club-card__types" aria-label="Tipos de quadra disponíveis">
+                  @for (type of club.types; track type) {
+                    <li class="club-card__type-badge">{{ type }}</li>
+                  }
+                </ul>
+              }
+
+              <!-- Rodapé -->
+              <div class="club-card__footer">
+                <span class="club-card__price">
+                  A partir de <strong>{{ formatPrice(club.minPrice) }}</strong>
+                </span>
+                <span class="club-card__courts">
+                  {{ club.courtCount }} {{ club.courtCount === 1 ? 'quadra' : 'quadras' }}
+                </span>
+              </div>
+            </div>
+
+            <span class="club-card__arrow" aria-hidden="true">&#8250;</span>
+          </button>
+        </li>
+      }
+    </ul>
+  </section>
+}
