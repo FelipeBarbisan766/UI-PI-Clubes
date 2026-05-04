@@ -3,6 +3,9 @@ import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../services/auth-service';
 import { map } from 'rxjs/operators';
 
+const normalizeRole = (role: string | null | undefined): string =>
+  (role ?? '').trim().toLowerCase();
+
 export const adminGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
   const router = inject(Router);
@@ -13,7 +16,9 @@ export const adminGuard: CanActivateFn = () => {
         return router.parseUrl('/login');
       }
 
-      return user.role?.toLowerCase() === 'admin'
+      const role = normalizeRole(user.role);
+
+      return role === 'admin' || role === 'both'
         ? true
         : router.parseUrl('/select');
     })
