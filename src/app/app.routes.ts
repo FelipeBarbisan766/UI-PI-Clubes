@@ -11,7 +11,6 @@ export const routes: Routes = [
   {
     path: '',
     component: MainLayout,
-
     children: [
       {
         path: '',
@@ -54,19 +53,29 @@ export const routes: Routes = [
     canActivate: [adminGuard],
     children: [
       {
-        path: 'dashboard',
-        loadComponent: () =>
-          import('./features/admin/pages/dashboard/dashboard').then((m) => m.Dashboard),
-      },
-      {
-        path: 'courts',
-        loadComponent: () =>
-          import('./features/admin/pages/courts/courts').then((m) => m.Courts),
+        path: '',
+        redirectTo: 'clubs',
+        pathMatch: 'full',
       },
       {
         path: 'clubs',
         loadComponent: () =>
           import('./features/admin/pages/clubs/clubs').then((m) => m.Clubs),
+      },
+      {
+        path: 'club/:clubId',
+        children: [
+          {
+            path: 'dashboard',
+            loadComponent: () =>
+              import('./features/admin/pages/dashboard/dashboard').then((m) => m.Dashboard),
+          },
+          {
+            path: 'courts',
+            loadComponent: () =>
+              import('./features/admin/pages/courts/courts').then((m) => m.Courts),
+          }
+        ]
       }
     ],
   },

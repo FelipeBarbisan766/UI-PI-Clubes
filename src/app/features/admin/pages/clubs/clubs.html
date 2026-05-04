@@ -1,156 +1,204 @@
-<h1>Gestão de Clubes</h1>
+<div class="p-6 max-w-7xl mx-auto">
+  <!-- Cabeçalho -->
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+    <div>
+      <h1 class="text-3xl font-bold text-base-content">Gestão de Clubes</h1>
+      <p class="text-base-content/60 mt-1">Gerencie os clubes cadastrados na plataforma.</p>
+    </div>
+    <button class="btn btn-primary text-primary-content" (click)="openCreate()">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+      Novo Clube
+    </button>
+  </div>
 
-@if (clubService.error()) {
-  <p style="color: red;">Erro: {{ clubService.error() }}</p>
-}
-@if (clubService.loading()) {
-  <p>Carregando...</p>
-}
-
-@if (!isFormOpen()) {
-  <button (click)="openCreate()">+ Novo Clube</button>
-  <hr>
-
-  @if (clubService.isEmpty()) {
-    <p>Nenhum clube cadastrado ainda.</p>
-  } @else {
-    <ul>
-      @for (club of clubService.clubs(); track club.id) {
-        <li>
-          <strong>{{ club.name }}</strong>
-          <small>({{ club.city }}/{{ club.state }} - {{ club.country }})</small>
-
-          <p>{{ club.description }}</p>
-          <p>{{ club.phoneNumber }} | A partir de R$ {{ club.minPrice }} | {{ club.courtCount }} quadra(s)</p>
-
-          <button (click)="openEdit(club.id)">Editar</button>
-          <button (click)="requestDelete(club.id)">Excluir</button>
-
-          @if (deleteConfirmId() === club.id) {
-            <div style="border: 1px solid red; padding: 10px; margin-top: 5px;">
-              <p>Tem certeza que deseja excluir este clube?</p>
-              <button (click)="confirmDelete()">Sim, excluir</button>
-              <button (click)="cancelDelete()">Cancelar</button>
-            </div>
-          }
-        </li>
-      }
-    </ul>
+  <!-- Alertas -->
+  @if (clubService.error()) {
+    <div role="alert" class="alert alert-error mb-6">
+      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+      <span>Erro: {{ clubService.error() }}</span>
+    </div>
   }
-}
 
-@if (isFormOpen()) {
-  <h2>{{ isEditing() ? 'Editar Clube' : 'Cadastrar Clube' }}</h2>
+  @if (clubService.loading()) {
+    <div class="flex justify-center my-10" aria-live="polite" aria-busy="true">
+      <span class="loading loading-spinner loading-lg text-primary"></span>
+      <span class="sr-only">Carregando clubes...</span>
+    </div>
+  }
 
-  <form [formGroup]="form" (ngSubmit)="onSubmit()">
-
-    @if (!isEditing()) {
-      <div>
-        <label for="adminId">ID do Admin: </label>
-        <input id="adminId" type="text" formControlName="adminId">
-        @if (fieldInvalid('adminId')) { <span>(Admin é obrigatório)</span> }
+  <!-- Listagem de Clubes -->
+  @if (!isFormOpen()) {
+    @if (clubService.isEmpty()) {
+      <div class="text-center py-16 text-base-content/50 border-2 border-dashed border-base-300 rounded-box">
+        <p class="text-lg">Nenhum clube cadastrado ainda.</p>
       </div>
-      <br>
-    }
+    } @else {
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @for (club of clubService.clubs(); track club.id) {
+          <div class="card bg-base-100 card-border shadow-sm hover:shadow-md transition-shadow">
+            <div class="card-body p-5">
+              <!-- Título e Ações -->
+              <div class="flex justify-between items-start">
+                <h2 class="card-title text-lg font-bold">{{ club.name }}</h2>
+                <div class="flex gap-1 -mt-1 -mr-2">
+                  <button class="btn btn-ghost btn-sm btn-square text-base-content/70 hover:text-primary" aria-label="Editar clube" title="Editar" (click)="openEdit(club.id)">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                  </button>
+                  <button class="btn btn-ghost btn-sm btn-square text-base-content/70 hover:text-error" aria-label="Excluir clube" title="Excluir" (click)="requestDelete(club.id)">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                  </button>
+                </div>
+              </div>
 
-    <div>
-      <label for="name">Nome: </label>
-      <input id="name" type="text" formControlName="name">
-      @if (fieldInvalid('name')) { <span>(Nome é obrigatório, mín. 3 letras)</span> }
-    </div>
-    <br>
+              <!-- Tags de Informação -->
+              <div class="flex flex-wrap gap-2 mt-2">
+                <div class="badge badge-neutral badge-outline bg-base-200 border-none text-xs font-semibold px-3 py-2 h-auto text-base-content/70">{{ club.city }}</div>
+                <div class="badge badge-neutral badge-outline bg-base-200 border-none text-xs font-semibold px-3 py-2 h-auto text-base-content/70">{{ club.courtCount }} quadra(s)</div>
+              </div>
 
-    <div>
-      <label for="phoneNumber">Telefone: </label>
-      <input id="phoneNumber" type="text" formControlName="phoneNumber">
-      @if (fieldInvalid('phoneNumber')) { <span>(Telefone é obrigatório)</span> }
-    </div>
-    <br>
+              <!-- Descrição -->
+              <p class="text-sm text-base-content/60 mt-3 line-clamp-2 min-h-[40px]">{{ club.description }}</p>
 
-    <div>
-      <label for="description">Descrição: </label><br>
-      <textarea id="description" formControlName="description"></textarea>
-      @if (fieldInvalid('description')) { <span>(Descrição é obrigatória)</span> }
-    </div>
-    <br>
+              <!-- Preço / Info Final -->
+              <div class="mt-4 pt-4 border-t border-base-200 flex flex-col gap-1">
+                <p class="font-bold text-primary text-xl">R$ {{ club.minPrice }}/h</p>
+                <p class="text-xs text-base-content/50">{{ club.phoneNumber }}</p>
+              </div>
 
-    <div>
-      <label for="zipCode">CEP: </label>
-      <input id="zipCode" type="text" formControlName="zipCode">
-      @if (fieldInvalid('zipCode')) { <span>(CEP é obrigatório)</span> }
-    </div>
-    <br>
-
-    <div>
-      <label for="street">Rua: </label>
-      <input id="street" type="text" formControlName="street">
-      @if (fieldInvalid('street')) { <span>(Rua é obrigatória)</span> }
-    </div>
-    <br>
-
-    <div>
-      <label for="number">Número: </label>
-      <input id="number" type="text" formControlName="number">
-      @if (fieldInvalid('number')) { <span>(Número é obrigatório)</span> }
-    </div>
-    <br>
-
-    <div>
-      <label for="neighborhood">Bairro: </label>
-      <input id="neighborhood" type="text" formControlName="neighborhood">
-      @if (fieldInvalid('neighborhood')) { <span>(Bairro é obrigatório)</span> }
-    </div>
-    <br>
-
-    <div>
-      <label for="complement">Complemento: </label>
-      <input id="complement" type="text" formControlName="complement">
-    </div>
-    <br>
-
-    <div>
-      <label for="city">Cidade: </label>
-      <input id="city" type="text" formControlName="city">
-      @if (fieldInvalid('city')) { <span>(Cidade é obrigatória)</span> }
-    </div>
-    <br>
-
-    <div>
-      <label for="state">Estado: </label>
-      <input id="state" type="text" formControlName="state">
-      @if (fieldInvalid('state')) { <span>(Estado é obrigatório)</span> }
-    </div>
-    <br>
-
-    <div>
-      <label for="country">País: </label>
-      <input id="country" type="text" formControlName="country">
-      @if (fieldInvalid('country')) { <span>(País é obrigatório)</span> }
-    </div>
-    <br>
-
-    @if (!isEditing()) {
-      <div>
-        <label for="images">Imagens: </label>
-        <input id="images" type="file" multiple accept="image/*" (change)="onFilesSelected($event)">
-
-        @if (selectedFiles().length > 0) {
-          <ul>
-            @for (file of selectedFiles(); track file.name; let i = $index) {
-              <li>{{ file.name }} <button type="button" (click)="removeFile(i)">Remover</button></li>
-            }
-          </ul>
+              <!-- Confirmação de Exclusão Inline -->
+              @if (deleteConfirmId() === club.id) {
+                <div role="alert" class="alert alert-warning mt-4 p-3 text-sm flex-col items-start gap-3">
+                  <span class="font-semibold">Tem certeza que deseja excluir?</span>
+                  <div class="flex gap-2 w-full">
+                    <button class="btn btn-sm btn-error flex-1 text-error-content" (click)="confirmDelete()">Excluir</button>
+                    <button class="btn btn-sm btn-ghost flex-1 border border-base-300" (click)="cancelDelete()">Cancelar</button>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
         }
       </div>
-      <br>
     }
+  }
+</div>
 
-    <button type="submit" [disabled]="!isSubmitEnabled() || clubService.loading()">
-      Salvar
-    </button>
-    <button type="button" (click)="closeForm()">
-      Cancelar
-    </button>
+<!-- Modal Form -->
+@if (isFormOpen()) {
+  <app-modal>
+    <div class="flex justify-between items-center mb-4 border-b border-base-200 pb-3">
+      <!-- Título menor -->
+      <h3 id="modal-title" class="font-bold text-xl text-base-content">
+        {{ isEditing() ? 'Editar Clube' : 'Cadastrar Clube' }}
+      </h3>
+      <button class="btn btn-ghost btn-sm btn-circle" aria-label="Fechar modal" (click)="closeForm()">✕</button>
+    </div>
+    
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-3">
+      <!-- Grid de 3 colunas para dados principais -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-2">
+        
+        <div class="flex flex-col w-full md:col-span-2">
+          <label class="py-1 font-medium text-xs text-base-content" for="name">Nome do Clube</label>
+          <input id="name" type="text" formControlName="name" class="input input-bordered input-sm w-full" [class.input-error]="fieldInvalid('name')" placeholder="Ex: Clube de Tênis..." />
+          @if (fieldInvalid('name')) { <span role="alert" class="block text-error text-[11px] mt-1 font-medium px-1">Obrigatório (mín. 3 letras)</span> }
+        </div>
 
-  </form>
+        <div class="flex flex-col w-full md:col-span-1">
+          <label class="py-1 font-medium text-xs text-base-content" for="phoneNumber">Telefone</label>
+          <input id="phoneNumber" type="text" formControlName="phoneNumber" class="input input-bordered input-sm w-full" [class.input-error]="fieldInvalid('phoneNumber')" placeholder="(00) 00000-0000" />
+          @if (fieldInvalid('phoneNumber')) { <span role="alert" class="block text-error text-[11px] mt-1 font-medium px-1">Obrigatório</span> }
+        </div>
+        
+        <div class="flex flex-col w-full md:col-span-3">
+          <label class="py-1 font-medium text-xs text-base-content" for="description">Descrição</label>
+          <textarea id="description" formControlName="description" class="textarea textarea-bordered textarea-sm h-16 resize-none w-full" [class.textarea-error]="fieldInvalid('description')" placeholder="Descreva sobre o clube..."></textarea>
+          @if (fieldInvalid('description')) { <span role="alert" class="block text-error text-[11px] mt-1 font-medium px-1">Obrigatória</span> }
+        </div>
+      </div>
+
+      <!-- Fieldset de Endereço com Grid de 4 colunas para otimizar espaço -->
+      <fieldset class="fieldset border border-base-200 p-3 rounded-box mt-1">
+        <legend class="fieldset-legend text-sm font-semibold px-2">Endereço</legend>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-x-4 gap-y-2 w-full">
+          
+          <div class="flex flex-col w-full md:col-span-1">
+            <label class="py-1 font-medium text-xs text-base-content" for="zipCode">CEP</label>
+            <input id="zipCode" type="text" formControlName="zipCode" class="input input-bordered input-sm w-full" [class.input-error]="fieldInvalid('zipCode')" />
+            @if (fieldInvalid('zipCode')) { <span role="alert" class="block text-error text-[11px] mt-1 font-medium px-1">Obrigatório</span> }
+          </div>
+
+          <div class="flex flex-col w-full md:col-span-3">
+            <label class="py-1 font-medium text-xs text-base-content" for="street">Rua</label>
+            <input id="street" type="text" formControlName="street" class="input input-bordered input-sm w-full" [class.input-error]="fieldInvalid('street')" />
+            @if (fieldInvalid('street')) { <span role="alert" class="block text-error text-[11px] mt-1 font-medium px-1">Obrigatória</span> }
+          </div>
+
+          <div class="flex flex-col w-full md:col-span-1">
+            <label class="py-1 font-medium text-xs text-base-content" for="number">Número</label>
+            <input id="number" type="text" formControlName="number" class="input input-bordered input-sm w-full" [class.input-error]="fieldInvalid('number')" />
+            @if (fieldInvalid('number')) { <span role="alert" class="block text-error text-[11px] mt-1 font-medium px-1">Obrigatório</span> }
+          </div>
+
+          <div class="flex flex-col w-full md:col-span-1">
+            <label class="py-1 font-medium text-xs text-base-content" for="complement">Complemento</label>
+            <input id="complement" type="text" formControlName="complement" class="input input-bordered input-sm w-full" placeholder="Opcional" />
+          </div>
+
+          <div class="flex flex-col w-full md:col-span-2">
+            <label class="py-1 font-medium text-xs text-base-content" for="neighborhood">Bairro</label>
+            <input id="neighborhood" type="text" formControlName="neighborhood" class="input input-bordered input-sm w-full" [class.input-error]="fieldInvalid('neighborhood')" />
+            @if (fieldInvalid('neighborhood')) { <span role="alert" class="block text-error text-[11px] mt-1 font-medium px-1">Obrigatório</span> }
+          </div>
+
+          <div class="flex flex-col w-full md:col-span-2">
+            <label class="py-1 font-medium text-xs text-base-content" for="city">Cidade</label>
+            <input id="city" type="text" formControlName="city" class="input input-bordered input-sm w-full" [class.input-error]="fieldInvalid('city')" />
+            @if (fieldInvalid('city')) { <span role="alert" class="block text-error text-[11px] mt-1 font-medium px-1">Obrigatória</span> }
+          </div>
+
+          <div class="flex flex-col w-full md:col-span-1">
+            <label class="py-1 font-medium text-xs text-base-content" for="state">Estado</label>
+            <input id="state" type="text" formControlName="state" class="input input-bordered input-sm w-full" [class.input-error]="fieldInvalid('state')" />
+            @if (fieldInvalid('state')) { <span role="alert" class="block text-error text-[11px] mt-1 font-medium px-1">Obrigatório</span> }
+          </div>
+
+          <div class="flex flex-col w-full md:col-span-1">
+            <label class="py-1 font-medium text-xs text-base-content" for="country">País</label>
+            <input id="country" type="text" formControlName="country" class="input input-bordered input-sm w-full" [class.input-error]="fieldInvalid('country')" />
+            @if (fieldInvalid('country')) { <span role="alert" class="block text-error text-[11px] mt-1 font-medium px-1">Obrigatório</span> }
+          </div>
+        </div>
+      </fieldset>
+
+      @if (!isEditing()) {
+        <div class="flex flex-col w-full mt-1">
+          <label class="py-1 font-medium text-xs text-base-content" for="images">Imagens do Clube</label>
+          <input id="images" type="file" multiple accept="image/*" (change)="onFilesSelected($event)" class="file-input file-input-bordered file-input-primary file-input-sm w-full" />
+          
+          @if (selectedFiles().length > 0) {
+            <ul class="flex flex-wrap gap-2 mt-2" aria-label="Imagens selecionadas">
+              @for (file of selectedFiles(); track file.name; let i = $index) {
+                <li class="badge badge-primary badge-sm text-primary-content gap-1 p-3 text-xs font-semibold">
+                  <span class="truncate max-w-[120px]">{{ file.name }}</span>
+                  <button type="button" class="btn btn-ghost btn-xs btn-circle hover:bg-black/20 w-4 h-4 min-h-0" aria-label="Remover imagem" (click)="removeFile(i)">✕</button>
+                </li>
+              }
+            </ul>
+          }
+        </div>
+      }
+
+      <!-- Ações do Modal com botões menores (btn-sm) -->
+      <div class="modal-action mt-4 pt-3 border-t border-base-200">
+        <button type="button" class="btn btn-ghost btn-sm" (click)="closeForm()">Cancelar</button>
+        <button type="submit" class="btn btn-primary btn-sm text-primary-content px-6" [disabled]="!isSubmitEnabled() || clubService.loading()">
+          @if (clubService.loading()) {
+            <span class="loading loading-spinner loading-xs" aria-hidden="true"></span>
+          }
+          Salvar Clube
+        </button>
+      </div>
+    </form>
+  </app-modal>
 }

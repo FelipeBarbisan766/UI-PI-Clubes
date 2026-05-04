@@ -1,130 +1,168 @@
-<h1>Gestão de Quadras</h1>
+<div class="p-6 max-w-7xl mx-auto">
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+    <div>
+      <h1 class="text-3xl font-bold text-base-content">Gestão de Quadras</h1>
+      <p class="text-base-content/60 mt-1">Gerencie as quadras do seu clube.</p>
+    </div>
+    <button class="btn btn-primary text-primary-content" (click)="openCreate()">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+      Nova Quadra
+    </button>
+  </div>
 
-@if (courtService.error()) {
-  <p style="color: red;">Erro: {{ courtService.error() }}</p>
-}
-@if (courtService.loading()) {
-  <p>Carregando...</p>
-}
-
-@if (!isFormOpen()) {
-  <button (click)="openCreate()">+ Nova Quadra</button>
-  <hr>
-
-  @if (courtService.isEmpty()) {
-    <p>Nenhuma quadra cadastrada para este clube ainda.</p>
-  } @else {
-    <ul>
-      @for (court of courtService.courts(); track court.id) {
-        <li>
-          <strong>{{ court.name }}</strong>
-          <small>({{ getTypeName(court.type) }} - {{ getSurfaceName(court.surface) }})</small>
-
-          <p>{{ court.description }}</p>
-          <p>R$ {{ court.pricePerHour }} por hora | Status: {{ court.isCovered ? 'Coberta' : 'Descoberta' }}</p>
-
-          <button (click)="openEdit(court)">Editar</button>
-          <button (click)="requestDelete(court.id)">Excluir</button>
-
-          @if (deleteConfirmId() === court.id) {
-            <div style="border: 1px solid red; padding: 10px; margin-top: 5px;">
-              <p>Tem certeza que deseja excluir esta quadra?</p>
-              <button (click)="confirmDelete()">Sim, excluir</button>
-              <button (click)="cancelDelete()">Cancelar</button>
-            </div>
-          }
-        </li>
-      }
-    </ul>
+  @if (courtService.error()) {
+    <div role="alert" class="alert alert-error mb-6">
+      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+      <span>Erro: {{ courtService.error() }}</span>
+    </div>
   }
-}
 
-@if (isFormOpen()) {
-  <h2>{{ isEditing() ? 'Editar Quadra' : 'Cadastrar Quadra' }}</h2>
-
-  <form [formGroup]="form" (ngSubmit)="onSubmit()">
-
-    <div>
-      <label for="name">Nome: </label>
-      <input id="name" type="text" formControlName="name">
-      @if (fieldInvalid('name')) { <span>(Nome é obrigatório, mín. 3 letras)</span> }
+  @if (courtService.loading()) {
+    <div class="flex justify-center my-10" aria-live="polite" aria-busy="true">
+      <span class="loading loading-spinner loading-lg text-primary"></span>
+      <span class="sr-only">Carregando quadras...</span>
     </div>
-    <br>
+  }
 
-    <div>
-      <label for="type">Tipo: </label>
-      <select id="type" formControlName="type">
-        <option [value]="null" disabled>Selecione</option>
-        @for (option of typeOptions; track option.value) {
-          <option [value]="option.value">{{ option.label }}</option>
-        }
-      </select>
-      @if (fieldInvalid('type')) { <span>(Selecione um tipo)</span> }
-    </div>
-    <br>
+  @if (!isFormOpen()) {
+    @if (courtService.isEmpty()) {
+      <div class="text-center py-16 text-base-content/50 border-2 border-dashed border-base-300 rounded-box">
+        <p class="text-lg">Nenhuma quadra cadastrada para este clube ainda.</p>
+      </div>
+    } @else {
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @for (court of courtService.courts(); track court.id) {
+          <div class="card bg-base-100 card-border shadow-sm hover:shadow-md transition-shadow">
+            <div class="card-body p-5">
+              <div class="flex justify-between items-start">
+                <h2 class="card-title text-lg font-bold">{{ court.name }}</h2>
+                <div class="flex gap-1 -mt-1 -mr-2">
+                  <button class="btn btn-ghost btn-sm btn-square text-base-content/70 hover:text-primary" aria-label="Editar quadra" title="Editar" (click)="openEdit(court)">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                  </button>
+                  <button class="btn btn-ghost btn-sm btn-square text-base-content/70 hover:text-error" aria-label="Excluir quadra" title="Excluir" (click)="requestDelete(court.id)">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                  </button>
+                </div>
+              </div>
 
-    <div>
-      <label for="surface">Superfície: </label>
-      <select id="surface" formControlName="surface">
-        <option [value]="null" disabled>Selecione</option>
-        @for (option of surfaceOptions; track option.value) {
-          <option [value]="option.value">{{ option.label }}</option>
-        }
-      </select>
-      @if (fieldInvalid('surface')) { <span>(Selecione uma superfície)</span> }
-    </div>
-    <br>
+              <div class="flex flex-wrap gap-2 mt-2">
+                <div class="badge badge-neutral badge-outline bg-base-200 border-none text-xs font-semibold px-3 py-2 h-auto text-base-content/70">{{ getTypeName(court.type) }}</div>
+                <div class="badge badge-neutral badge-outline bg-base-200 border-none text-xs font-semibold px-3 py-2 h-auto text-base-content/70">{{ court.isCovered ? 'Coberta' : 'Descoberta' }}</div>
+              </div>
 
-    <div>
-      <label>
-        <input type="checkbox" formControlName="isCovered"> Quadra é coberta?
-      </label>
-    </div>
-    <br>
+              <p class="text-sm text-base-content/60 mt-3 line-clamp-2 min-h-[40px]">{{ court.description }}</p>
+              <p class="text-sm text-base-content/60 mt-1">Superfície: {{ getSurfaceName(court.surface) }}</p>
 
-    <div>
-      <label for="pricePerHour">Preço por Hora (R$): </label>
-      <input id="pricePerHour" type="number" formControlName="pricePerHour">
-      @if (fieldInvalid('pricePerHour')) { <span>(Preço inválido)</span> }
-    </div>
-    <br>
+              <div class="mt-4 pt-4 border-t border-base-200 flex flex-col gap-1">
+                <p class="font-bold text-primary text-xl">R$ {{ court.pricePerHour }}/h</p>
+              </div>
 
-    <div>
-      <label for="description">Descrição: </label><br>
-      <textarea id="description" formControlName="description"></textarea>
-      @if (fieldInvalid('description')) { <span>(Descrição obrigatória)</span> }
-    </div>
-    <br>
-
-    <div>
-      <label for="clubId">ID do Clube: </label>
-      <input id="clubId" type="text" formControlName="clubId">
-      @if (fieldInvalid('clubId')) { <span>(Clube é obrigatório)</span> }
-    </div>
-    <br>
-
-    @if (!isEditing()) {
-      <div>
-        <label for="images">Imagens: </label>
-        <input id="images" type="file" multiple accept="image/*" (change)="onFilesSelected($event)">
-
-        @if (selectedFiles().length > 0) {
-          <ul>
-            @for (file of selectedFiles(); track file.name; let i = $index) {
-              <li>{{ file.name }} <button type="button" (click)="removeFile(i)">Remover</button></li>
-            }
-          </ul>
+              @if (deleteConfirmId() === court.id) {
+                <div role="alert" class="alert alert-warning mt-4 p-3 text-sm flex-col items-start gap-3">
+                  <span class="font-semibold">Tem certeza que deseja excluir?</span>
+                  <div class="flex gap-2 w-full">
+                    <button class="btn btn-sm btn-error flex-1 text-error-content" (click)="confirmDelete()">Excluir</button>
+                    <button class="btn btn-sm btn-ghost flex-1 border border-base-300" (click)="cancelDelete()">Cancelar</button>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
         }
       </div>
-      <br>
     }
+  }
+</div>
 
-    <button type="submit" [disabled]="!isSubmitEnabled() || courtService.loading()">
-      Salvar
-    </button>
-    <button type="button" (click)="closeForm()">
-      Cancelar
-    </button>
+<!-- Modal Form -->
+@if (isFormOpen()) {
+  <app-modal>
+    <div class="flex justify-between items-center mb-4 border-b border-base-200 pb-3">
+      <h3 id="modal-title" class="font-bold text-xl text-base-content">
+        {{ isEditing() ? 'Editar Quadra' : 'Cadastrar Quadra' }}
+      </h3>
+      <button class="btn btn-ghost btn-sm btn-circle" aria-label="Fechar modal" (click)="closeForm()">✕</button>
+    </div>
+    
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-3">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-2">
+        
+        <div class="flex flex-col w-full md:col-span-2">
+          <label class="py-1 font-medium text-xs text-base-content" for="name">Nome da Quadra</label>
+          <input id="name" type="text" formControlName="name" class="input input-bordered input-sm w-full" [class.input-error]="fieldInvalid('name')" placeholder="Ex: Quadra 1 - Futsal..." />
+          @if (fieldInvalid('name')) { <span role="alert" class="block text-error text-[11px] mt-1 font-medium px-1">Obrigatório (mín. 3 letras)</span> }
+        </div>
 
-  </form>
+        <div class="flex flex-col w-full md:col-span-1">
+          <label class="py-1 font-medium text-xs text-base-content" for="pricePerHour">Preço por Hora (R$)</label>
+          <input id="pricePerHour" type="number" formControlName="pricePerHour" class="input input-bordered input-sm w-full" [class.input-error]="fieldInvalid('pricePerHour')" placeholder="0.00" />
+          @if (fieldInvalid('pricePerHour')) { <span role="alert" class="block text-error text-[11px] mt-1 font-medium px-1">Preço inválido</span> }
+        </div>
+
+        <div class="flex flex-col w-full md:col-span-1">
+          <label class="py-1 font-medium text-xs text-base-content" for="type">Tipo</label>
+          <select id="type" formControlName="type" class="select select-bordered select-sm w-full" [class.select-error]="fieldInvalid('type')">
+            <option [value]="null" disabled>Selecione</option>
+            @for (option of typeOptions; track option.value) {
+              <option [value]="option.value">{{ option.label }}</option>
+            }
+          </select>
+          @if (fieldInvalid('type')) { <span role="alert" class="block text-error text-[11px] mt-1 font-medium px-1">Obrigatório</span> }
+        </div>
+
+        <div class="flex flex-col w-full md:col-span-1">
+          <label class="py-1 font-medium text-xs text-base-content" for="surface">Superfície</label>
+          <select id="surface" formControlName="surface" class="select select-bordered select-sm w-full" [class.select-error]="fieldInvalid('surface')">
+            <option [value]="null" disabled>Selecione</option>
+            @for (option of surfaceOptions; track option.value) {
+              <option [value]="option.value">{{ option.label }}</option>
+            }
+          </select>
+          @if (fieldInvalid('surface')) { <span role="alert" class="block text-error text-[11px] mt-1 font-medium px-1">Obrigatória</span> }
+        </div>
+
+        <div class="flex flex-col w-full md:col-span-1 justify-center pt-5">
+          <label class="label cursor-pointer justify-start gap-3">
+            <span class="label-text font-medium text-xs text-base-content">Quadra é coberta?</span> 
+            <input type="checkbox" formControlName="isCovered" class="toggle toggle-primary toggle-sm" />
+          </label>
+        </div>
+        
+        <div class="flex flex-col w-full md:col-span-3">
+          <label class="py-1 font-medium text-xs text-base-content" for="description">Descrição</label>
+          <textarea id="description" formControlName="description" class="textarea textarea-bordered textarea-sm h-16 resize-none w-full" [class.textarea-error]="fieldInvalid('description')" placeholder="Detalhes da quadra..."></textarea>
+          @if (fieldInvalid('description')) { <span role="alert" class="block text-error text-[11px] mt-1 font-medium px-1">Obrigatória</span> }
+        </div>
+      </div>
+
+      @if (!isEditing()) {
+        <div class="flex flex-col w-full mt-1">
+          <label class="py-1 font-medium text-xs text-base-content" for="images">Imagens da Quadra</label>
+          <input id="images" type="file" multiple accept="image/*" (change)="onFilesSelected($event)" class="file-input file-input-bordered file-input-primary file-input-sm w-full" />
+          
+          @if (selectedFiles().length > 0) {
+            <ul class="flex flex-wrap gap-2 mt-2" aria-label="Imagens selecionadas">
+              @for (file of selectedFiles(); track file.name; let i = $index) {
+                <li class="badge badge-primary badge-sm text-primary-content gap-1 p-3 text-xs font-semibold">
+                  <span class="truncate max-w-[120px]">{{ file.name }}</span>
+                  <button type="button" class="btn btn-ghost btn-xs btn-circle hover:bg-black/20 w-4 h-4 min-h-0" aria-label="Remover imagem" (click)="removeFile(i)">✕</button>
+                </li>
+              }
+            </ul>
+          }
+        </div>
+      }
+
+      <div class="modal-action mt-4 pt-3 border-t border-base-200">
+        <button type="button" class="btn btn-ghost btn-sm" (click)="closeForm()">Cancelar</button>
+        <button type="submit" class="btn btn-primary btn-sm text-primary-content px-6" [disabled]="!isSubmitEnabled() || courtService.loading()">
+          @if (courtService.loading()) {
+            <span class="loading loading-spinner loading-xs" aria-hidden="true"></span>
+          }
+          Salvar Quadra
+        </button>
+      </div>
+    </form>
+  </app-modal>
 }

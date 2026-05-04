@@ -13,32 +13,33 @@ import {
 } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ServiceClub } from '../../services/service-club';
-import { ResponseClubDTO } from '../../models/model-club';
+import { AuthService } from '../../../../core/services/auth-service';
+import { Modal } from "../../../../shared/components/modal/modal"; 
 
 type FormMode = 'create' | 'edit' | null;
 
 @Component({
   selector: 'app-club',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, Modal],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './clubs.html',
 })
 export class Clubs implements OnInit {
   private readonly fb = inject(FormBuilder);
+  private readonly authService = inject(AuthService);
   protected readonly clubService = inject(ServiceClub);
 
-  // --- Local state ---
   protected readonly formMode = signal<FormMode>(null);
   protected readonly editingId = signal<string | null>(null);
   protected readonly selectedFiles = signal<File[]>([]);
   protected readonly deleteConfirmId = signal<string | null>(null);
 
+  private adminId: string | null = null;
+
   protected readonly isFormOpen = computed(() => this.formMode() !== null);
   protected readonly isEditing = computed(() => this.formMode() === 'edit');
 
-  // --- Form ---
   protected readonly form = this.fb.group({
-    adminId: ['', Validators.required],
     name: ['', [Validators.required, Validators.minLength(3)]],
     phoneNumber: ['', Validators.required],
     description: ['', Validators.required],
@@ -67,11 +68,9 @@ export class Clubs implements OnInit {
     this.clubService.getAll().subscribe();
   }
 
-  // --- Form actions ---
 
   protected openCreate(): void {
     this.form.reset({
-      adminId: '',
       name: '',
       phoneNumber: '',
       description: '',
@@ -84,7 +83,6 @@ export class Clubs implements OnInit {
       state: '',
       country: '',
     });
-    this.form.get('adminId')?.enable();
     this.selectedFiles.set([]);
     this.editingId.set(null);
     this.formMode.set('create');
@@ -94,7 +92,6 @@ export class Clubs implements OnInit {
     this.clubService.getById(id).subscribe({
       next: (club) => {
         this.form.reset({
-          adminId: '',
           name: club.name,
           phoneNumber: club.phoneNumber,
           description: club.description,
@@ -107,7 +104,6 @@ export class Clubs implements OnInit {
           state: club.state,
           country: club.country,
         });
-        this.form.get('adminId')?.disable();
         this.selectedFiles.set([]);
         this.editingId.set(id);
         this.formMode.set('edit');
@@ -118,8 +114,8 @@ export class Clubs implements OnInit {
   protected closeForm(): void {
     this.formMode.set(null);
     this.editingId.set(null);
+    this.adminId = null;
     this.form.reset();
-    this.form.get('adminId')?.enable();
   }
 
   protected onFilesSelected(event: Event): void {
@@ -139,57 +135,82 @@ export class Clubs implements OnInit {
       return;
     }
 
-    const { adminId, name, phoneNumber, description, zipCode, street, number, neighborhood, complement, city, state, country } =
-      this.form.getRawValue();
-
     if (this.formMode() === 'create') {
-      this.clubService
-        .create({
-          adminId: adminId!,
-          name: name!,
-          phoneNumber: phoneNumber!,
-          description: description!,
-          zipCode: zipCode!,
-          street: street!,
-          number: number!,
-          neighborhood: neighborhood!,
-          complement: complement ?? undefined,
-          city: city!,
-          state: state!,
-          country: country!,
-          images: this.selectedFiles(),
-        })
-        .subscribe({
-          next: () => {
-            this.closeForm();
-          },
-          error: (err: unknown) => {
-            console.error('Erro ao criar clube', err);
-          },
-        });
+      this._submitCreate();
     } else {
-      const id = this.editingId();
-      if (id === null) return;
-
-      this.clubService
-        .update(id, {
-          name: name!,
-          phoneNumber: phoneNumber!,
-          description: description!,
-          zipCode: zipCode!,
-          street: street!,
-          number: number!,
-          neighborhood: neighborhood!,
-          complement: complement ?? undefined,
-          city: city!,
-          state: state!,
-          country: country!,
-        })
-        .subscribe({ next: () => this.closeForm() });
+      this._submitUpdate();
     }
   }
 
-  // --- Delete ---
+  private _submitCreate(): void {
+    if (this.adminId) {
+      this._dispatchCreate(this.adminId);
+      return;
+    }
+
+    this.authService.getAdminMe().subscribe({
+      next: (admin) => {
+        this.adminId = admin.id;
+        this._dispatchCreate(admin.id);
+      },
+      error: (err: unknown) => {
+        console.error('Não foi possível obter o perfil do administrador.', err);
+      },
+    });
+  }
+
+  private _dispatchCreate(adminId: string): void {
+    const { name, phoneNumber, description, zipCode, street, number, neighborhood, complement, city, state, country } =
+      this.form.getRawValue();
+
+    this.clubService
+      .create({
+        adminId,
+        name: name!,
+        phoneNumber: phoneNumber!,
+        description: description!,
+        zipCode: zipCode!,
+        street: street!,
+        number: number!,
+        neighborhood: neighborhood!,
+        complement: complement ?? undefined,
+        city: city!,
+        state: state!,
+        country: country!,
+        images: this.selectedFiles(),
+      })
+      .subscribe({
+        next: () => this.closeForm(),
+        error: (err: unknown) => {
+          console.error('Erro ao criar clube', err);
+        },
+      });
+  }
+
+  private _submitUpdate(): void {
+    const id = this.editingId();
+    if (id === null) return;
+
+    const { name, phoneNumber, description, zipCode, street, number, neighborhood, complement, city, state, country } =
+      this.form.getRawValue();
+
+    this.clubService
+      .update(id, {
+        name: name!,
+        phoneNumber: phoneNumber!,
+        description: description!,
+        zipCode: zipCode!,
+        street: street!,
+        number: number!,
+        neighborhood: neighborhood!,
+        complement: complement ?? undefined,
+        city: city!,
+        state: state!,
+        country: country!,
+      })
+      .subscribe({ next: () => this.closeForm() });
+  }
+
 
   protected requestDelete(id: string): void {
     this.deleteConfirmId.set(id);
@@ -207,7 +228,6 @@ export class Clubs implements OnInit {
     this.deleteConfirmId.set(null);
   }
 
-  // --- Helpers ---
 
   protected fieldInvalid(field: string): boolean {
     const ctrl = this.form.get(field);

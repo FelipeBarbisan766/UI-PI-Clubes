@@ -9,3 +9,15 @@ export interface MeResponse {
   email: string;
   role: string;
 }
+
+export interface AdminMeResponse {
+  id: string;
+  name: string;
+  email: string;
+}
+
+export interface PlayerMeResponse {
+  id: string;
+  name: string;
+  email: string;
+}
