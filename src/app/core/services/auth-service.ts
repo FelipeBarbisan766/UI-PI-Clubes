@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable, computed, signal } from '@angular/core';
 import { Observable, tap, catchError, throwError, map, shareReplay, of } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { MeResponse, LoginPayload } from '../models/auth-model';
+import { MeResponse, AdminMeResponse, PlayerMeResponse, LoginPayload } from '../models/auth-model';
 
 type AuthStatus = 'unknown' | 'authenticated' | 'unauthenticated';
 
@@ -12,6 +12,8 @@ type AuthStatus = 'unknown' | 'authenticated' | 'unauthenticated';
 export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/Auth`;
+  private readonly adminBaseUrl = `${environment.apiUrl}/Admin`;
+  private readonly playerBaseUrl = `${environment.apiUrl}/Player`;
 
   readonly me = signal<MeResponse | null>(null);
   readonly authStatus = signal<AuthStatus>('unknown');
@@ -65,7 +67,11 @@ export class AuthService {
         catchError((error: unknown) => {
           this.clearSession();
 
-          if (error instanceof HttpErrorResponse && typeof error.error === 'string' && error.error.trim()) {
+          if (
+            error instanceof HttpErrorResponse &&
+            typeof error.error === 'string' &&
+            error.error.trim()
+          ) {
             return throwError(() => new Error(error.error));
           }
           return throwError(() => new Error('Erro ao realizar logout.'));
@@ -111,15 +117,55 @@ export class AuthService {
 
   refreshMe(): Observable<MeResponse> {
     this.meRequest$ = null;
-    return this.http.get<MeResponse>(`${this.baseUrl}/me`, { withCredentials: true }).pipe(
-      tap((user) => this.markAuthenticated(user)),
-      catchError((error: unknown) => {
-        this.clearSession();
-        if (error instanceof HttpErrorResponse && typeof error.error === 'string' && error.error.trim()) {
-          return throwError(() => new Error(error.error));
-        }
-        return throwError(() => new Error('Não foi possível carregar usuário.'));
-      })
-    );
+    return this.http
+      .get<MeResponse>(`${this.baseUrl}/me`, { withCredentials: true })
+      .pipe(
+        tap((user) => this.markAuthenticated(user)),
+        catchError((error: unknown) => {
+          this.clearSession();
+          if (
+            error instanceof HttpErrorResponse &&
+            typeof error.error === 'string' &&
+            error.error.trim()
+          ) {
+            return throwError(() => new Error(error.error));
+          }
+          return throwError(() => new Error('Não foi possível carregar usuário.'));
+        })
+      );
+  }
+
+  getAdminMe(): Observable<AdminMeResponse> {
+    return this.http
+      .get<AdminMeResponse>(`${this.adminBaseUrl}/me`, { withCredentials: true })
+      .pipe(
+        catchError((error: unknown) => {
+          if (
+            error instanceof HttpErrorResponse &&
+            typeof error.error === 'string' &&
+            error.error.trim()
+          ) {
+            return throwError(() => new Error(error.error));
+          }
+          return throwError(() => new Error('Não foi possível carregar o perfil do administrador.'));
+        })
+      );
+  }
+
+  getPlayerMe(): Observable<PlayerMeResponse> {
+    return this.http
+      .get<PlayerMeResponse>(`${this.playerBaseUrl}/me`, { withCredentials: true })
+      .pipe(
+        catchError((error: unknown) => {
+          if (
+            error instanceof HttpErrorResponse &&
+            typeof error.error === 'string' &&
+            error.error.trim()
+          ) {
+            return throwError(() => new Error(error.error));
+          }
+          return throwError(() => new Error('Não foi possível carregar o perfil do jogador.'));
+        })
+      );
   }
 }

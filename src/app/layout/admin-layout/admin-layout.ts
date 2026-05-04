@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { Router, RouterOutlet } from '@angular/router';
 
 
 @Component({
@@ -8,4 +8,13 @@ import { RouterOutlet } from '@angular/router';
   templateUrl: './admin-layout.html',
   styleUrl: './admin-layout.css',
 })
-export class AdminLayout {}
+export class AdminLayout {
+  private route = inject(Router);
+
+  goToCourts(): void {
+    this.route.navigateByUrl('/admin/courts');
+  }
+
+  
+
+}

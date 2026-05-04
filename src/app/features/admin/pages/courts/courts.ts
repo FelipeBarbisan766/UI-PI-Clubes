@@ -11,16 +11,17 @@ import {
   Validators,
   ReactiveFormsModule,
 } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ServiceCourt } from '../../services/service-court';
 import { TypeEnum, SurfaceEnum, ResponseCourtDTO } from '../../models/model-court';
+import { Modal } from "../../../../shared/components/modal/modal";
 
 type FormMode = 'create' | 'edit' | null;
 
 @Component({
   selector: 'app-court',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, Modal],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './courts.html',
 })
@@ -28,6 +29,10 @@ export class Courts implements OnInit {
   private readonly fb = inject(FormBuilder);
   protected readonly courtService = inject(ServiceCourt);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute); // Injeção da rota para pegar o ID
+
+  // ID do clube capturado da URL
+  private currentClubId: string = '';
 
   // --- Enum options for selects ---
   protected readonly typeOptions = Object.entries(TypeEnum)
@@ -40,14 +45,15 @@ export class Courts implements OnInit {
 
   // --- Local state ---
   protected readonly formMode = signal<FormMode>(null);
-  protected readonly editingId = signal<string | null>(null); // Alterado de number para string
+  protected readonly editingId = signal<string | null>(null);
   protected readonly selectedFiles = signal<File[]>([]);
-  protected readonly deleteConfirmId = signal<string | null>(null); // Alterado de number para string
+  protected readonly deleteConfirmId = signal<string | null>(null);
 
   protected readonly isFormOpen = computed(() => this.formMode() !== null);
   protected readonly isEditing = computed(() => this.formMode() === 'edit');
 
   // --- Form ---
+  // clubId foi removido pois agora é preenchido de forma transparente via URL
   protected readonly form = this.fb.group({
     name: ['', [Validators.required, Validators.minLength(3)]],
     type: [null as TypeEnum | null, Validators.required],
@@ -55,7 +61,6 @@ export class Courts implements OnInit {
     isCovered: [false],
     pricePerHour: [null as number | null, [Validators.required, Validators.min(0)]],
     description: ['', Validators.required],
-    clubId: ['', Validators.required],
   });
 
   private readonly formStatus = toSignal(this.form.statusChanges, {
@@ -70,6 +75,15 @@ export class Courts implements OnInit {
   });
 
   ngOnInit(): void {
+    // Tenta pegar o ID da URL atual ou da rota pai (cobrindo parâmetros nomeados como 'id' ou 'clubId')
+    this.currentClubId = 
+      this.route.snapshot.paramMap.get('id') ?? 
+      this.route.parent?.snapshot.paramMap.get('id') ?? 
+      this.route.snapshot.paramMap.get('clubId') ?? 
+      this.route.parent?.snapshot.paramMap.get('clubId') ?? 
+      '';
+
+    // Aqui pode ser necessário passar o currentClubId caso o getAll() seja filtrado por clube no backend
     this.courtService.getAll().subscribe();
   }
 
@@ -83,7 +97,6 @@ export class Courts implements OnInit {
       isCovered: false,
       pricePerHour: null,
       description: '',
-      clubId: '',
     });
     this.selectedFiles.set([]);
     this.editingId.set(null);
@@ -98,7 +111,6 @@ export class Courts implements OnInit {
       isCovered: court.isCovered,
       pricePerHour: court.pricePerHour,
       description: court.description,
-      clubId: court.clubId,
     });
     this.selectedFiles.set([]);
     this.editingId.set(court.id);
@@ -128,7 +140,7 @@ export class Courts implements OnInit {
       return;
     }
 
-    const { name, type, surface, isCovered, pricePerHour, description, clubId } =
+    const { name, type, surface, isCovered, pricePerHour, description } =
       this.form.getRawValue();
 
     if (this.formMode() === 'create') {
@@ -140,16 +152,15 @@ export class Courts implements OnInit {
           isCovered: isCovered!,
           pricePerHour: pricePerHour!,
           description: description!,
-          clubId: clubId!,
+          clubId: this.currentClubId,
           images: this.selectedFiles(),
         })
         .subscribe({
           next: () => {
-             this.closeForm(); // Alterado para fechar o modal em vez de tentar navegar, se for a mesma rota
+             this.closeForm();
           },
           error: (err: unknown) => {
              console.error('Erro ao criar quadra', err);
-             // O erro já foi setado no signal _error pelo handleError do próprio service!
           },
         });
     } else {
@@ -171,7 +182,7 @@ export class Courts implements OnInit {
 
   // --- Delete ---
 
-  protected requestDelete(id: string): void { // Alterado de number para string
+  protected requestDelete(id: string): void {
     this.deleteConfirmId.set(id);
   }
 
