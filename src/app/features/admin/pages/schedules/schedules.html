@@ -1,0 +1,160 @@
+<div class="p-6 max-w-7xl mx-auto">
+  <!-- Cabeçalho -->
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+    <div>
+      <h1 class="text-3xl font-bold text-base-content">Gestão de Horários</h1>
+      <p class="text-base-content/60 mt-1">Gerencie os horários disponíveis para esta quadra.</p>
+    </div>
+    <button class="btn btn-primary text-primary-content" (click)="openCreate()">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+      Novo Horário
+    </button>
+  </div>
+
+  <!-- Alertas -->
+  @if (scheduleService.error()) {
+    <div role="alert" class="alert alert-error mb-6">
+      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+      <span>Erro: {{ scheduleService.error() }}</span>
+    </div>
+  }
+
+  @if (scheduleService.loading()) {
+    <div class="flex justify-center my-10" aria-live="polite" aria-busy="true">
+      <span class="loading loading-spinner loading-lg text-primary"></span>
+      <span class="sr-only">Carregando horários...</span>
+    </div>
+  }
+
+  <!-- Listagem de Horários -->
+  @if (!isFormOpen()) {
+    @if (scheduleService.isEmpty()) {
+      <div class="text-center py-16 text-base-content/50 border-2 border-dashed border-base-300 rounded-box">
+        <p class="text-lg">Nenhum horário cadastrado para esta quadra ainda.</p>
+      </div>
+    } @else {
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @for (schedule of scheduleService.schedules(); track schedule.id) {
+          <div class="card bg-base-100 card-border shadow-sm hover:shadow-md transition-shadow">
+            <div class="card-body p-5">
+              <!-- Título e Ações -->
+              <div class="flex justify-between items-start">
+                <h2 class="card-title text-lg font-bold">{{ getDayName(schedule.dayOfWeek) }}</h2>
+                <div class="flex gap-1 -mt-1 -mr-2">
+                  <button class="btn btn-ghost btn-sm btn-square text-base-content/70 hover:text-primary" aria-label="Editar horário" title="Editar" (click)="openEdit(schedule)">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                  </button>
+                  <button class="btn btn-ghost btn-sm btn-square text-base-content/70 hover:text-error" aria-label="Excluir horário" title="Excluir" (click)="requestDelete(schedule.id)">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Horário -->
+              <p class="text-2xl font-bold text-primary mt-1">
+                {{ schedule.startTime }} – {{ schedule.endTime }}
+              </p>
+
+              <!-- Tags de Status -->
+              <div class="flex flex-wrap gap-2 mt-3">
+                @if (schedule.isFixed) {
+                  <div class="badge badge-info badge-sm text-info-content font-semibold">Fixo</div>
+                }
+                @if (schedule.isReserved) {
+                  <div class="badge badge-success badge-sm text-success-content font-semibold">Reservado</div>
+                }
+                @if (schedule.isBlocked) {
+                  <div class="badge badge-error badge-sm text-error-content font-semibold">Bloqueado</div>
+                }
+                @if (!schedule.isFixed && !schedule.isReserved && !schedule.isBlocked) {
+                  <div class="badge badge-ghost badge-sm font-semibold">Disponível</div>
+                }
+              </div>
+
+              <!-- Confirmação de Exclusão Inline -->
+              @if (deleteConfirmId() === schedule.id) {
+                <div role="alert" class="alert alert-warning mt-4 p-3 text-sm flex-col items-start gap-3">
+                  <span class="font-semibold">Tem certeza que deseja excluir?</span>
+                  <div class="flex gap-2 w-full">
+                    <button class="btn btn-sm btn-error flex-1 text-error-content" (click)="confirmDelete()">Excluir</button>
+                    <button class="btn btn-sm btn-ghost flex-1 border border-base-300" (click)="cancelDelete()">Cancelar</button>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>
+
+<!-- Modal Form -->
+@if (isFormOpen()) {
+  <app-modal>
+    <div class="flex justify-between items-center mb-4 border-b border-base-200 pb-3">
+      <h3 id="modal-title" class="font-bold text-xl text-base-content">
+        {{ isEditing() ? 'Editar Horário' : 'Cadastrar Horário' }}
+      </h3>
+      <button class="btn btn-ghost btn-sm btn-circle" aria-label="Fechar modal" (click)="closeForm()">✕</button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-3">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
+
+        <div class="flex flex-col w-full">
+          <label class="py-1 font-medium text-xs text-base-content" for="startTime">Horário de Início</label>
+          <input id="startTime" type="time" formControlName="startTime" class="input input-bordered input-sm w-full" [class.input-error]="fieldInvalid('startTime')" />
+          @if (fieldInvalid('startTime')) { <span role="alert" class="block text-error text-[11px] mt-1 font-medium px-1">Obrigatório</span> }
+        </div>
+
+        <div class="flex flex-col w-full">
+          <label class="py-1 font-medium text-xs text-base-content" for="endTime">Horário de Término</label>
+          <input id="endTime" type="time" formControlName="endTime" class="input input-bordered input-sm w-full" [class.input-error]="fieldInvalid('endTime')" />
+          @if (fieldInvalid('endTime')) { <span role="alert" class="block text-error text-[11px] mt-1 font-medium px-1">Obrigatório</span> }
+        </div>
+
+        <div class="flex flex-col w-full md:col-span-2">
+          <label class="py-1 font-medium text-xs text-base-content" for="dayOfWeek">Dia da Semana</label>
+          <select id="dayOfWeek" formControlName="dayOfWeek" class="select select-bordered select-sm w-full" [class.select-error]="fieldInvalid('dayOfWeek')">
+            <option [value]="null" disabled>Selecione um dia</option>
+            @for (option of dayOfWeekOptions; track option.value) {
+              <option [value]="option.value">{{ option.label }}</option>
+            }
+          </select>
+          @if (fieldInvalid('dayOfWeek')) { <span role="alert" class="block text-error text-[11px] mt-1 font-medium px-1">Obrigatório</span> }
+        </div>
+      </div>
+
+      <!-- Flags de status -->
+      <fieldset class="fieldset border border-base-200 p-3 rounded-box mt-1">
+        <legend class="fieldset-legend text-sm font-semibold px-2">Status</legend>
+        <div class="flex flex-col gap-3">
+          <label class="flex items-center gap-3 cursor-pointer">
+            <input type="checkbox" formControlName="isFixed" class="checkbox checkbox-sm checkbox-primary" />
+            <span class="text-sm text-base-content">Horário fixo</span>
+          </label>
+          <label class="flex items-center gap-3 cursor-pointer">
+            <input type="checkbox" formControlName="isReserved" class="checkbox checkbox-sm checkbox-success" />
+            <span class="text-sm text-base-content">Reservado</span>
+          </label>
+          <label class="flex items-center gap-3 cursor-pointer">
+            <input type="checkbox" formControlName="isBlocked" class="checkbox checkbox-sm checkbox-error" />
+            <span class="text-sm text-base-content">Bloqueado</span>
+          </label>
+        </div>
+      </fieldset>
+
+      <!-- Ações do Modal -->
+      <div class="modal-action mt-4 pt-3 border-t border-base-200">
+        <button type="button" class="btn btn-ghost btn-sm" (click)="closeForm()">Cancelar</button>
+        <button type="submit" class="btn btn-primary btn-sm text-primary-content px-6" [disabled]="!isSubmitEnabled() || scheduleService.loading()">
+          @if (scheduleService.loading()) {
+            <span class="loading loading-spinner loading-xs" aria-hidden="true"></span>
+          }
+          Salvar Horário
+        </button>
+      </div>
+    </form>
+  </app-modal>
+}

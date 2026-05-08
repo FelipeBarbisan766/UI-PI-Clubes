@@ -60,9 +60,19 @@
               <p class="text-sm text-base-content/60 mt-3 line-clamp-2 min-h-[40px]">{{ club.description }}</p>
 
               <!-- Preço / Info Final -->
-              <div class="mt-4 pt-4 border-t border-base-200 flex flex-col gap-1">
-                <p class="font-bold text-primary text-xl">R$ {{ club.minPrice }}/h</p>
-                <p class="text-xs text-base-content/50">{{ club.phoneNumber }}</p>
+              <div class="mt-4 pt-4 border-t border-base-200 flex items-center justify-between gap-2">
+                <div class="flex flex-col gap-1">
+                  <p class="font-bold text-primary text-xl">R$ {{ club.minPrice }}/h</p>
+                  <p class="text-xs text-base-content/50">{{ club.phoneNumber }}</p>
+                </div>
+                <button
+                  class="btn btn-outline btn-sm gap-2"
+                  aria-label="Gerenciar quadras do clube"
+                  title="Gerenciar Quadras"
+                  (click)="goToCourts(club.id)">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                  Quadras
+                </button>
               </div>
 
               <!-- Confirmação de Exclusão Inline -->
@@ -87,17 +97,15 @@
 @if (isFormOpen()) {
   <app-modal>
     <div class="flex justify-between items-center mb-4 border-b border-base-200 pb-3">
-      <!-- Título menor -->
       <h3 id="modal-title" class="font-bold text-xl text-base-content">
         {{ isEditing() ? 'Editar Clube' : 'Cadastrar Clube' }}
       </h3>
       <button class="btn btn-ghost btn-sm btn-circle" aria-label="Fechar modal" (click)="closeForm()">✕</button>
     </div>
-    
+
     <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-3">
-      <!-- Grid de 3 colunas para dados principais -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-2">
-        
+
         <div class="flex flex-col w-full md:col-span-2">
           <label class="py-1 font-medium text-xs text-base-content" for="name">Nome do Clube</label>
           <input id="name" type="text" formControlName="name" class="input input-bordered input-sm w-full" [class.input-error]="fieldInvalid('name')" placeholder="Ex: Clube de Tênis..." />
@@ -109,7 +117,7 @@
           <input id="phoneNumber" type="text" formControlName="phoneNumber" class="input input-bordered input-sm w-full" [class.input-error]="fieldInvalid('phoneNumber')" placeholder="(00) 00000-0000" />
           @if (fieldInvalid('phoneNumber')) { <span role="alert" class="block text-error text-[11px] mt-1 font-medium px-1">Obrigatório</span> }
         </div>
-        
+
         <div class="flex flex-col w-full md:col-span-3">
           <label class="py-1 font-medium text-xs text-base-content" for="description">Descrição</label>
           <textarea id="description" formControlName="description" class="textarea textarea-bordered textarea-sm h-16 resize-none w-full" [class.textarea-error]="fieldInvalid('description')" placeholder="Descreva sobre o clube..."></textarea>
@@ -117,11 +125,10 @@
         </div>
       </div>
 
-      <!-- Fieldset de Endereço com Grid de 4 colunas para otimizar espaço -->
       <fieldset class="fieldset border border-base-200 p-3 rounded-box mt-1">
         <legend class="fieldset-legend text-sm font-semibold px-2">Endereço</legend>
         <div class="grid grid-cols-1 md:grid-cols-4 gap-x-4 gap-y-2 w-full">
-          
+
           <div class="flex flex-col w-full md:col-span-1">
             <label class="py-1 font-medium text-xs text-base-content" for="zipCode">CEP</label>
             <input id="zipCode" type="text" formControlName="zipCode" class="input input-bordered input-sm w-full" [class.input-error]="fieldInvalid('zipCode')" />
@@ -175,7 +182,7 @@
         <div class="flex flex-col w-full mt-1">
           <label class="py-1 font-medium text-xs text-base-content" for="images">Imagens do Clube</label>
           <input id="images" type="file" multiple accept="image/*" (change)="onFilesSelected($event)" class="file-input file-input-bordered file-input-primary file-input-sm w-full" />
-          
+
           @if (selectedFiles().length > 0) {
             <ul class="flex flex-wrap gap-2 mt-2" aria-label="Imagens selecionadas">
               @for (file of selectedFiles(); track file.name; let i = $index) {
@@ -189,7 +196,6 @@
         </div>
       }
 
-      <!-- Ações do Modal com botões menores (btn-sm) -->
       <div class="modal-action mt-4 pt-3 border-t border-base-200">
         <button type="button" class="btn btn-ghost btn-sm" (click)="closeForm()">Cancelar</button>
         <button type="submit" class="btn btn-primary btn-sm text-primary-content px-6" [disabled]="!isSubmitEnabled() || clubService.loading()">

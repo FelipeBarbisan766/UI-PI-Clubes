@@ -52,6 +52,12 @@ export class Courts implements OnInit {
   protected readonly isFormOpen = computed(() => this.formMode() !== null);
   protected readonly isEditing = computed(() => this.formMode() === 'edit');
 
+    // --- Navigation ---
+
+  protected goToSchedules(courtId: string): void {
+    this.router.navigate(['/admin/club', this.currentClubId, 'court', courtId, 'schedule']);
+  }
+
   // --- Form ---
   // clubId foi removido pois agora é preenchido de forma transparente via URL
   protected readonly form = this.fb.group({
@@ -76,15 +82,15 @@ export class Courts implements OnInit {
 
   ngOnInit(): void {
     // Tenta pegar o ID da URL atual ou da rota pai (cobrindo parâmetros nomeados como 'id' ou 'clubId')
-    this.currentClubId = 
-      this.route.snapshot.paramMap.get('id') ?? 
-      this.route.parent?.snapshot.paramMap.get('id') ?? 
-      this.route.snapshot.paramMap.get('clubId') ?? 
-      this.route.parent?.snapshot.paramMap.get('clubId') ?? 
+    this.currentClubId =
+      this.route.snapshot.paramMap.get('id') ??
+      this.route.parent?.snapshot.paramMap.get('id') ??
+      this.route.snapshot.paramMap.get('clubId') ??
+      this.route.parent?.snapshot.paramMap.get('clubId') ??
       '';
 
     // Aqui pode ser necessário passar o currentClubId caso o getAll() seja filtrado por clube no backend
-    this.courtService.getAll().subscribe();
+    this.courtService.getByClubId(this.currentClubId).subscribe();
   }
 
   // --- Form actions ---
