@@ -35,18 +35,11 @@ export class ServiceClub {
 
   // --- CRUD ---
 
-  getAll(params?: Record<string, string>): Observable<ResponseClubDTO[]> {
-    let httpParams = new HttpParams();
-    if (params) {
-      Object.entries(params).forEach(([key, value]) => {
-        httpParams = httpParams.set(key, value);
-      });
-    }
-
+  getAllByAdminId(id: string): Observable<ResponseClubDTO[]> {
     this._loading.set(true);
     this._error.set(null);
 
-    return this.http.get<ResponseClubDTO[]>(this.apiUrl, { params: httpParams }).pipe(
+    return this.http.get<ResponseClubDTO[]>(`${this.apiUrl}/admin/${id}`).pipe(
       tap((clubs) => {
         this._clubs.set(clubs);
         this._loading.set(false);

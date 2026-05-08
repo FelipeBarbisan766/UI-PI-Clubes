@@ -11,10 +11,11 @@ import {
   Validators,
   ReactiveFormsModule,
 } from '@angular/forms';
+import { Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ServiceClub } from '../../services/service-club';
 import { AuthService } from '../../../../core/services/auth-service';
-import { Modal } from "../../../../shared/components/modal/modal"; 
+import { Modal } from '../../../../shared/components/modal/modal';
 
 type FormMode = 'create' | 'edit' | null;
 
@@ -26,6 +27,7 @@ type FormMode = 'create' | 'edit' | null;
 })
 export class Clubs implements OnInit {
   private readonly fb = inject(FormBuilder);
+  private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
   protected readonly clubService = inject(ServiceClub);
 
@@ -65,9 +67,24 @@ export class Clubs implements OnInit {
   });
 
   ngOnInit(): void {
-    this.clubService.getAll().subscribe();
+    this.authService.getAdminMe().subscribe({
+      next: (admin) => {
+        this.adminId = admin.id;
+        this.clubService.getAllByAdminId(this.adminId).subscribe();
+      },
+      error: (err: unknown) => {
+        console.error('Não foi possível obter o perfil do administrador.', err);
+      },
+    });
   }
 
+  // --- Navigation ---
+
+  protected goToCourts(clubId: string): void {
+    this.router.navigate(['/admin/club', clubId, 'courts']);
+  }
+
+  // --- Form actions ---
 
   protected openCreate(): void {
     this.form.reset({
@@ -211,6 +228,7 @@ export class Clubs implements OnInit {
       .subscribe({ next: () => this.closeForm() });
   }
 
+  // --- Delete ---
 
   protected requestDelete(id: string): void {
     this.deleteConfirmId.set(id);
@@ -228,6 +246,7 @@ export class Clubs implements OnInit {
     this.deleteConfirmId.set(null);
   }
 
+  // --- Helpers ---
 
   protected fieldInvalid(field: string): boolean {
     const ctrl = this.form.get(field);

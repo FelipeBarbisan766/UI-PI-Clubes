@@ -74,6 +74,16 @@ export const routes: Routes = [
             path: 'courts',
             loadComponent: () =>
               import('./features/admin/pages/courts/courts').then((m) => m.Courts),
+          },
+          {
+            path: 'court/:courtId',
+            children: [
+              {
+                path: 'schedule',
+                loadComponent: () =>
+                  import('./features/admin/pages/schedules/schedules').then((m) => m.Schedules),
+              }
+            ]
           }
         ]
       }

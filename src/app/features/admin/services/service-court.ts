@@ -35,18 +35,11 @@ export class ServiceCourt {
 
   // --- CRUD ---
 
-  getAll(params?: Record<string, string>): Observable<ResponseCourtDTO[]> {
-    let httpParams = new HttpParams();
-    if (params) {
-      Object.entries(params).forEach(([key, value]) => {
-        httpParams = httpParams.set(key, value);
-      });
-    }
-
+  getByClubId(id: string): Observable<ResponseCourtDTO[]> {
     this._loading.set(true);
     this._error.set(null);
 
-    return this.http.get<ResponseCourtDTO[]>(this.apiUrl, { params: httpParams }).pipe(
+    return this.http.get<ResponseCourtDTO[]>(`${this.apiUrl}/club/${id}`).pipe(
       tap((courts) => {
         this._courts.set(courts);
         this._loading.set(false);
