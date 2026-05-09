@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
 import { NgOptimizedImage } from '@angular/common';
 import { ServiceClub } from '../services/service-club';
 import { ResponseClubDTO } from '../models/model-club';
+import { TypeEnum } from '../models/model-court';
 
 @Component({
   selector: 'app-clubs-list',
@@ -57,4 +58,46 @@ export class ClubsList implements OnInit {
   trackById(_index: number, club: ResponseClubDTO): string {
     return club.id;
   }
+
+// Mapa de TypeEnum → label legível
+readonly typeLabels: Record<TypeEnum, string> = {
+  [TypeEnum.None]:          'Outro',
+  [TypeEnum.Futsal]:        'Futsal',
+  [TypeEnum.Basquetebol]:   'Basquetebol',
+  [TypeEnum.Basquete]:      'Basquete',
+  [TypeEnum.Voleibol]:      'Vôlei',
+  [TypeEnum.VôleiSentado]:  'Vôlei Sentado',
+  [TypeEnum.Handebol]:      'Handebol',
+  [TypeEnum.Netball]:       'Netball',
+  [TypeEnum.Tênis]:         'Tênis',
+  [TypeEnum.Badminton]:     'Badminton',
+  [TypeEnum.Squash]:        'Squash',
+  [TypeEnum.Padel]:         'Padel',
+  [TypeEnum.Pickleball]:    'Pickleball',
+  [TypeEnum.TênisDeMesa]:   'Tênis de Mesa',
+  [TypeEnum.Judô]:          'Judô',
+  [TypeEnum.Karatê]:        'Karatê',
+  [TypeEnum.Taekwondo]:     'Taekwondo',
+  [TypeEnum.Esgrima]:       'Esgrima',
+  [TypeEnum.SepakTakraw]:   'Sepak Takraw',
+  [TypeEnum.Hóquei]:        'Hóquei',
+  [TypeEnum.Dodgeball]:     'Dodgeball',
+  [TypeEnum.Raquetebol]:    'Raquetebol',
+  [TypeEnum.PelotaBasca]:   'Pelota Basca',
+  [TypeEnum.Floorball]:     'Floorball',
+  [TypeEnum.Korfball]:      'Korfball',
+  [TypeEnum.Tchoukball]:    'Tchoukball',
+  [TypeEnum.Goalball]:      'Goalball',
+  [TypeEnum.Futebol]:       'Futebol',
+};
+
+// Lista usada nos checkboxes do sidebar
+readonly availableTypes = Object.entries(this.typeLabels)
+  .filter(([value]) => Number(value) !== TypeEnum.None)
+  .map(([value, label]) => ({ value: Number(value) as TypeEnum, label }));
+
+// Converte um TypeEnum para seu label (usado no @for do template)
+getTypeName(type: TypeEnum): string {
+  return this.typeLabels[type] ?? 'Outro';
+}
 }
