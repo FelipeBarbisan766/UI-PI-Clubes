@@ -6,6 +6,7 @@ import { authGuard } from './core/guards/auth-guard';
 import { SignUp } from './features/auth/pages/sign-up/sign-up';
 import { adminGuard } from './core/guards/admin-guard';
 import { selectRoleGuard } from './core/guards/selectRole-guard';
+import { Clubs } from './features/admin/pages/clubs/clubs';
 
 export const routes: Routes = [
   {
@@ -48,6 +49,11 @@ export const routes: Routes = [
     ],
   },
   {
+        path: 'admin/clubs',
+        canActivate: [adminGuard],
+        component: Clubs,
+      },
+  {
     path: 'admin',
     component: AdminLayout,
     canActivate: [adminGuard],
@@ -56,11 +62,6 @@ export const routes: Routes = [
         path: '',
         redirectTo: 'clubs',
         pathMatch: 'full',
-      },
-      {
-        path: 'clubs',
-        loadComponent: () =>
-          import('./features/admin/pages/clubs/clubs').then((m) => m.Clubs),
       },
       {
         path: 'club/:clubId',
@@ -100,8 +101,8 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/auth/pages/select-role/select-role').then((m) => m.SelectRole),
   },
-  {
-    path: '**',
-    redirectTo: '',
-  },
+  // {
+  //   path: '**',
+  //   redirectTo: '',
+  // },
 ];

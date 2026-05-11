@@ -1,21 +1,21 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
+  computed,
   inject,
   OnInit,
   signal,
-  computed,
 } from '@angular/core';
-import {
-  FormBuilder,
-  Validators,
-  ReactiveFormsModule,
-} from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { debounceTime, distinctUntilChanged, filter, map, switchMap } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ServiceClub } from '../../services/service-club';
 import { AuthService } from '../../../../core/services/auth-service';
 import { Modal } from '../../../../shared/components/modal/modal';
+import { ViaCepService } from '../../../../core/services/via-cep'; 
 
 type FormMode = 'create' | 'edit' | null;
 
@@ -29,6 +29,9 @@ export class Clubs implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
+  private readonly viaCepService = inject(ViaCepService);
+  private readonly destroyRef = inject(DestroyRef);
+
   protected readonly clubService = inject(ServiceClub);
 
   protected readonly formMode = signal<FormMode>(null);
@@ -76,6 +79,34 @@ export class Clubs implements OnInit {
         console.error('Não foi possível obter o perfil do administrador.', err);
       },
     });
+
+    this.form.controls.zipCode.valueChanges
+      .pipe(
+        map((value) => (value ?? '').replace(/\D/g, '')),
+        distinctUntilChanged(),
+        debounceTime(300),
+        filter((cep) => cep.length === 8),
+        switchMap((cep) => this.viaCepService.getAddressByCep(cep)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (address) => {
+          if (address.erro) {
+            return;
+          }
+
+          this.form.patchValue({
+            street: address.logradouro,
+            neighborhood: address.bairro,
+            city: address.localidade,
+            state: address.uf,
+            complement: address.complemento,
+          });
+        },
+        error: (err: unknown) => {
+          console.error('Erro ao buscar CEP', err);
+        },
+      });
   }
 
   // --- Navigation ---
@@ -125,13 +156,15 @@ export class Clubs implements OnInit {
         this.editingId.set(id);
         this.formMode.set('edit');
       },
+      error: (err: unknown) => {
+        console.error('Não foi possível carregar o clube para edição.', err);
+      },
     });
   }
 
   protected closeForm(): void {
     this.formMode.set(null);
     this.editingId.set(null);
-    this.adminId = null;
     this.form.reset();
   }
 
@@ -153,22 +186,22 @@ export class Clubs implements OnInit {
     }
 
     if (this.formMode() === 'create') {
-      this._submitCreate();
+      this.submitCreate();
     } else {
-      this._submitUpdate();
+      this.submitUpdate();
     }
   }
 
-  private _submitCreate(): void {
+  private submitCreate(): void {
     if (this.adminId) {
-      this._dispatchCreate(this.adminId);
+      this.dispatchCreate(this.adminId);
       return;
     }
 
     this.authService.getAdminMe().subscribe({
       next: (admin) => {
         this.adminId = admin.id;
-        this._dispatchCreate(admin.id);
+        this.dispatchCreate(admin.id);
       },
       error: (err: unknown) => {
         console.error('Não foi possível obter o perfil do administrador.', err);
@@ -176,7 +209,7 @@ export class Clubs implements OnInit {
     });
   }
 
-  private _dispatchCreate(adminId: string): void {
+  private dispatchCreate(adminId: string): void {
     const { name, phoneNumber, description, zipCode, street, number, neighborhood, complement, city, state, country } =
       this.form.getRawValue();
 
@@ -204,7 +237,7 @@ export class Clubs implements OnInit {
       });
   }
 
-  private _submitUpdate(): void {
+  private submitUpdate(): void {
     const id = this.editingId();
     if (id === null) return;
 
@@ -225,7 +258,12 @@ export class Clubs implements OnInit {
         state: state!,
         country: country!,
       })
-      .subscribe({ next: () => this.closeForm() });
+      .subscribe({
+        next: () => this.closeForm(),
+        error: (err: unknown) => {
+          console.error('Erro ao atualizar clube', err);
+        },
+      });
   }
 
   // --- Delete ---
