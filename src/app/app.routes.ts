@@ -19,9 +19,14 @@ export const routes: Routes = [
           import('./features/home-page/home-page').then((m) => m.HomePage),
       },
       {
-        path: 'clubs-list',
+        path: 'clubs',
         loadComponent: () =>
           import('./features/clubs/clubs-list/clubs-list').then((m) => m.ClubsList),
+      },
+      {
+        path: 'clubs/:clubId',
+        loadComponent: () =>
+          import('./features/clubs/clubs-details/clubs-details').then((m) => m.ClubsDetail),
       },
       {
         path: 'login',
