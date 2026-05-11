@@ -1,12 +1,12 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { Observable, tap, catchError, throwError } from 'rxjs';
-import { ResponseClubDTO, ResponseClubByIdDTO} from '../models/model-club';
+import { ResponseCourtDTO} from '../models/model-court';
 import { environment } from '../../../../environments/environment';
 
-export interface ClubState {
-  clubs: ResponseClubDTO[];
-  selectedClub: ResponseClubByIdDTO | null;
+export interface CourtState {
+  courts: ResponseCourtDTO[];
+  selectedCourt: ResponseCourtDTO | null;
   loading: boolean;
   error: string | null;
 }
@@ -14,54 +14,47 @@ export interface ClubState {
 @Injectable({
   providedIn: 'root',
 })
-export class ServiceClub {
+export class ServiceCourt {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = `${environment.apiUrl}/club`;
+  private readonly apiUrl = `${environment.apiUrl}/court`;
 
   // --- State ---
-  private readonly _clubs = signal<ResponseClubDTO[]>([]);
-  private readonly _selectedClub = signal<ResponseClubByIdDTO | null>(null);
+  private readonly _courts = signal<ResponseCourtDTO[]>([]);
+  private readonly _selectedCourt = signal<ResponseCourtDTO | null>(null);
   private readonly _loading = signal<boolean>(false);
   private readonly _error = signal<string | null>(null);
 
   // --- Selectors (public, readonly) ---
-  readonly clubs = this._clubs.asReadonly();
-  readonly selectedClub = this._selectedClub.asReadonly();
+  readonly courts = this._courts.asReadonly();
+  readonly selectedcourt = this._selectedCourt.asReadonly();
   readonly loading = this._loading.asReadonly();
   readonly error = this._error.asReadonly();
 
-  readonly isEmpty = computed(() => this._clubs().length === 0);
-  readonly clubsCount = computed(() => this._clubs().length);
+  readonly isEmpty = computed(() => this._courts().length === 0);
+  readonly courtsCount = computed(() => this._courts().length);
 
   // --- CRUD ---
 
-  getAll(params?: Record<string, string>): Observable<ResponseClubDTO[]> {
-    let httpParams = new HttpParams();
-    if (params) {
-      Object.entries(params).forEach(([key, value]) => {
-        httpParams = httpParams.set(key, value);
-      });
-    }
-
+  getAll(clubId: string): Observable<ResponseCourtDTO[]> {
     this._loading.set(true);
     this._error.set(null);
 
-    return this.http.get<ResponseClubDTO[]>(this.apiUrl, { params: httpParams }).pipe(
-      tap((clubs) => {
-        this._clubs.set(clubs);
+    return this.http.get<ResponseCourtDTO[]>(`${this.apiUrl}/club/${clubId}`).pipe(
+      tap((courts) => {
+        this._courts.set(courts);
         this._loading.set(false);
       }),
       catchError((err) => this.handleError(err)),
     );
   }
 
-  getById(id: string): Observable<ResponseClubByIdDTO> {
+  getById(id: string): Observable<ResponseCourtDTO> {
     this._loading.set(true);
     this._error.set(null);
 
-    return this.http.get<ResponseClubByIdDTO>(`${this.apiUrl}/${id}`).pipe(
-      tap((club) => {
-        this._selectedClub.set(club);
+    return this.http.get<ResponseCourtDTO>(`${this.apiUrl}/${id}`).pipe(
+      tap((court) => {
+        this._selectedCourt.set(court);
         this._loading.set(false);
       }),
       catchError((err) => this.handleError(err)),
@@ -71,8 +64,8 @@ export class ServiceClub {
 
   // --- Helpers ---
 
-  selectClub(club: ResponseClubByIdDTO | null): void {
-    this._selectedClub.set(club);
+  selectcourt(court: ResponseCourtDTO | null): void {
+    this._selectedCourt.set(court);
   }
 
   clearError(): void {
