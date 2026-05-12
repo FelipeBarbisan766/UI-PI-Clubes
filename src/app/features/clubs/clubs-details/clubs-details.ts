@@ -45,7 +45,8 @@ export class ClubsDetail implements OnInit {
 
   // --- Lifecycle ---
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
+    const id = this.route.snapshot.paramMap.get('clubId');
+    console.log(id);
     if (id) this.loadClub(id);
   }
 
