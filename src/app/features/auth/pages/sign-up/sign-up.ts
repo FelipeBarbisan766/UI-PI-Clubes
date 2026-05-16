@@ -3,6 +3,7 @@ import { AbstractControl, NonNullableFormBuilder, ReactiveFormsModule, Validatio
 import { Router, RouterLink } from '@angular/router';
 import { ServiceSignUp } from '../../services/service-sign-up';
 import { ToastAlert } from '../../../../shared/components/toast-alert/toast-alert';
+import { NgxMaskDirective } from 'ngx-mask';
 
 function passwordsMatchValidator(control: AbstractControl): ValidationErrors | null {
   const password = control.get('password')?.value ?? '';
@@ -12,7 +13,7 @@ function passwordsMatchValidator(control: AbstractControl): ValidationErrors | n
 
 @Component({
   selector: 'app-sign-up',
-  imports: [ReactiveFormsModule, RouterLink, ToastAlert],
+  imports: [ReactiveFormsModule, RouterLink, ToastAlert, NgxMaskDirective],
   templateUrl: './sign-up.html',
   styleUrl: './sign-up.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -16,12 +16,13 @@ import { ServiceClub } from '../../services/service-club';
 import { AuthService } from '../../../../core/services/auth-service';
 import { Modal } from '../../../../shared/components/modal/modal';
 import { ViaCepService } from '../../../../core/services/via-cep'; 
+import { NgxMaskDirective } from 'ngx-mask';
 
 type FormMode = 'create' | 'edit' | null;
 
 @Component({
   selector: 'app-club',
-  imports: [ReactiveFormsModule, Modal],
+  imports: [ReactiveFormsModule, Modal, NgxMaskDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './clubs.html',
 })

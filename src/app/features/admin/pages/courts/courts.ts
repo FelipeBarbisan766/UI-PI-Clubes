@@ -16,12 +16,13 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ServiceCourt } from '../../services/service-court';
 import { TypeEnum, SurfaceEnum, ResponseCourtDTO } from '../../models/model-court';
 import { Modal } from "../../../../shared/components/modal/modal";
+import { NgxMaskDirective } from 'ngx-mask';
 
 type FormMode = 'create' | 'edit' | null;
 
 @Component({
   selector: 'app-court',
-  imports: [ReactiveFormsModule, Modal],
+  imports: [ReactiveFormsModule, Modal, NgxMaskDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './courts.html',
 })

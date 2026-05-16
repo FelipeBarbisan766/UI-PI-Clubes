@@ -84,6 +84,7 @@
               id="phoneNumber"
               type="tel"
               formControlName="phoneNumber"
+              mask="(00) 00000-0000"
               class="grow px-3 py-2 bg-transparent outline-none text-sm"
               [attr.aria-invalid]="form.controls.phoneNumber.invalid && form.controls.phoneNumber.touched"
               [attr.aria-describedby]="(form.controls.phoneNumber.invalid && form.controls.phoneNumber.touched) ? 'phoneNumber-error' : null"
