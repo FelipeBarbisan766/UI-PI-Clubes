@@ -9,11 +9,14 @@ import { Observable } from 'rxjs';
 })
 export class ServiceSignUp {
   private http = inject(HttpClient);
-  private apiUrl = `${environment.apiUrl}/Auth/register`;
+  private apiUrl = `${environment.apiUrl}/Auth`;
 
   signUp(data: SignUpPayload): Observable<string> {
-  return this.http.post(this.apiUrl, data, { responseType: 'text' });
-}
+    return this.http.post(`${this.apiUrl}/register`, data, { responseType: 'text' });
+  }
+  signUpWithGoogle(payload: { idToken: string }): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/google/signup`, payload);
+  }
 
 
 }
