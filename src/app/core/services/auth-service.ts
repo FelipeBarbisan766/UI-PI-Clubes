@@ -33,17 +33,37 @@ export class AuthService {
           this.authStatus.set('authenticated');
           this.meRequest$ = null;
         }),
-        catchError((error: unknown) => {
-          if (error instanceof HttpErrorResponse) {
-            if (error.status === 401) {
-              return throwError(() => new Error('Credenciais inválidas.'));
-            }
-            if (typeof error.error === 'string' && error.error.trim()) {
-              return throwError(() => new Error(error.error));
-            }
-          }
-          return throwError(() => new Error('Erro ao realizar login.'));
-        })
+        catchError(this.handleHttpError('Erro ao realizar login.'))
+      );
+  }
+
+  googleLogin(idToken: string): Observable<string> {
+    return this.http
+      .post(`${this.baseUrl}/google/login`, { idToken }, {
+        responseType: 'text',
+        withCredentials: true,
+      })
+      .pipe(
+        tap(() => {
+          this.authStatus.set('authenticated');
+          this.meRequest$ = null;
+        }),
+        catchError(this.handleHttpError('Erro ao realizar login com Google.'))
+      );
+  }
+
+  googleSignUp(idToken: string): Observable<string> {
+    return this.http
+      .post(`${this.baseUrl}/google/signup`, { idToken }, {
+        responseType: 'text',
+        withCredentials: true,
+      })
+      .pipe(
+        tap(() => {
+          this.authStatus.set('authenticated');
+          this.meRequest$ = null;
+        }),
+        catchError(this.handleHttpError('Erro ao criar conta com Google.'))
       );
   }
 
@@ -66,15 +86,7 @@ export class AuthService {
         tap(() => this.clearSession()),
         catchError((error: unknown) => {
           this.clearSession();
-
-          if (
-            error instanceof HttpErrorResponse &&
-            typeof error.error === 'string' &&
-            error.error.trim()
-          ) {
-            return throwError(() => new Error(error.error));
-          }
-          return throwError(() => new Error('Erro ao realizar logout.'));
+          return this.handleHttpError('Erro ao realizar logout.')(error);
         })
       );
   }
@@ -121,17 +133,7 @@ export class AuthService {
       .get<MeResponse>(`${this.baseUrl}/me`, { withCredentials: true })
       .pipe(
         tap((user) => this.markAuthenticated(user)),
-        catchError((error: unknown) => {
-          this.clearSession();
-          if (
-            error instanceof HttpErrorResponse &&
-            typeof error.error === 'string' &&
-            error.error.trim()
-          ) {
-            return throwError(() => new Error(error.error));
-          }
-          return throwError(() => new Error('Não foi possível carregar usuário.'));
-        })
+        catchError(this.handleHttpError('Não foi possível carregar usuário.'))
       );
   }
 
@@ -139,16 +141,7 @@ export class AuthService {
     return this.http
       .get<AdminMeResponse>(`${this.adminBaseUrl}/me`, { withCredentials: true })
       .pipe(
-        catchError((error: unknown) => {
-          if (
-            error instanceof HttpErrorResponse &&
-            typeof error.error === 'string' &&
-            error.error.trim()
-          ) {
-            return throwError(() => new Error(error.error));
-          }
-          return throwError(() => new Error('Não foi possível carregar o perfil do administrador.'));
-        })
+        catchError(this.handleHttpError('Não foi possível carregar o perfil do administrador.'))
       );
   }
 
@@ -156,16 +149,21 @@ export class AuthService {
     return this.http
       .get<PlayerMeResponse>(`${this.playerBaseUrl}/me`, { withCredentials: true })
       .pipe(
-        catchError((error: unknown) => {
-          if (
-            error instanceof HttpErrorResponse &&
-            typeof error.error === 'string' &&
-            error.error.trim()
-          ) {
-            return throwError(() => new Error(error.error));
-          }
-          return throwError(() => new Error('Não foi possível carregar o perfil do jogador.'));
-        })
+        catchError(this.handleHttpError('Não foi possível carregar o perfil do jogador.'))
       );
+  }
+
+  // Centraliza o tratamento de erro HTTP — evita repetição nos métodos acima
+  private handleHttpError(fallback: string) {
+    return (error: unknown): Observable<never> => {
+      if (error instanceof HttpErrorResponse) {
+        if (error.status === 401)
+          return throwError(() => new Error('Credenciais inválidas.'));
+
+        if (typeof error.error === 'string' && error.error.trim())
+          return throwError(() => new Error(error.error));
+      }
+      return throwError(() => new Error(fallback));
+    };
   }
 }
