@@ -104,7 +104,7 @@
 
         <div class="flex flex-col w-full md:col-span-1">
           <label class="py-1 font-medium text-xs text-base-content" for="pricePerHour">Preço por Hora (R$)</label>
-          <input id="pricePerHour" type="number" formControlName="pricePerHour" class="input input-bordered input-sm w-full" [class.input-error]="fieldInvalid('pricePerHour')" placeholder="0.00" />
+          <input id="pricePerHour" type="number" formControlName="pricePerHour" class="input input-bordered input-sm w-full" mask="00000.00" [class.input-error]="fieldInvalid('pricePerHour')" placeholder="0.00" />
           @if (fieldInvalid('pricePerHour')) { <span role="alert" class="block text-error text-[11px] mt-1 font-medium px-1">Preço inválido</span> }
         </div>
 

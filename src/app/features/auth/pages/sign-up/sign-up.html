@@ -84,6 +84,7 @@
               id="phoneNumber"
               type="tel"
               formControlName="phoneNumber"
+              mask="(00) 00000-0000"
               class="grow px-3 py-2 bg-transparent outline-none text-sm"
               [attr.aria-invalid]="form.controls.phoneNumber.invalid && form.controls.phoneNumber.touched"
               [attr.aria-describedby]="(form.controls.phoneNumber.invalid && form.controls.phoneNumber.touched) ? 'phoneNumber-error' : null"
@@ -180,6 +181,7 @@
         </div>
 
         <div class="text-center pt-1">
+          <div #googleBtn aria-label="Cadastrar com Google"></div>
           <p class="text-gray-500 text-xs md:text-sm">
             Já tem uma conta?
             <a routerLink="/login" class="link link-primary no-underline font-semibold hover:underline">
