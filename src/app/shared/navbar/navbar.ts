@@ -37,4 +37,8 @@ export class Navbar {
       error: () => void this.router.navigateByUrl('/login'),
     });
   }
+
+  goToAccount(): void {
+    void this.router.navigate(['/admin/clubs']);
+  }
 }

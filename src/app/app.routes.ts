@@ -54,47 +54,38 @@ export const routes: Routes = [
     ],
   },
   {
-        path: 'admin/clubs',
-        canActivate: [adminGuard],
-        component: Clubs,
-      },
-  {
-    path: 'admin',
+    path: 'admin/clubs',
+    canActivate: [adminGuard],
+    component: Clubs, 
+  },
+    {
+    path: 'admin/club/:clubId',
     component: AdminLayout,
     canActivate: [adminGuard],
     children: [
       {
-        path: '',
-        redirectTo: 'clubs',
-        pathMatch: 'full',
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./features/admin/pages/dashboard/dashboard').then((m) => m.Dashboard),
       },
       {
-        path: 'club/:clubId',
+        path: 'courts',
+        loadComponent: () =>
+          import('./features/admin/pages/courts/courts').then((m) => m.Courts),
+      },
+      {
+        path: 'court/:courtId',
         children: [
           {
-            path: 'dashboard',
+            path: 'schedule',
             loadComponent: () =>
-              import('./features/admin/pages/dashboard/dashboard').then((m) => m.Dashboard),
-          },
-          {
-            path: 'courts',
-            loadComponent: () =>
-              import('./features/admin/pages/courts/courts').then((m) => m.Courts),
-          },
-          {
-            path: 'court/:courtId',
-            children: [
-              {
-                path: 'schedule',
-                loadComponent: () =>
-                  import('./features/admin/pages/schedules/schedules').then((m) => m.Schedules),
-              }
-            ]
+              import('./features/admin/pages/schedules/schedules').then((m) => m.Schedules),
           }
         ]
       }
     ],
   },
+
   {
     path: 'sign-up',
     canActivate: [guestGuard],

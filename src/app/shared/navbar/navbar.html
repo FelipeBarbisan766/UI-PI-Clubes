@@ -64,7 +64,7 @@
             role="menu"
           >
             <li role="none">
-              <a role="menuitem" [routerLink]="['/select']">Minha conta</a>
+              <a role="menuitem" (click)="goToAccount()">Minha conta</a>
             </li>
             <li role="none">
               <button type="button" role="menuitem" (click)="onLogout()">

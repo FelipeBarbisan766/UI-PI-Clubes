@@ -12,7 +12,7 @@ export class AdminLayout {
   private route = inject(Router);
 
   goToCourts(): void {
-    this.route.navigateByUrl('/admin/courts');
+    this.route.navigateByUrl('/admin/:clubId/courts');
   }
 
   
