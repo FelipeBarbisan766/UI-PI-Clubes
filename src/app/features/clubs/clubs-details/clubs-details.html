@@ -8,7 +8,7 @@
   }
 
   @if (error()) {
-    <div role="alert" class="container mx-auto max-w-4xl mt-12 px-4">
+    <div role="alert" aria-live="assertive" class="container mx-auto max-w-4xl mt-12 px-4">
       <div class="rounded-2xl border border-error/20 bg-error/10 p-8 text-center">
         <p class="text-error font-medium mb-3">{{ error() }}</p>
         <button class="btn btn-sm btn-outline btn-error rounded-full" (click)="loadClub()">
@@ -32,7 +32,7 @@
         Voltar
       </a>
 
-      @if (getFirstImage(); as heroUrl) {
+      @if (getFirstImage(club()); as heroUrl) {
         <div class="h-64 sm:h-96 w-full rounded-3xl overflow-hidden relative shadow-sm border border-base-200">
           <img
             [ngSrc]="heroUrl"
