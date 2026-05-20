@@ -8,10 +8,11 @@
   }
 
   @if (error()) {
-    <div role="alert" aria-live="assertive" class="container mx-auto max-w-4xl mt-12 px-4">
-      <div class="rounded-2xl border border-error/20 bg-error/10 p-8 text-center">
-        <p class="text-error font-medium mb-3">{{ error() }}</p>
-        <button class="btn btn-sm btn-outline btn-error rounded-full" (click)="loadClub()">
+    <div class="container mx-auto max-w-4xl mt-12 px-4">
+      <!-- Utilização das novas classes de estilo do daisyUI 5: alert-soft -->
+      <div role="alert" aria-live="assertive" class="alert alert-soft alert-error p-8 flex-col text-center rounded-2xl">
+        <p class="font-medium">{{ error() }}</p>
+        <button class="btn btn-sm btn-error rounded-full mt-2" (click)="loadClub()">
           Tentar novamente
         </button>
       </div>
@@ -34,12 +35,13 @@
 
       @if (getFirstImage(club()); as heroUrl) {
         <div class="h-64 sm:h-96 w-full rounded-3xl overflow-hidden relative shadow-sm border border-base-200">
+          <!-- NgOptimizedImage (fill attribute requires the parent to be relative/absolute/fixed) -->
           <img
             [ngSrc]="heroUrl"
             [alt]="club()!.name"
             fill
             priority
-            class="object-cover w-full h-full"
+            class="object-cover"
           />
         </div>
       }
@@ -124,12 +126,13 @@
 
             <div class="grid gap-4 sm:grid-cols-2">
               @for (court of club()!.courts; track court.id) {
+                <!-- Binding de classe nativo mais limpo agrupando lógicas -->
                 <button
                   class="rounded-2xl border bg-base-100 p-4 text-left transition-all duration-200 hover:border-primary/40 hover:shadow-md outline-none"
-                  [class.ring-2]="selectedCourt()?.id === court.id"
-                  [class.ring-primary]="selectedCourt()?.id === court.id"
-                  [class.border-primary]="selectedCourt()?.id === court.id"
-                  [class.border-base-200]="selectedCourt()?.id !== court.id"
+                  [class]="{
+                    'ring-2 ring-primary border-primary': selectedCourt()?.id === court.id,
+                    'border-base-200': selectedCourt()?.id !== court.id
+                  }"
                   (click)="selectCourt(court)"
                   [attr.aria-pressed]="selectedCourt()?.id === court.id"
                   [attr.aria-label]="'Selecionar quadra ' + court.name">
@@ -178,11 +181,10 @@
                 @for (date of availableDates(); track date) {
                   <button
                     class="shrink-0 rounded-full px-4 py-1.5 text-xs font-medium transition-colors"
-                    [class.bg-primary]="selectedDate() === date"
-                    [class.text-primary-content]="selectedDate() === date"
-                    [class.bg-base-200]="selectedDate() !== date"
-                    [class.text-base-content]="selectedDate() !== date"
-                    [class.hover:bg-base-300]="selectedDate() !== date"
+                    [class]="{
+                      'bg-primary text-primary-content': selectedDate() === date,
+                      'bg-base-200 text-base-content hover:bg-base-300': selectedDate() !== date
+                    }"
                     (click)="selectDate(date)"
                     [attr.aria-pressed]="selectedDate() === date"
                     [attr.aria-label]="'Ver horários para ' + formatDate(date)">
@@ -196,31 +198,23 @@
                 <div class="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5" role="list" aria-label="Horários disponíveis">
                   @for (slot of slotsForDate(); track slot.id) {
                     <button
-                      [disabled]="!slot.available"
-                      (click)="openBookingModal(slot)"
-                      role="listitem"
-                      class="rounded-xl px-3 py-2 text-center text-sm font-medium transition-colors border"
-                      [class.bg-success/10]="slot.available"
-                      [class.text-success]="slot.available"
-                      [class.border-success/20]="slot.available"
-                      [class.hover:bg-success/20]="slot.available"
-                      [class.cursor-pointer]="slot.available"
-                      
-                      [class.bg-base-200]="!slot.available && slot.fixed"
-                      [class.text-base-content/40]="!slot.available && slot.fixed"
-                      [class.border-transparent]="!slot.available"
-                      [class.cursor-not-allowed]="!slot.available"
-                      
-                      [class.bg-error/10]="!slot.available && !slot.fixed"
-                      [class.text-error/60]="!slot.available && !slot.fixed"
-                      
-                      [attr.aria-label]="slot.startTime + (slot.available ? ', disponível' : ', indisponível')"
-                      [attr.aria-disabled]="!slot.available">
-                      {{ slot.startTime }}
-                      @if (!slot.available) {
-                        <div class="text-[10px] uppercase tracking-wider mt-0.5">{{ slot.fixed ? 'Fixo' : 'Ocupado' }}</div>
-                      }
-                    </button>
+                    (click)="openBookingModal(slot)"
+                    role="listitem"
+                    class="rounded-xl px-3 py-2 text-center text-sm font-medium transition-colors border"
+                    [ngClass]="{
+                     'bg-success/10 text-success border-success/20 hover:bg-success/20 cursor-pointer': slot.available,
+                      'bg-base-200 text-base-content/40 border-transparent cursor-not-allowed pointer-events-none': !slot.available && slot.fixed,
+                      'bg-error/10 text-error/60 border-transparent cursor-not-allowed pointer-events-none': !slot.available && !slot.fixed
+                    }"
+                    [attr.aria-label]="slot.startTime + (slot.available ? ', disponível' : ', indisponível')"
+                    [attr.aria-disabled]="!slot.available">
+                    
+                    {{ slot.startTime }}
+                    
+                    @if (!slot.available) {
+                      <div class="text-[10px] uppercase tracking-wider mt-0.5">{{ slot.fixed ? 'Fixo' : 'Ocupado' }}</div>
+                    }
+                  </button>
                   }
                 </div>
               } @else {
@@ -237,6 +231,7 @@
 
   }
 
+  <!-- Modal usando atributos recomendados pelo daisyUI e a11y HTML nativa -->
   <dialog
     id="booking-modal"
     class="modal"
@@ -280,7 +275,10 @@
       </div>
     </div>
 
-    <div class="modal-backdrop bg-neutral/40 backdrop-blur-sm" (click)="closeBookingModal()" aria-hidden="true"></div>
+    <!-- Implementação acessível e nativa para o Backdrop do DaisyUI -->
+    <form method="dialog" class="modal-backdrop">
+      <button (click)="closeBookingModal()" aria-label="Fechar janela">Fechar</button>
+    </form>
   </dialog>
 
 </div>

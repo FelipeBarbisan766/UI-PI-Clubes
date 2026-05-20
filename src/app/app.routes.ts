@@ -40,6 +40,11 @@ export const routes: Routes = [
           import('./features/auth/pages/verify-mail/verify-mail').then((m) => m.VerifyMail),
       },
       {
+        path: 'forgot-password',
+        loadComponent: () =>
+          import('./features/auth/pages/forgot-password/forgot-password').then((m) => m.ForgotPassword),
+      },
+      {
         path: 'player-form',
         canActivate: [authGuard],
         loadComponent: () =>
