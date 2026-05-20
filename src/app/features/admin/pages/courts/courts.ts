@@ -84,8 +84,6 @@ export class Courts implements OnInit {
   ngOnInit(): void {
     // Tenta pegar o ID da URL atual ou da rota pai (cobrindo parâmetros nomeados como 'id' ou 'clubId')
     this.currentClubId =
-      this.route.snapshot.paramMap.get('id') ??
-      this.route.parent?.snapshot.paramMap.get('id') ??
       this.route.snapshot.paramMap.get('clubId') ??
       this.route.parent?.snapshot.paramMap.get('clubId') ??
       '';
