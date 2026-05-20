@@ -40,24 +40,6 @@
               <!-- Título e Ações -->
               <div class="flex justify-between items-start">
                 <h2 class="card-title text-lg font-bold">{{ club.name }}</h2>
-                <div class="flex gap-1 -mt-1 -mr-2">
-                  <button
-                    type="button"
-                    class="btn btn-ghost btn-sm btn-square text-base-content/70 hover:text-primary"
-                    aria-label="Editar clube"
-                    title="Editar"
-                    (click)="openEdit(club.id)">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                  </button>
-                  <button
-                    type="button"
-                    class="btn btn-ghost btn-sm btn-square text-base-content/70 hover:text-error"
-                    aria-label="Excluir clube"
-                    title="Excluir"
-                    (click)="requestDelete(club.id)">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                  </button>
-                </div>
               </div>
 
               <!-- Tags de Informação -->
@@ -85,17 +67,6 @@
                   Quadras
                 </button>
               </div>
-
-              <!-- Confirmação de Exclusão Inline -->
-              @if (deleteConfirmId() === club.id) {
-                <div role="alert" class="alert alert-warning mt-4 p-3 text-sm flex-col items-start gap-3">
-                  <span class="font-semibold">Tem certeza que deseja excluir?</span>
-                  <div class="flex gap-2 w-full">
-                    <button type="button" class="btn btn-sm btn-error flex-1 text-error-content" (click)="confirmDelete()">Excluir</button>
-                    <button type="button" class="btn btn-sm btn-ghost flex-1 border border-base-300" (click)="cancelDelete()">Cancelar</button>
-                  </div>
-                </div>
-              }
             </div>
           </div>
         }
@@ -110,7 +81,7 @@
     <div role="dialog" aria-modal="true" aria-labelledby="modal-title">
       <div class="flex justify-between items-center mb-4 border-b border-base-200 pb-3">
         <h3 id="modal-title" class="font-bold text-xl text-base-content">
-          {{ isEditing() ? 'Editar Clube' : 'Cadastrar Clube' }}
+          Cadastrar Clube
         </h3>
         <button type="button" class="btn btn-ghost btn-sm btn-circle" aria-label="Fechar modal" (click)="closeForm()">✕</button>
       </div>
@@ -265,7 +236,7 @@
           </div>
         </fieldset>
 
-        @if (!isEditing()) {
+        
           <div class="flex flex-col w-full mt-1">
             <label class="py-1 font-medium text-xs text-base-content" for="images">Imagens do Clube</label>
             <input id="images" type="file" multiple accept="image/*" (change)="onFilesSelected($event)" class="file-input file-input-bordered file-input-primary file-input-sm w-full" />
@@ -281,7 +252,7 @@
               </ul>
             }
           </div>
-        }
+        
 
         <div class="modal-action mt-4 pt-3 border-t border-base-200">
           <button type="button" class="btn btn-ghost btn-sm" (click)="closeForm()">Cancelar</button>

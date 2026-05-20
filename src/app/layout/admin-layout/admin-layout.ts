@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { Router, RouterOutlet } from '@angular/router';
+import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 
 
 @Component({
@@ -9,11 +9,25 @@ import { Router, RouterOutlet } from '@angular/router';
   styleUrl: './admin-layout.css',
 })
 export class AdminLayout {
-  private route = inject(Router);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute); 
 
-  goToCourts(): void {
-    this.route.navigateByUrl('/admin/:clubId/courts');
+ private currentClubId: string = '';
+
+ngOnInit(): void {
+    this.currentClubId =
+      this.route.snapshot.paramMap.get('clubId') ??
+      this.route.parent?.snapshot.paramMap.get('clubId') ??
+      '';
   }
+  
+  goToCourts(): void {
+    this.router.navigate(['/admin/club', this.currentClubId, 'courts']);
+  }
+  goToConfig(): void {
+    this.router.navigate(['/admin/club', this.currentClubId, 'config']);
+  }
+
 
   
 

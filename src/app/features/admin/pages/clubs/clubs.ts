@@ -36,14 +36,11 @@ export class Clubs implements OnInit {
   protected readonly clubService = inject(ServiceClub);
 
   protected readonly formMode = signal<FormMode>(null);
-  protected readonly editingId = signal<string | null>(null);
   protected readonly selectedFiles = signal<File[]>([]);
-  protected readonly deleteConfirmId = signal<string | null>(null);
 
   private adminId: string | null = null;
 
   protected readonly isFormOpen = computed(() => this.formMode() !== null);
-  protected readonly isEditing = computed(() => this.formMode() === 'edit');
 
   protected readonly form = this.fb.group({
     name: ['', [Validators.required, Validators.minLength(3)]],
@@ -133,39 +130,11 @@ export class Clubs implements OnInit {
       country: '',
     });
     this.selectedFiles.set([]);
-    this.editingId.set(null);
     this.formMode.set('create');
-  }
-
-  protected openEdit(id: string): void {
-    this.clubService.getById(id).subscribe({
-      next: (club) => {
-        this.form.reset({
-          name: club.name,
-          phoneNumber: club.phoneNumber,
-          description: club.description,
-          zipCode: club.zipCode,
-          street: club.street,
-          number: club.number,
-          neighborhood: club.neighborhood,
-          complement: club.complement ?? '',
-          city: club.city,
-          state: club.state,
-          country: club.country,
-        });
-        this.selectedFiles.set([]);
-        this.editingId.set(id);
-        this.formMode.set('edit');
-      },
-      error: (err: unknown) => {
-        console.error('Não foi possível carregar o clube para edição.', err);
-      },
-    });
   }
 
   protected closeForm(): void {
     this.formMode.set(null);
-    this.editingId.set(null);
     this.form.reset();
   }
 
@@ -189,7 +158,7 @@ export class Clubs implements OnInit {
     if (this.formMode() === 'create') {
       this.submitCreate();
     } else {
-      this.submitUpdate();
+      return
     }
   }
 
@@ -237,55 +206,6 @@ export class Clubs implements OnInit {
         },
       });
   }
-
-  private submitUpdate(): void {
-    const id = this.editingId();
-    if (id === null) return;
-
-    const { name, phoneNumber, description, zipCode, street, number, neighborhood, complement, city, state, country } =
-      this.form.getRawValue();
-
-    this.clubService
-      .update(id, {
-        name: name!,
-        phoneNumber: phoneNumber!,
-        description: description!,
-        zipCode: zipCode!,
-        street: street!,
-        number: number!,
-        neighborhood: neighborhood!,
-        complement: complement ?? undefined,
-        city: city!,
-        state: state!,
-        country: country!,
-      })
-      .subscribe({
-        next: () => this.closeForm(),
-        error: (err: unknown) => {
-          console.error('Erro ao atualizar clube', err);
-        },
-      });
-  }
-
-  // --- Delete ---
-
-  protected requestDelete(id: string): void {
-    this.deleteConfirmId.set(id);
-  }
-
-  protected confirmDelete(): void {
-    const id = this.deleteConfirmId();
-    if (id === null) return;
-    this.clubService
-      .delete(id)
-      .subscribe({ next: () => this.deleteConfirmId.set(null) });
-  }
-
-  protected cancelDelete(): void {
-    this.deleteConfirmId.set(null);
-  }
-
-  // --- Helpers ---
 
   protected fieldInvalid(field: string): boolean {
     const ctrl = this.form.get(field);

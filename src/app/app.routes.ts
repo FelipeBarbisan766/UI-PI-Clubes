@@ -87,7 +87,12 @@ export const routes: Routes = [
               import('./features/admin/pages/schedules/schedules').then((m) => m.Schedules),
           }
         ]
-      }
+      },
+      {
+        path: 'config',
+        loadComponent: () =>
+          import('./features/admin/pages/config-club/config-club').then((m) => m.ConfigClub),
+      },
     ],
   },
 

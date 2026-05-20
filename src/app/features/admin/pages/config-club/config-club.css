@@ -1,0 +1,39 @@
+.card {
+  padding: 16px;
+  border-radius: 12px;
+  background: #f5f5f5;
+}
+
+.titulo {
+  font-weight: bold;
+}
+
+.preco {
+  color: orange;
+}
+
+.btn-novo {
+  position: fixed; 
+  bottom: 20px;    
+  right: 20px;     
+
+  background-color: #f97316; 
+  color: white;
+  border: none;
+  border-radius: 8px;
+
+  padding: 12px 18px;
+  font-size: 14px;
+  font-weight: bold;
+
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-novo:hover {
+  background-color: #ea580c;
+}
