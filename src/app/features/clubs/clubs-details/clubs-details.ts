@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { NgOptimizedImage } from '@angular/common';
+import { NgOptimizedImage, NgClass } from '@angular/common';
 import { TypeEnum, SurfaceEnum, ResponseCourtDTO } from '../models/model-court';
 import { ResponseClubByIdDTO } from '../models/model-club';
 import { ServiceClub } from '../services/service-club';
@@ -132,7 +132,7 @@ export interface TimeSlot {
 
 @Component({
   selector: 'app-clubs-detail',
-  imports: [NgOptimizedImage, RouterLink],
+  imports: [NgOptimizedImage, RouterLink, NgClass],
   templateUrl: './clubs-details.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
