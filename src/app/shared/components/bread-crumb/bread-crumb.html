@@ -1,0 +1,17 @@
+<!-- Classes do daisyUI -->
+    <div class="breadcrumbs text-sm mb-6">
+      <ul>
+        <li><a routerLink="/">Início</a></li>
+        
+        <li *ngFor="let crumb of breadcrumbs$ | async; let last = last">
+          <!-- Se não for o último item, exibe como link -->
+          <a *ngIf="!last" [routerLink]="crumb.url">{{ crumb.label }}</a>
+          
+          <!-- O último item exibe como texto comum e negrito para destacar -->
+          <span *ngIf="last" class="font-semibold text-base-content/70">
+            {{ crumb.label }}
+          </span>
+        </li>
+      </ul>
+    </div>
+  
