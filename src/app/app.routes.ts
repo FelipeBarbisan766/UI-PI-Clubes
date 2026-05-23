@@ -96,6 +96,12 @@ export const routes: Routes = [
         ]
       },
       {
+        path: 'reserves',
+        data: { breadcrumb: 'Reservas' },
+        loadComponent: () =>
+          import('./features/admin/pages/reserves/reserves').then((m) => m.Reserve),
+      },
+      {
         path: 'config',
         data: { breadcrumb: 'Configurações' },
         loadComponent: () =>

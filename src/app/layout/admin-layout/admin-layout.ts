@@ -25,6 +25,9 @@ ngOnInit(): void {
   goToCourts(): void {
     this.router.navigate(['/admin/club', this.currentClubId, 'courts']);
   }
+  goToReserves(): void {
+    this.router.navigate(['/admin/club', this.currentClubId, 'reserves']);
+  }
   goToConfig(): void {
     this.router.navigate(['/admin/club', this.currentClubId, 'config']);
   }
