@@ -32,7 +32,7 @@ export class ServiceSchedule {
     this._loading.set(true);
     this._error.set(null);
 
-    return this.http.get<ResponseScheduleDTO[]>(`${this.apiUrl}/courts/${courtId}`).pipe(
+    return this.http.get<ResponseScheduleDTO[]>(`${this.apiUrl}/court/${courtId}`).pipe(
       tap((schedules) => {
         this._schedules.set(schedules);
         this._loading.set(false);

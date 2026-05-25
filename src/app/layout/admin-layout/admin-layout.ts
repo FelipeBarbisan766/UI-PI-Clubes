@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { BreadCrumb } from "../../shared/components/bread-crumb/bread-crumb";
+import { clubNameResolver } from '../../shared/components/resolvers/club-name.resolver';
 
 
 @Component({
@@ -32,6 +33,12 @@ ngOnInit(): void {
     this.router.navigate(['/admin/club', this.currentClubId, 'config']);
   }
 
+  closeDrawerOnMobile(): void {
+  if (window.matchMedia('(min-width: 1024px)').matches) return;
+
+  const el = document.getElementById('admin-drawer') as HTMLInputElement | null;
+  if (el) el.checked = false;
+}
 
   
 
