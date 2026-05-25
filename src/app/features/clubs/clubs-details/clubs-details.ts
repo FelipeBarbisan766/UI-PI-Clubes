@@ -257,4 +257,5 @@ export class ClubsDetail {
     this.bookingSlot.set(null);
     this.bookingModalOpen.set(false);
   }
+
 }
