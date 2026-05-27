@@ -10,6 +10,7 @@
       </div>
 
       <div class="flex items-center gap-2 self-start sm:self-auto">
+        <!-- Ordenação: conectar ao backend quando suportado -->
         <select class="select select-bordered select-sm w-48 rounded-md" aria-label="Ordenar resultados por">
           <option value="price">Preço (menor primeiro)</option>
           <option value="name">Nome (A-Z)</option>
@@ -38,11 +39,14 @@
           </h2>
 
           <div class="space-y-6">
-            <!-- Busca -->
+
+            <!-- Busca por nome -->
             <div>
-              <label for="search-input" class="text-sm font-bold text-base-content block mb-2">Pesquisar propriedade</label>
+              <label for="search-input" class="text-sm font-bold text-base-content block mb-2">
+                Pesquisar propriedade
+              </label>
               <div class="relative">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-base-content/50">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-base-content/50" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                 </svg>
                 <input
@@ -50,28 +54,51 @@
                   type="search"
                   placeholder="Nome do clube..."
                   class="input input-bordered input-sm w-full pl-9 rounded-md"
+                  [value]="searchTerm()"
+                  (input)="onSearchChange($event)"
                 />
               </div>
             </div>
 
             <!-- Cidade -->
             <div>
-              <label for="city-input" class="text-sm font-bold text-base-content block mb-2">Destino / Cidade</label>
+              <label for="city-input" class="text-sm font-bold text-base-content block mb-2">
+                Destino / Cidade
+              </label>
               <input
                 id="city-input"
                 type="text"
                 placeholder="Ex: São Paulo"
                 class="input input-bordered input-sm w-full rounded-md"
+                [value]="cityFilter()"
+                (input)="onCityChange($event)"
               />
             </div>
 
-            <!-- Esportes (TypeEnum) -->
+            <!-- Modalidades (TypeEnum) -->
             <div>
-              <span class="text-sm font-bold text-base-content block mb-3" id="sports-filter-label">Comodidades / Modalidades</span>
+              <span class="text-sm font-bold text-base-content block mb-3" id="sports-filter-label">
+                Comodidades / Modalidades
+              </span>
+
+              @if (selectedTypes().length > 0) {
+                <button
+                  class="btn btn-xs btn-ghost text-error mb-2 px-0"
+                  (click)="selectedTypes.set([]); currentPage.set(1)"
+                  type="button">
+                  Limpar seleção ({{ selectedTypes().length }})
+                </button>
+              }
+
               <div class="space-y-2.5 max-h-60 overflow-y-auto pr-2" role="group" aria-labelledby="sports-filter-label">
                 @for (type of availableTypes; track type.value) {
                   <label class="flex items-center gap-3 cursor-pointer text-sm text-base-content/80 hover:text-base-content">
-                    <input type="checkbox" class="checkbox checkbox-primary checkbox-sm rounded" />
+                    <input
+                      type="checkbox"
+                      class="checkbox checkbox-primary checkbox-sm rounded"
+                      [checked]="isTypeSelected(type.value)"
+                      (change)="toggleType(type.value)"
+                    />
                     {{ type.label }}
                   </label>
                 }
@@ -96,7 +123,9 @@
         <!-- Estado de erro -->
         @if (error()) {
           <div role="alert" class="alert alert-error alert-soft rounded-lg">
-            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
             <div class="flex-1">
               <h3 class="font-bold">Ocorreu um erro</h3>
               <div class="text-sm">{{ error() }}</div>
@@ -112,7 +141,7 @@
           </div>
         }
 
-        <!-- Cards de clubes (Estilo Booking) -->
+        <!-- Cards de clubes -->
         @if (!loading() && !error()) {
           <div class="space-y-4">
             @for (club of clubs(); track club.id) {
@@ -120,9 +149,10 @@
                 class="flex flex-col sm:flex-row gap-4 p-4 rounded-lg border border-base-300 bg-base-100 transition-all hover:bg-base-200/30 cursor-pointer group"
                 (click)="selectClub(club)"
                 (keydown.enter)="selectClub(club)"
-                tabindex="0">
+                tabindex="0"
+                [attr.aria-label]="'Ver detalhes de ' + club.name">
 
-                <!-- Imagem (Menor e quadrada/retangular) -->
+                <!-- Imagem -->
                 <div class="relative w-full h-48 sm:w-48 sm:h-48 shrink-0 rounded-md overflow-hidden bg-base-300">
                   @if (getFirstImage(club); as imageUrl) {
                     <img
@@ -133,46 +163,40 @@
                     />
                   } @else {
                     <div class="flex h-full w-full items-center justify-center bg-base-200">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8 text-base-content/30">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8 text-base-content/30" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Z" />
                       </svg>
                     </div>
                   }
                 </div>
 
-                <!-- Conteúdo Dividido em Meio e Direita -->
+                <!-- Conteúdo -->
                 <div class="flex flex-col sm:flex-row flex-1 gap-4 min-w-0">
-                  
+
                   <!-- Info Central -->
                   <div class="flex-1 min-w-0 flex flex-col">
                     <h3 class="text-lg font-bold text-primary hover:underline truncate">
                       {{ club.name }}
                     </h3>
-                    
-                    <!-- Link de localização -->
-                    <p class="text-xs  link link-hover flex items-center gap-1 mt-0.5 truncate">
+
+                    <p class="text-xs link link-hover flex items-center gap-1 mt-0.5 truncate">
                       {{ club.street }}, {{ club.city }} • <span class="font-semibold">Mostrar no mapa</span>
                     </p>
-                    
-                    <!-- Descrição curta -->
+
                     @if (club.description) {
                       <p class="text-xs text-base-content/70 mt-2 line-clamp-2 border-l-2 border-base-300 pl-2">
                         {{ club.description }}
                       </p>
                     }
-                    
-                    
 
-                      <div class="mt-2">
-                        @for (type of club.types; track type) {
-                          <span class="ml-2 badge badge-outline badge-sm text-[10px] text-base-content/70">
-                            {{ getTypeName(type) }}
-                          </span>
-                        }
-                      </div>
+                    <div class="mt-2">
+                      @for (type of club.types; track type) {
+                        <span class="ml-2 badge badge-outline badge-sm text-[10px] text-base-content/70">
+                          {{ getTypeName(type) }}
+                        </span>
+                      }
+                    </div>
 
-                   
-                    <!-- Badges (Ex: Número de quadras em destaque verde, seguido dos esportes) -->
                     <div class="mt-auto pt-3 flex flex-wrap gap-1 items-center">
                       <span class="text-[11px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded mr-1">
                         ✓ {{ club.courtCount }} quadra{{ club.courtCount !== 1 ? 's' : '' }} disponíve{{ club.courtCount !== 1 ? 'is' : 'l' }}
@@ -180,44 +204,79 @@
                     </div>
                   </div>
 
-                  <!-- Bloco de Preço e Call to Action (Direita) -->
+                  <!-- Preço e CTA -->
                   <div class="sm:w-36 flex flex-col justify-end items-start sm:items-end text-left sm:text-right shrink-0 mt-2 sm:mt-0">
                     <div class="flex flex-col">
                       <span class="text-[10px] text-base-content/60 uppercase font-semibold">A partir de</span>
                       <span class="text-xl font-bold text-base-content leading-tight">
                         {{ formatPrice(club.minPrice) }}
                       </span>
-                      
                     </div>
-                    
-                    <button class="btn btn-primary btn-sm mt-3 w-full font-bold text-white">
+
+                    <button class="btn btn-primary btn-sm mt-3 w-full font-bold text-white" type="button">
                       Reservar
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-3 hidden sm:inline">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-3 hidden sm:inline" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
                       </svg>
                     </button>
                   </div>
-                </div>
 
+                </div>
               </article>
             }
           </div>
         }
 
-        <!-- Paginação -->
-        <nav aria-label="Paginação" class="flex justify-center sm:justify-start mt-8 mb-4">
-          <div class="join border border-base-300 rounded-md">
-            <button class="join-item btn btn-sm bg-base-100 hover:bg-base-200" disabled>«</button>
-            <button class="join-item btn btn-sm btn-active border-primary bg-primary text-primary-content">1</button>
-            <button class="join-item btn btn-sm bg-base-100 hover:bg-base-200">2</button>
-            <button class="join-item btn btn-sm bg-base-100 hover:bg-base-200">3</button>
-            <button class="join-item btn btn-sm bg-base-100 hover:bg-base-200 btn-disabled">...</button>
-            <button class="join-item btn btn-sm bg-base-100 hover:bg-base-200">10</button>
-            <button class="join-item btn btn-sm bg-base-100 hover:bg-base-200">»</button>
-          </div>
-        </nav>
+        <!-- Paginação dinâmica -->
+        @if (!loading() && !isEmpty() && totalPages() > 1) {
+          <nav aria-label="Paginação" class="flex justify-center sm:justify-start mt-8 mb-4">
+            <div class="join border border-base-300 rounded-md">
+
+              <!-- Anterior -->
+              <button
+                class="join-item btn btn-sm bg-base-100 hover:bg-base-200"
+                [disabled]="currentPage() <= 1"
+                (click)="goToPage(currentPage() - 1)"
+                aria-label="Página anterior">
+                «
+              </button>
+
+              <!-- Páginas -->
+              @for (page of visiblePages(); track $index) {
+                @if (page === '...') {
+                  <button class="join-item btn btn-sm bg-base-100" disabled aria-hidden="true">…</button>
+                } @else {
+                  <button
+                    class="join-item btn btn-sm"
+                    [class.btn-active]="page === currentPage()"
+                    [class.bg-primary]="page === currentPage()"
+                    [class.text-primary-content]="page === currentPage()"
+                    [class.border-primary]="page === currentPage()"
+                    [class.bg-base-100]="page !== currentPage()"
+                    [class.hover:bg-base-200]="page !== currentPage()"
+                    (click)="goToPage(page)"
+                    [attr.aria-current]="page === currentPage() ? 'page' : null"
+                    [attr.aria-label]="'Ir para página ' + page">
+                    {{ page }}
+                  </button>
+                }
+              }
+
+              <!-- Próxima -->
+              <button
+                class="join-item btn btn-sm bg-base-100 hover:bg-base-200"
+                [disabled]="currentPage() >= totalPages()"
+                (click)="goToPage(currentPage() + 1)"
+                aria-label="Próxima página">
+                »
+              </button>
+
+            </div>
+          </nav>
+        }
 
       </div>
     </div>
   </div>
+
 </div>
