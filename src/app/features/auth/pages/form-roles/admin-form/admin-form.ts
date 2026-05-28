@@ -51,20 +51,20 @@ export class AdminForm {
       userId,
     };
 
-    this.adminService.createAdmin(payload).pipe(
-      take(1),
-      finalize(() => this.isSubmitting.set(false))
-    ).subscribe({
-      next: () => {
-        this.successMessage.set('Perfil de administrador salvo com sucesso.');
-        void this.router.navigateByUrl('/clubs-list');
-      },
-      error: (error: unknown) => {
-        this.errorMessage.set(
-          error instanceof Error ? error.message : 'Erro ao salvar perfil de administrador.'
-        );
-      },
-    });
+    // this.adminService.createAdmin(payload).pipe(
+    //   take(1),
+    //   finalize(() => this.isSubmitting.set(false))
+    // ).subscribe({
+    //   next: () => {
+    //     this.successMessage.set('Perfil de administrador salvo com sucesso.');
+    //     void this.router.navigateByUrl('/clubs-list');
+    //   },
+    //   error: (error: unknown) => {
+    //     this.errorMessage.set(
+    //       error instanceof Error ? error.message : 'Erro ao salvar perfil de administrador.'
+    //     );
+    //   },
+    // });
   }
 
   hasError(controlName: 'userName' | 'contactNumber' | 'description'): boolean {

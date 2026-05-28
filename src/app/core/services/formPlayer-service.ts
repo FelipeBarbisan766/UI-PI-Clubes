@@ -15,8 +15,8 @@ export class FormPlayerService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/Player`;
 
-  createPlayer(payload: CreatePlayerRequest): Observable<unknown> {
-    return this.http.post(`${this.baseUrl}`, payload, { withCredentials: true }).pipe(
+  createPlayer(userId: string): Observable<unknown> {
+    return this.http.post(`${this.baseUrl}`, { userId }, { withCredentials: true }).pipe(
       catchError((error: unknown) => {
         if (error instanceof HttpErrorResponse && typeof error.error === 'string' && error.error.trim()) {
           return throwError(() => new Error(error.error));

@@ -16,8 +16,8 @@ export class FormAdminService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/Admin`;
 
-  createAdmin(payload: CreateAdminRequest): Observable<unknown> {
-    return this.http.post(`${this.baseUrl}`, payload, { withCredentials: true }).pipe(
+  createAdmin(userId: string ): Observable<unknown> {
+    return this.http.post(`${this.baseUrl}`, { userId }, { withCredentials: true }).pipe(
       catchError((error: unknown) => {
         if (error instanceof HttpErrorResponse && typeof error.error === 'string' && error.error.trim()) {
           return throwError(() => new Error(error.error));

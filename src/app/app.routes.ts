@@ -46,18 +46,18 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/auth/pages/forgot-password/forgot-password').then((m) => m.ForgotPassword),
       },
-      {
-        path: 'player-form',
-        canActivate: [authGuard],
-        loadComponent: () =>
-          import('./features/auth/pages/form-roles/player-form/player-form').then((m) => m.PlayerForm),
-      },
-      {
-        path: 'admin-form',
-        canActivate: [authGuard],
-        loadComponent: () =>
-          import('./features/auth/pages/form-roles/admin-form/admin-form').then((m) => m.AdminForm),
-      },
+      // {
+      //   path: 'player-form',
+      //   canActivate: [authGuard],
+      //   loadComponent: () =>
+      //     import('./features/auth/pages/form-roles/player-form/player-form').then((m) => m.PlayerForm),
+      // },
+      // {
+      //   path: 'admin-form',
+      //   canActivate: [authGuard],
+      //   loadComponent: () =>
+      //     import('./features/auth/pages/form-roles/admin-form/admin-form').then((m) => m.AdminForm),
+      // },
     ],
   },
   {

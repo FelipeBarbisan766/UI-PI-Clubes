@@ -3,26 +3,26 @@ import { TypeEnum } from './model-court';
 export interface CreateClubDTO {
   adminId: string;
   name: string;
-  phoneNumber: string;
-  description: string;
+  phoneNumber?: string;
+  description?: string;
   zipCode: string;
   street: string;
-  number: string;
+  number?: string;
   neighborhood: string;
   complement?: string;
   city: string;
   state: string;
   country: string;
-  images: File[];
+  images?: File[];
 }
 
 export interface UpdateClubDTO {
   name: string;
-  phoneNumber: string;
-  description: string;
+  phoneNumber?: string;
+  description?: string;
   zipCode: string;
   street: string;
-  number: string;
+  number?: string;
   neighborhood: string;
   complement?: string;
   city: string;
@@ -33,8 +33,8 @@ export interface UpdateClubDTO {
 export interface ResponseClubDTO {
   id: string;
   name: string;
-  phoneNumber: string;
-  description: string;
+  phoneNumber?: string;
+  description?: string;
   street: string;
   city: string;
   state: string;
@@ -47,11 +47,11 @@ export interface ResponseClubDTO {
 
 export interface ResponseClubByIdDTO {
   name: string;
-  phoneNumber: string;
-  description: string;
+  phoneNumber?: string;
+  description?: string;
   zipCode: string;
   street: string;
-  number: string;
+  number?: string;
   neighborhood: string;
   complement?: string;
   city: string;

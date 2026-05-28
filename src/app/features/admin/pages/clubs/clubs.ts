@@ -44,11 +44,11 @@ export class Clubs implements OnInit {
 
   protected readonly form = this.fb.group({
     name: ['', [Validators.required, Validators.minLength(3)]],
-    phoneNumber: ['', Validators.required],
-    description: ['', Validators.required],
+    phoneNumber: [''],
+    description: [''],
     zipCode: ['', Validators.required],
     street: ['', Validators.required],
-    number: ['', Validators.required],
+    number: [''],
     neighborhood: ['', Validators.required],
     complement: [''],
     city: ['', Validators.required],
@@ -62,7 +62,7 @@ export class Clubs implements OnInit {
 
   protected readonly isSubmitEnabled = computed(() => {
     if (this.formMode() === 'create') {
-      return this.formStatus() === 'VALID' && this.selectedFiles().length > 0;
+      return this.formStatus() === 'VALID';
     }
     return this.formStatus() === 'VALID';
   });
@@ -187,17 +187,17 @@ export class Clubs implements OnInit {
       .create({
         adminId,
         name: name!,
-        phoneNumber: phoneNumber!,
-        description: description!,
+        phoneNumber: phoneNumber ?? undefined,
+        description: description ?? undefined,
         zipCode: zipCode!,
         street: street!,
-        number: number!,
+        number: number ?? undefined,
         neighborhood: neighborhood!,
         complement: complement ?? undefined,
         city: city!,
         state: state!,
         country: country!,
-        images: this.selectedFiles(),
+        images: this.selectedFiles() ?? undefined,
       })
       .subscribe({
         next: () => this.closeForm(),
