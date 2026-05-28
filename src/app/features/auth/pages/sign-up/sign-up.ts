@@ -6,8 +6,9 @@ import {
   AfterViewInit,
   viewChild,
   ElementRef,
-  OnDestroy,
+  DestroyRef,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
   NonNullableFormBuilder,
@@ -16,12 +17,10 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { finalize } from 'rxjs';
 import { ServiceSignUp } from '../../services/service-sign-up';
 import { ToastAlert } from '../../../../shared/components/toast-alert/toast-alert';
-import { NgxMaskDirective } from 'ngx-mask';
 import { GoogleAuthService } from '../../services/service-google';
-
-declare const google: typeof import('google-one-tap');
 
 function passwordsMatchValidator(control: AbstractControl): ValidationErrors | null {
   const password = control.get('password')?.value ?? '';
@@ -31,16 +30,17 @@ function passwordsMatchValidator(control: AbstractControl): ValidationErrors | n
 
 @Component({
   selector: 'app-sign-up',
-  imports: [ReactiveFormsModule, RouterLink, ToastAlert, NgxMaskDirective],
+  imports: [ReactiveFormsModule, RouterLink, ToastAlert],
   templateUrl: './sign-up.html',
   styleUrl: './sign-up.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SignUp implements AfterViewInit, OnDestroy {
+export class SignUp implements AfterViewInit {
   private readonly fb = inject(NonNullableFormBuilder);
   private readonly signUpService = inject(ServiceSignUp);
   private readonly router = inject(Router);
   private readonly googleAuth = inject(GoogleAuthService);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly googleBtnRef = viewChild<ElementRef<HTMLElement>>('googleBtn');
 
@@ -58,10 +58,6 @@ export class SignUp implements AfterViewInit, OnDestroy {
         ],
       ],
       email: ['', [Validators.required, Validators.email]],
-      phoneNumber: [
-        '',
-        [Validators.required, Validators.pattern(/^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$/)],
-      ],
       password: [
         '',
         [
@@ -78,31 +74,26 @@ export class SignUp implements AfterViewInit, OnDestroy {
     const btnEl = this.googleBtnRef()?.nativeElement;
     if (!btnEl) return;
 
-    this.googleAuth.initialize((idToken) => {
-      this.handleGoogleSignUp(idToken);
-    });
-
+    this.googleAuth.initialize((idToken) => this.handleGoogleSignUp(idToken));
     this.googleAuth.renderButton(btnEl);
-  }
 
-  ngOnDestroy(): void {
-    this.googleAuth.cancel();
+    this.destroyRef.onDestroy(() => this.googleAuth.cancel());
   }
 
   private handleGoogleSignUp(idToken: string): void {
     this.isSubmitting.set(true);
     this.errorMessage.set(null);
 
-    this.signUpService.signUpWithGoogle({ idToken }).subscribe({
-      next: () => {
-        this.isSubmitting.set(false);
-        void this.router.navigateByUrl('/select');
-      },
-      error: (error: unknown) => {
-        this.isSubmitting.set(false);
-        this.errorMessage.set(this.extractErrorMessage(error));
-      },
-    });
+    this.signUpService
+      .signUpWithGoogle({ idToken })
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.isSubmitting.set(false)),
+      )
+      .subscribe({
+        next: () => void this.router.navigateByUrl('/select'),
+        error: (error: unknown) => this.errorMessage.set(this.extractErrorMessage(error)),
+      });
   }
 
   onSubmit(): void {
@@ -114,19 +105,18 @@ export class SignUp implements AfterViewInit, OnDestroy {
     this.isSubmitting.set(true);
     this.errorMessage.set(null);
 
-    const { confirmPassword, ...payload } = this.form.getRawValue();
+    const { confirmPassword: _, ...payload } = this.form.getRawValue();
 
-    this.signUpService.signUp(payload).subscribe({
-      next: () => {
-        this.isSubmitting.set(false);
-        this.errorMessage.set(null);
-        void this.router.navigate(['/verify-mail']);
-      },
-      error: (error: unknown) => {
-        this.isSubmitting.set(false);
-        this.errorMessage.set(this.extractErrorMessage(error));
-      },
-    });
+    this.signUpService
+      .signUp(payload)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.isSubmitting.set(false)),
+      )
+      .subscribe({
+        next: () => void this.router.navigate(['/verify-mail']),
+        error: (error: unknown) => this.errorMessage.set(this.extractErrorMessage(error)),
+      });
   }
 
   private extractErrorMessage(error: unknown): string {

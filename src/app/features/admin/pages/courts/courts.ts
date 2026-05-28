@@ -37,12 +37,12 @@ export class Courts implements OnInit {
 
   // --- Enum options for selects ---
   protected readonly typeOptions = Object.entries(TypeEnum)
-    .filter(([, v]) => typeof v === 'number' && (v as number) !== 0)
-    .map(([label, value]) => ({ label, value: value as number }));
+    .filter(([, v]) => typeof v === 'string')
+    .map(([label, value]) => ({ label, value: value as string }));
 
   protected readonly surfaceOptions = Object.entries(SurfaceEnum)
-    .filter(([, v]) => typeof v === 'number' && (v as number) !== 0)
-    .map(([label, value]) => ({ label, value: value as number }));
+    .filter(([, v]) => typeof v === 'string')
+    .map(([label, value]) => ({ label, value: value as string }));
 
   // --- Local state ---
   protected readonly formMode = signal<FormMode>(null);
@@ -205,12 +205,12 @@ export class Courts implements OnInit {
 
   // --- Helpers ---
 
-  protected getTypeName(value: number): string {
-    return TypeEnum[value] ?? 'Desconhecido';
+  protected getTypeName(value: string): string {
+    return TypeEnum[value as keyof typeof TypeEnum] ?? 'Desconhecido';
   }
 
-  protected getSurfaceName(value: number): string {
-    return SurfaceEnum[value] ?? 'Desconhecido';
+  protected getSurfaceName(value: string): string {
+    return SurfaceEnum[value as keyof typeof SurfaceEnum] ?? 'Desconhecido';
   }
 
   protected fieldInvalid(field: string): boolean {
