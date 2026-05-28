@@ -68,17 +68,17 @@ export class ServiceClub {
     const formData = new FormData();
     formData.append('adminId', dto.adminId);
     formData.append('name', dto.name);
-    formData.append('phoneNumber', dto.phoneNumber);
-    formData.append('description', dto.description);
+    if (dto.phoneNumber) formData.append('phoneNumber', dto.phoneNumber);
+    if (dto.description) formData.append('description', dto.description);
     formData.append('zipCode', dto.zipCode);
     formData.append('street', dto.street);
-    formData.append('number', dto.number);
+    if (dto.number) formData.append('number', dto.number);
     formData.append('neighborhood', dto.neighborhood);
     if (dto.complement) formData.append('complement', dto.complement);
     formData.append('city', dto.city);
     formData.append('state', dto.state);
     formData.append('country', dto.country);
-    dto.images.forEach((img) => formData.append('images', img));
+    if (dto.images) dto.images.forEach((img) => formData.append('images', img));
 
     return this.http.post<ResponseClubDTO>(this.apiUrl, formData).pipe(
       tap((newClub) => {
