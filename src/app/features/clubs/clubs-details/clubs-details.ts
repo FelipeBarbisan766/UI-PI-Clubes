@@ -4,6 +4,7 @@ import {
   computed,
   effect,
   inject,
+  Signal,
   signal,
 } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -13,6 +14,7 @@ import { TypeEnum, SurfaceEnum, ResponseCourtDTO } from '../models/model-court';
 import { ResponseClubByIdDTO } from '../models/model-club';
 import { ServiceClub } from '../services/service-club';
 import { distinctUntilChanged, map } from 'rxjs';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 const TYPE_LABELS: Record<TypeEnum, string> = {
   [TypeEnum.None]: 'Outro',
@@ -139,6 +141,7 @@ export interface TimeSlot {
 export class ClubsDetail {
   private readonly route = inject(ActivatedRoute);
   private readonly clubService = inject(ServiceClub);
+  private sanitizer = inject(DomSanitizer);
   // private readonly scheduleService = inject(ServiceSchedule); // serviço de slots (a implementar)
   private readonly routeClubId = toSignal(
     this.route.paramMap.pipe(
@@ -217,6 +220,26 @@ export class ClubsDetail {
     }
     this.clubService.getById(clubId).subscribe();
   }
+  mapUrl: Signal<SafeResourceUrl | null> = computed(() => {
+    const c = this.club();
+    
+    if (!c) return null;
+
+    const partesEndereco = [
+      `${c.street}, ${c.number}`,
+      c.neighborhood,
+      `${c.city} - ${c.state}`
+    ];
+
+    const enderecoCompleto = partesEndereco.join(', ');
+    console.log('Endereço completo para o mapa:', enderecoCompleto);
+
+    const enderecoCodificado = encodeURIComponent(enderecoCompleto);
+
+    const url = `https://maps.google.com/maps?q=${enderecoCodificado}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  });
 
   // --- Court & slot selection ---
   selectCourt(court: ResponseCourtDTO): void {
