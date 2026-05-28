@@ -47,7 +47,7 @@ export class ClubsList {
     name:     this.searchTerm() || undefined,
     city:     this.cityFilter() || undefined,
     types:    this.selectedTypes().length > 0
-                ? this.selectedTypes()   // TypeEnum[] já é number[]
+                ? this.selectedTypes()  
                 : undefined,
     page:     this.currentPage(),
     pageSize: PAGE_SIZE,
@@ -142,7 +142,7 @@ export class ClubsList {
     this.clubService.clearError();
   }
 
-  // --- Mapa TypeEnum → label legível ---
+ // --- Mapa TypeEnum → label legível ---
   readonly typeLabels: Record<TypeEnum, string> = {
     [TypeEnum.None]:         'Outro',
     [TypeEnum.Futsal]:       'Futsal',
@@ -175,10 +175,10 @@ export class ClubsList {
   };
 
   readonly availableTypes = Object.entries(this.typeLabels)
-    .filter(([value]) => Number(value) !== TypeEnum.None)
-    .map(([value, label]) => ({ value: Number(value) as TypeEnum, label }));
+    .filter(([value]) => value !== TypeEnum.None)
+    .map(([value, label]) => ({ value: value as TypeEnum, label }));
 
-  getTypeName(type: TypeEnum): string {
-    return this.typeLabels[type] ?? 'Outro';
+  getTypeName(type: TypeEnum | string): string {
+    return this.typeLabels[type as TypeEnum] ?? 'Outro';
   }
 }
