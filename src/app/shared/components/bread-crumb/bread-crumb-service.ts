@@ -36,8 +36,8 @@ export class BreadcrumbService {
       let label = '';
 
       // Verifica se ESTA rota específica definiu o resolver dinâmico ou o nome estático
-      if (routeConfig?.resolve?.['dynamicBreadcrumb']) {
-        label = route.data['dynamicBreadcrumb'];
+      if (routeConfig?.resolve?.['clubName']) {
+        label = route.data['clubName'];
       } else if (routeConfig?.data?.['breadcrumb']) {
         label = route.data['breadcrumb'];
       }
