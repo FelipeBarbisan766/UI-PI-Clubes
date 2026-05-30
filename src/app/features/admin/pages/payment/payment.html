@@ -1,0 +1,308 @@
+<main
+  class="min-h-screen w-full pattern-background flex items-center justify-center px-4 py-12 pt-20"
+>
+  <section
+    class="card bg-base-100 shadow-sm w-full max-w-2xl"
+    aria-labelledby="payment-title"
+  >
+    <div class="card-body">
+
+      @if (step() === 'select-method') {
+
+        <header class="text-center mb-6 max-w-xl mx-auto">
+          <h1 id="payment-title" class="text-3xl md:text-4xl font-bold mb-3">
+            Finalizar assinatura
+          </h1>
+          @if (selectedPlan()) {
+            <p class="text-sm md:text-base text-base-content/70">
+              Você escolheu o
+              <strong class="text-base-content">{{ selectedPlan()!.name }}</strong>
+              — {{ formatPrice(selectedPlan()!.price) }}{{ formatPrice(selectedPlan()!.price) && '' }}
+              — escolha como deseja pagar.
+            </p>
+          } @else {
+            <p class="text-sm md:text-base text-base-content/70">
+              Escolha a forma de pagamento.
+            </p>
+          }
+        </header>
+
+        <!-- Plan summary -->
+        @if (selectedPlan()) {
+          <div class="bg-base-200 rounded-2xl p-4 mb-6 max-w-md mx-auto w-full">
+            <div class="flex items-center justify-between gap-4 flex-wrap">
+              <div>
+                <p class="font-semibold">{{ selectedPlan()!.name }}</p>
+                <p class="text-xs text-base-content/60">
+                  {{ selectedPlan()!.quantClub }} {{ selectedPlan()!.quantClub === 1 ? 'clube' : 'clubes' }}
+                  · {{ selectedPlan()!.quantCourt }} quadras por clube
+                </p>
+              </div>
+              <p class="text-xl font-bold text-primary">
+                {{ formatPrice(selectedPlan()!.price) }}
+              </p>
+            </div>
+          </div>
+        }
+
+        <!-- Payment method selection -->
+        <div
+          class="grid grid-cols-1 gap-3 w-full max-w-md mx-auto mb-4"
+          role="radiogroup"
+          aria-label="Método de pagamento"
+        >
+          @for (method of methodOptions; track method) {
+            <button
+              type="button"
+              class="flex items-center gap-4 p-4 rounded-2xl border-2 transition-colors text-left"
+              [class.border-primary]="selectedMethod() === method"
+              [class.bg-primary]="selectedMethod() === method"
+              [class.bg-opacity-5]="selectedMethod() === method"
+              [class.border-base-300]="selectedMethod() !== method"
+              [class.hover:border-primary]="selectedMethod() !== method"
+              [attr.aria-checked]="selectedMethod() === method"
+              [attr.aria-label]="methodLabels[method] + ': ' + methodDescriptions[method]"
+              role="radio"
+              (click)="selectMethod(method)"
+            >
+              <!-- Icon -->
+              <div
+                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
+                [class.bg-primary]="selectedMethod() === method"
+                [class.text-primary-content]="selectedMethod() === method"
+                [class.bg-base-200]="selectedMethod() !== method"
+                [class.text-base-content]="selectedMethod() !== method"
+                aria-hidden="true"
+              >
+                @if (method === 'Pix') {
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                  </svg>
+                }
+                @if (method === 'CreditCard') {
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                  </svg>
+                }
+                @if (method === 'Boleto') {
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                  </svg>
+                }
+              </div>
+
+              <!-- Label -->
+              <div>
+                <p class="font-semibold text-sm">{{ methodLabels[method] }}</p>
+                <p class="text-xs text-base-content/60">{{ methodDescriptions[method] }}</p>
+              </div>
+
+              <!-- Selected indicator -->
+              @if (selectedMethod() === method) {
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary ml-auto shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+              }
+            </button>
+          }
+        </div>
+
+        <!-- Global error -->
+        @if (errorMessage()) {
+          <div class="alert alert-error max-w-md mx-auto w-full mb-4" role="alert" aria-live="assertive">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+            </svg>
+            <span>{{ errorMessage() }}</span>
+          </div>
+        }
+
+        <!-- Actions -->
+        <div class="grid grid-cols-1 gap-3 w-full max-w-md mx-auto">
+          <button
+            type="button"
+            class="btn btn-primary rounded-full text-white w-full"
+            [disabled]="!canSubmit()"
+            [attr.aria-busy]="isLoading()"
+            aria-label="Ir para o checkout"
+            (click)="initiatePayment()"
+          >
+            @if (isLoading()) {
+              <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+              Aguarde...
+            } @else {
+              Ir para o checkout
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+              </svg>
+            }
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-outline rounded-full w-full"
+            (click)="goToPricing()"
+            aria-label="Voltar para escolha de plano"
+          >
+            Voltar para planos
+          </button>
+        </div>
+      }
+
+      <!-- ─────────────────────────────────────────────────────────────── -->
+      <!-- STEP: redirecting                                               -->
+      <!-- ─────────────────────────────────────────────────────────────── -->
+      @if (step() === 'redirecting') {
+        <div class="flex flex-col items-center justify-center py-12 gap-4" aria-live="polite" aria-label="Redirecionando para o checkout">
+          <span class="loading loading-spinner loading-lg text-primary" aria-hidden="true"></span>
+          <p class="text-base-content/70 text-sm">Redirecionando para o Mercado Pago...</p>
+        </div>
+      }
+
+      <!-- ─────────────────────────────────────────────────────────────── -->
+      <!-- STEP: success                                                   -->
+      <!-- ─────────────────────────────────────────────────────────────── -->
+      @if (step() === 'success') {
+        <header class="text-center mb-6 max-w-xl mx-auto">
+          <div class="flex justify-center mb-4" aria-hidden="true">
+            @if (accessConfirmed()) {
+              <div class="bg-success/10 rounded-full p-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+              </div>
+            } @else {
+              <div class="bg-warning/10 rounded-full p-4">
+                <span class="loading loading-spinner loading-md text-warning" aria-hidden="true"></span>
+              </div>
+            }
+          </div>
+
+          <h1 id="payment-title" class="text-3xl md:text-4xl font-bold mb-3">
+            @if (accessConfirmed()) {
+              Assinatura ativada!
+            } @else {
+              Pagamento recebido
+            }
+          </h1>
+
+          <div aria-live="polite">
+            @if (accessConfirmed()) {
+              <p class="text-sm md:text-base text-success">
+                Seu pagamento foi confirmado e sua assinatura está ativa. Bom trabalho!
+              </p>
+            } @else if (isPolling()) {
+              <p class="text-sm md:text-base text-base-content/70">
+                Aguardando confirmação do pagamento...
+                <br>
+                <span class="text-xs">Isso pode levar alguns segundos.</span>
+              </p>
+            } @else if (pollTimedOut()) {
+              <p class="text-sm md:text-base text-base-content/70">
+                Seu pagamento está sendo processado. Pode levar alguns minutos para ser confirmado.
+                Acesse sua assinatura para acompanhar o status.
+              </p>
+            }
+          </div>
+        </header>
+
+        <div class="grid grid-cols-1 gap-3 w-full max-w-md mx-auto">
+          @if (accessConfirmed() || pollTimedOut()) {
+            <button
+              type="button"
+              class="btn btn-primary rounded-full text-white w-full"
+              (click)="goToSubscription()"
+              aria-label="Ver minha assinatura"
+            >
+              Ver minha assinatura
+            </button>
+          }
+        </div>
+      }
+
+      <!-- ─────────────────────────────────────────────────────────────── -->
+      <!-- STEP: pending                                                   -->
+      <!-- ─────────────────────────────────────────────────────────────── -->
+      @if (step() === 'pending') {
+        <header class="text-center mb-6 max-w-xl mx-auto">
+          <div class="flex justify-center mb-4" aria-hidden="true">
+            <div class="bg-warning/10 rounded-full p-4">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-warning" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+          </div>
+          <h1 id="payment-title" class="text-3xl md:text-4xl font-bold mb-3">
+            Pagamento pendente
+          </h1>
+          <p class="text-sm md:text-base text-base-content/70" aria-live="polite">
+            Seu pagamento está sendo processado. Assim que for confirmado, sua assinatura
+            será ativada automaticamente. Verifique seu e-mail para instruções.
+          </p>
+        </header>
+
+        <div class="grid grid-cols-1 gap-3 w-full max-w-md mx-auto">
+          <button
+            type="button"
+            class="btn btn-primary rounded-full text-white w-full"
+            (click)="goToSubscription()"
+            aria-label="Ver minha assinatura"
+          >
+            Ver minha assinatura
+          </button>
+          <button
+            type="button"
+            class="btn btn-outline rounded-full w-full"
+            (click)="goToPricing()"
+            aria-label="Voltar para planos"
+          >
+            Voltar para planos
+          </button>
+        </div>
+      }
+
+      <!-- ─────────────────────────────────────────────────────────────── -->
+      <!-- STEP: failure                                                   -->
+      <!-- ─────────────────────────────────────────────────────────────── -->
+      @if (step() === 'failure') {
+        <header class="text-center mb-6 max-w-xl mx-auto">
+          <div class="flex justify-center mb-4" aria-hidden="true">
+            <div class="bg-error/10 rounded-full p-4">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+              </svg>
+            </div>
+          </div>
+          <h1 id="payment-title" class="text-3xl md:text-4xl font-bold mb-3">
+            Pagamento não concluído
+          </h1>
+          <p class="text-sm md:text-base text-base-content/70" aria-live="assertive">
+            Não foi possível processar o seu pagamento. Verifique os dados e tente novamente.
+          </p>
+        </header>
+
+        <div class="grid grid-cols-1 gap-3 w-full max-w-md mx-auto">
+          <button
+            type="button"
+            class="btn btn-primary rounded-full text-white w-full"
+            (click)="retryPayment()"
+            aria-label="Tentar novamente"
+          >
+            Tentar novamente
+          </button>
+          <button
+            type="button"
+            class="btn btn-outline rounded-full w-full"
+            (click)="goToPricing()"
+            aria-label="Voltar para planos"
+          >
+            Voltar para planos
+          </button>
+        </div>
+      }
+
+    </div>
+  </section>
+</main>
