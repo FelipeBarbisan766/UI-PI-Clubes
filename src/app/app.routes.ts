@@ -9,6 +9,7 @@ import { selectRoleGuard } from './core/guards/selectRole-guard';
 import { Clubs } from './features/admin/pages/clubs/clubs';
 import { clubNameResolver } from './shared/components/resolvers/club-name.resolver';
 import { courtNameResolver } from './shared/components/resolvers/court-name.resolver';
+import { clubCityResolver } from './shared/components/resolvers/club-city.resolver';
 
 export const routes: Routes = [
   {
@@ -67,7 +68,10 @@ export const routes: Routes = [
   },
     {
     path: 'admin/club/:clubId',
-    resolve: { dynamicBreadcrumb: clubNameResolver },
+    resolve: { 
+      clubName: clubNameResolver, 
+      clubCity: clubCityResolver,
+    },
     component: AdminLayout,
     canActivate: [adminGuard],
     children: [

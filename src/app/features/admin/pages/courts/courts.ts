@@ -81,15 +81,18 @@ export class Courts implements OnInit {
   });
 
   ngOnInit(): void {
-    // Tenta pegar o ID da URL atual ou da rota pai (cobrindo parâmetros nomeados como 'id' ou 'clubId')
     this.currentClubId =
       this.route.snapshot.paramMap.get('clubId') ??
       this.route.parent?.snapshot.paramMap.get('clubId') ??
       '';
 
-    // Aqui pode ser necessário passar o currentClubId caso o getAll() seja filtrado por clube no backend
+    this.loadCourts();
+  }
+
+  private loadCourts(): void {
     this.courtService.getByClubId(this.currentClubId).subscribe();
   }
+
 
   // --- Form actions ---
 
@@ -162,6 +165,7 @@ export class Courts implements OnInit {
         .subscribe({
           next: () => {
              this.closeForm();
+             this.loadCourts();
           },
           error: (err: unknown) => {
              console.error('Erro ao criar quadra', err);
@@ -180,7 +184,11 @@ export class Courts implements OnInit {
           pricePerHour: pricePerHour!,
           description: description!,
         })
-        .subscribe({ next: () => this.closeForm() });
+        .subscribe({ next: () => {
+          this.closeForm();
+          this.loadCourts();
+          }
+        });
     }
   }
 
@@ -195,7 +203,12 @@ export class Courts implements OnInit {
     if (id === null) return;
     this.courtService
       .delete(id)
-      .subscribe({ next: () => this.deleteConfirmId.set(null) });
+      .subscribe({ 
+        next: () => {
+        this.deleteConfirmId.set(null); 
+        this.loadCourts(); 
+        }
+      });
   }
 
   protected cancelDelete(): void {
