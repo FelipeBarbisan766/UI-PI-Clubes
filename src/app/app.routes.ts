@@ -18,8 +18,7 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        loadComponent: () =>
-          import('./features/home-page/home-page').then((m) => m.HomePage),
+        loadComponent: () => import('./features/home-page/home-page').then((m) => m.HomePage),
       },
       {
         path: 'clubs',
@@ -34,8 +33,7 @@ export const routes: Routes = [
       {
         path: 'login',
         canActivate: [guestGuard],
-        loadComponent: () =>
-          import('./features/auth/pages/login/login').then((m) => m.Login),
+        loadComponent: () => import('./features/auth/pages/login/login').then((m) => m.Login),
       },
       {
         path: 'verify-mail',
@@ -45,7 +43,9 @@ export const routes: Routes = [
       {
         path: 'forgot-password',
         loadComponent: () =>
-          import('./features/auth/pages/forgot-password/forgot-password').then((m) => m.ForgotPassword),
+          import('./features/auth/pages/forgot-password/forgot-password').then(
+            (m) => m.ForgotPassword,
+          ),
       },
       // {
       //   path: 'player-form',
@@ -59,14 +59,47 @@ export const routes: Routes = [
       //   loadComponent: () =>
       //     import('./features/auth/pages/form-roles/admin-form/admin-form').then((m) => m.AdminForm),
       // },
+      {
+        path: 'plans',
+        loadComponent: () => import('./features/admin/pages/plans/plans').then((m) => m.Plans),
+      },
+      {
+        path: 'payment',
+        loadComponent: () =>
+          import('./features/admin/pages/payment/payment').then((m) => m.Payment),
+        data: { paymentStep: 'select-method' },
+      },
+      {
+        path: 'payment/success',
+        loadComponent: () =>
+          import('./features/admin/pages/payment/payment').then((m) => m.Payment),
+        data: { paymentStep: 'success' },
+      },
+      {
+        path: 'payment/failure',
+        loadComponent: () =>
+          import('./features/admin/pages/payment/payment').then((m) => m.Payment),
+        data: { paymentStep: 'failure' },
+      },
+      {
+        path: 'payment/pending',
+        loadComponent: () =>
+          import('./features/admin/pages/payment/payment').then((m) => m.Payment),
+        data: { paymentStep: 'pending' },
+      },
+      {
+        path: 'subscriptions',
+        loadComponent: () =>
+          import('./features/admin/pages/subscriptions/subscriptions').then((m) => m.Subscriptions),
+      },
     ],
   },
   {
     path: 'admin/clubs',
     canActivate: [adminGuard],
-    component: Clubs, 
+    component: Clubs,
   },
-    {
+  {
     path: 'admin/club/:clubId',
     resolve: { 
       clubName: clubNameResolver, 
@@ -83,9 +116,8 @@ export const routes: Routes = [
       },
       {
         path: 'courts',
-        data: { breadcrumb: 'Quadras' }, 
-        loadComponent: () =>
-          import('./features/admin/pages/courts/courts').then((m) => m.Courts),
+        data: { breadcrumb: 'Quadras' },
+        loadComponent: () => import('./features/admin/pages/courts/courts').then((m) => m.Courts),
       },
       {
         path: 'court/:courtId',
@@ -93,11 +125,11 @@ export const routes: Routes = [
         children: [
           {
             path: 'schedule',
-            data: { breadcrumb: 'Horario' }, 
+            data: { breadcrumb: 'Horario' },
             loadComponent: () =>
               import('./features/admin/pages/schedules/schedules').then((m) => m.Schedules),
-          }
-        ]
+          },
+        ],
       },
       {
         path: 'reserves',
