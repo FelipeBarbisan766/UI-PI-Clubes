@@ -17,10 +17,11 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { finalize } from 'rxjs';
+import { catchError, EMPTY, finalize, switchMap, take, tap } from 'rxjs';
 import { ServiceSignUp } from '../../services/service-sign-up';
 import { ToastAlert } from '../../../../shared/components/toast-alert/toast-alert';
 import { GoogleAuthService } from '../../services/service-google';
+import { AuthService } from '../../../../core/services/auth-service';
 
 function passwordsMatchValidator(control: AbstractControl): ValidationErrors | null {
   const password = control.get('password')?.value ?? '';
@@ -39,6 +40,7 @@ export class SignUp implements AfterViewInit {
   private readonly fb = inject(NonNullableFormBuilder);
   private readonly signUpService = inject(ServiceSignUp);
   private readonly router = inject(Router);
+  private readonly authService = inject(AuthService);
   private readonly googleAuth = inject(GoogleAuthService);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -83,7 +85,7 @@ export class SignUp implements AfterViewInit {
   private handleGoogleSignUp(idToken: string): void {
     this.isSubmitting.set(true);
     this.errorMessage.set(null);
-
+    console.log('Google ID Token:', idToken);
     this.signUpService
       .signUpWithGoogle({ idToken })
       .pipe(
@@ -91,8 +93,30 @@ export class SignUp implements AfterViewInit {
         finalize(() => this.isSubmitting.set(false)),
       )
       .subscribe({
-        next: () => void this.router.navigateByUrl('/select'),
-        error: (error: unknown) => this.errorMessage.set(this.extractErrorMessage(error)),
+        next: () =>
+          this.authService
+            .googleLogin(idToken)
+            .pipe(
+              take(1),
+              switchMap(() => this.authService.refreshMe()),
+              tap(() => void this.router.navigateByUrl('/select')),
+              catchError((error: unknown) => {
+                this.errorMessage.set(
+                  error instanceof Error ? error.message : 'Erro ao entrar com Google.',
+                );
+                return EMPTY;
+              }),
+              tap(() => this.isSubmitting.set(false)),
+            )
+            .subscribe({
+              complete: () => this.isSubmitting.set(false),
+            }),
+        error: (error: unknown) => {
+          console.log('Google Sign-Up Error:', error);
+          this.errorMessage.set(
+            'Ocorreu um erro ao criar sua conta com o Google. Tente novamente.',
+          );
+        },
       });
   }
 

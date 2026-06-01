@@ -72,7 +72,7 @@ export class SelectRole {
     ).subscribe({
       next: () => {
         this.successMessage.set('Perfil de administrador salvo com sucesso.');
-        void this.router.navigateByUrl('/plans');
+        void this.router.navigateByUrl('/admin/clubs');
       },
       error: (error: unknown) => {
         this.errorMessage.set(
