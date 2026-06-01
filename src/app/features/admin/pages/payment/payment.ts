@@ -72,25 +72,33 @@ export class Payment implements OnInit, OnDestroy {
   // ─── Lifecycle ──────────────────────────────────────────────────────────
 
   ngOnInit(): void {
-    this.authService.getAdminMe().subscribe({
-      next: (admin) => {
-        this.adminId = admin.id;
-      },
-      error: (err: unknown) => {
-        console.error('Não foi possível obter o perfil do administrador.', err);
-      },
-    });
-    this.route.data.pipe(take(1)).subscribe((data) => {
-      const step = (data['paymentStep'] as PaymentStep) ?? 'select-method';
-      this.step.set(step);
+  this.route.data.pipe(take(1)).subscribe((data) => {
+    const step = (data['paymentStep'] as PaymentStep) ?? 'select-method';
+    this.step.set(step);
 
-      if (step === 'success') {
-        this.startPolling();
-      } else if (step === 'select-method') {
-        this.loadPlanFromQueryParams();
-      }
-    });
-  }
+    if (step === 'success') {
+      // Busca o adminId PRIMEIRO, só então inicia o polling
+      this.authService.getAdminMe().pipe(take(1)).subscribe({
+        next: (admin) => {
+          this.adminId = admin.id;
+          this.startPolling();
+        },
+        error: (err: unknown) => {
+          console.error('Não foi possível obter o perfil do administrador.', err);
+        },
+      });
+    } else if (step === 'select-method') {
+      // Para select-method o adminId é necessário pro initiatePayment
+      // então busca aqui também
+      this.authService.getAdminMe().pipe(take(1)).subscribe({
+        next: (admin) => {
+          this.adminId = admin.id;
+        },
+      });
+      this.loadPlanFromQueryParams();
+    }
+  });
+}
 
   ngOnDestroy(): void {
     this.pollingSubscription?.unsubscribe();
