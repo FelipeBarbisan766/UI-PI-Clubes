@@ -137,15 +137,15 @@ export class Payment implements OnInit, OnDestroy {
   }
 
   goToPricing(): void {
-    this.router.navigate(['/pricing']);
+    this.router.navigate(['/plans']);
   }
 
   goToSubscription(): void {
-    this.router.navigate(['/subscription']);
+    this.router.navigate(['/subscriptions']);
   }
 
   retryPayment(): void {
-    this.router.navigate(['/pricing']);
+    this.router.navigate(['/plans']);
   }
 
   // ─── Private helpers ────────────────────────────────────────────────────
@@ -154,7 +154,7 @@ export class Payment implements OnInit, OnDestroy {
     this.route.queryParamMap.pipe(take(1)).subscribe((params) => {
       const planId = params.get('planId');
       if (!planId) {
-        this.router.navigate(['/pricing']);
+        this.router.navigate(['/plans']);
         return;
       }
 
@@ -165,12 +165,12 @@ export class Payment implements OnInit, OnDestroy {
           next: (plans) => {
             const plan = plans.find((p) => p.id === planId) ?? null;
             if (!plan) {
-              this.router.navigate(['/pricing']);
+              this.router.navigate(['/plans']);
               return;
             }
             this.selectedPlan.set(plan);
           },
-          error: () => this.router.navigate(['/pricing']),
+          error: () => this.router.navigate(['/plans']),
         });
     });
   }
