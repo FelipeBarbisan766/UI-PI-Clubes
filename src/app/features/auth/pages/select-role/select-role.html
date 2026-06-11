@@ -1,99 +1,330 @@
-<main
-  class="min-h-screen w-full pattern-background flex items-center justify-center px-4 py-12 pt-20"
->
-  <section class="card bg-base-100 shadow-sm w-full max-w-4xl" aria-labelledby="welcome-title">
-    <div class="card-body">
-      <header class="text-center mb-8 max-w-2xl mx-auto">
-        <h1 id="welcome-title" class="text-3xl md:text-4xl font-bold mb-3">Bem-vindo!</h1>
-        <p class="text-sm md:text-base">
-          Para personalizar sua experiência, conta pra gente: como você pretende usar a plataforma?
-        </p>
-      </header>
+<main class="min-h-screen w-full bg-base-200 pattern-background flex justify-center px-4 py-10">
+  <div class="w-full max-w-4xl bg-base-100 rounded-2xl shadow-sm overflow-hidden self-start">
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-        <article class="card bg-base-200 border border-base-300">
-          <div class="card-body items-center text-center">
-            <div class="mb-2 rounded-full bg-primary/10 p-3" aria-hidden="true">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="lucide lucide-user-icon lucide-user text-primary"
-              >
-                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-                <circle cx="12" cy="7" r="4" />
-              </svg>
-            </div>
-            <h2 class="card-title">Jogador</h2>
-            <p class="text-sm">Encontre quadras, reserve e jogue!</p>
-            <div class="card-actions mt-2">
-              <button
-                type="button"
-                class="btn btn-primary rounded-full text-white"
-                aria-label="Selecionar perfil de Jogador"
-                (click)="bePlayer()"
-              >
-                Sou Jogador
-              </button>
-            </div>
-          </div>
-        </article>
+  <!-- ── TOP BAR ─────────────────────────────────────────────────────── -->
+  <header class="bg-base-100 border-b border-base-300">
+    <div class="px-6 h-14 flex items-center justify-between">
+      <span class="font-bold text-lg text-primary tracking-tight">QuadraApp</span>
+    </div>
+  </header>
 
-        <article class="card bg-base-200 border border-base-300">
-          <div class="card-body items-center text-center">
-            <div class="mb-2 rounded-full bg-primary/10 p-3" aria-hidden="true">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="lucide lucide-cog-icon lucide-cog text-primary"
-              >
-                <path d="M11 10.27 7 3.34" />
-                <path d="m11 13.73-4 6.93" />
-                <path d="M12 22v-2" />
-                <path d="M12 2v2" />
-                <path d="M14 12h8" />
-                <path d="m17 20.66-1-1.73" />
-                <path d="m17 3.34-1 1.73" />
-                <path d="M2 12h2" />
-                <path d="m20.66 17-1.73-1" />
-                <path d="m20.66 7-1.73 1" />
-                <path d="m3.34 17 1.73-1" />
-                <path d="m3.34 7 1.73 1" />
-                <circle cx="12" cy="12" r="2" />
-                <circle cx="12" cy="12" r="8" />
-              </svg>
-            </div>
-            <h2 class="card-title">Dono de Quadra</h2>
-            <p class="text-sm">Gerencie quadras, reservas! Tudo para seu clube.</p>
-            <div class="card-actions mt-2">
-              <button
-                type="button"
-                class="btn btn-primary rounded-full text-white"
-                aria-label="Selecionar perfil de Admin"
-                (click)="beAdmin()"
-              >
-                Sou Dono de Quadra
-              </button>
-            </div>
-          </div>
-        </article>
-        <div class="col-span-full text-center mt-6">
-          <button class="btn btn-primary rounded-full text-white px-10 py-3" (click)="onLogout()">Sair</button>
+  <!-- ── HERO ──────────────────────────────────────────────────────────── -->
+  <section class="bg-base-100 border-b border-base-300" aria-labelledby="hero-title">
+    <div class="px-6 md:px-10 py-14 md:py-20 text-center">
+
+      <div class="inline-flex items-center gap-2 bg-primary/10 text-primary text-xs font-semibold
+                  px-3 py-1.5 rounded-full mb-6 uppercase tracking-widest">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+          stroke-linejoin="round" aria-hidden="true">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+        </svg>
+        Para donos de clube
+      </div>
+
+      <h1 id="hero-title" class="text-4xl md:text-5xl font-extrabold text-base-content leading-tight mb-4">
+        Seu clube, completamente<br class="hidden md:block" />
+        <span class="text-primary">organizado</span>
+      </h1>
+
+      <p class="text-base md:text-lg text-base-content/70 max-w-xl mx-auto mb-10 leading-relaxed">
+        Gerencie quadras, horários e reservas num só lugar. Deixa o sistema trabalhar
+        — você foca em receber os jogadores.
+      </p>
+
+      <button
+        type="button"
+        class="btn btn-primary btn-lg rounded-full px-10 text-white shadow-lg
+               hover:scale-[1.03] active:scale-[0.98] transition-transform"
+        (click)="beAdmin()"
+        aria-label="Começar como Dono de Clube"
+      >
+        Quero cadastrar meu clube
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+          stroke-linejoin="round" aria-hidden="true">
+          <line x1="5" y1="12" x2="19" y2="12"/>
+          <polyline points="12 5 19 12 12 19"/>
+        </svg>
+      </button>
+
+      <p class="text-xs text-base-content/40 mt-4">Gratuito para começar. Sem contrato.</p>
+    </div>
+  </section>
+
+  <!-- ── STATS STRIP ──────────────────────────────────────────────────── -->
+  <section class="bg-primary" aria-label="Destaques da plataforma">
+    <div class="px-6 py-6 grid grid-cols-3 divide-x divide-primary-content/20">
+      @for (stat of [
+        { value: '100%', label: 'Online' },
+        { value: '< 15min', label: 'Para ativar' },
+        { value: '24/7', label: 'Reservas abertas' }
+      ]; track stat.label) {
+        <div class="text-center px-4">
+          <p class="text-xl md:text-2xl font-extrabold text-primary-content">{{ stat.value }}</p>
+          <p class="text-xs text-primary-content/70 mt-0.5">{{ stat.label }}</p>
         </div>
+      }
+    </div>
+  </section>
+
+  <!-- ── BENEFITS ──────────────────────────────────────────────────────── -->
+  <section class="bg-base-100 border-b border-base-300 py-16 md:py-20" aria-labelledby="benefits-title">
+    <div class="px-6 md:px-10">
+
+      <div class="text-center mb-12">
+        <p class="text-xs font-semibold text-primary uppercase tracking-widest mb-2">O que você ganha</p>
+        <h2 id="benefits-title" class="text-2xl md:text-3xl font-bold text-base-content">
+          Tudo que seu clube precisa
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+
+        <!-- Benefit card -->
+        <article class="card bg-base-200 border border-base-300 hover:border-primary/40
+                        hover:shadow-md transition-all">
+          <div class="card-body gap-3">
+            <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0"
+                 aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" class="text-primary">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-bold text-base-content">Agenda Centralizada</h3>
+              <p class="text-sm text-base-content/65 mt-1 leading-relaxed">
+                Visualize todos os horários e quadras em um calendário unificado. Bloqueie
+                horários para manutenção ou aulas fixas com um clique.
+              </p>
+            </div>
+          </div>
+        </article>
+
+        <article class="card bg-base-200 border border-base-300 hover:border-primary/40
+                        hover:shadow-md transition-all">
+          <div class="card-body gap-3">
+            <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0"
+                 aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" class="text-primary">
+                <path d="M20 12V22H4V12"/>
+                <path d="M22 7H2v5h20V7z"/>
+                <path d="M12 22V7"/>
+                <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/>
+                <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-bold text-base-content">Reservas Online</h3>
+              <p class="text-sm text-base-content/65 mt-1 leading-relaxed">
+                Os jogadores reservam e pagam diretamente pelo app, a qualquer hora. Chega de
+                grupos de WhatsApp e cobranças manuais.
+              </p>
+            </div>
+          </div>
+        </article>
+
+        <article class="card bg-base-200 border border-base-300 hover:border-primary/40
+                        hover:shadow-md transition-all">
+          <div class="card-body gap-3">
+            <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0"
+                 aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" class="text-primary">
+                <line x1="12" y1="1" x2="12" y2="23"/>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-bold text-base-content">Controle Financeiro</h3>
+              <p class="text-sm text-base-content/65 mt-1 leading-relaxed">
+                Acompanhe faturamento, repasses e histórico de pagamentos. Relatórios claros
+                sem planilhas.
+              </p>
+            </div>
+          </div>
+        </article>
+
+        <article class="card bg-base-200 border border-base-300 hover:border-primary/40
+                        hover:shadow-md transition-all">
+          <div class="card-body gap-3">
+            <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0"
+                 aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" class="text-primary">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-bold text-base-content">Visibilidade para Jogadores</h3>
+              <p class="text-sm text-base-content/65 mt-1 leading-relaxed">
+                Seu clube aparece nas buscas de jogadores da sua região que procuram quadras
+                disponíveis na plataforma.
+              </p>
+            </div>
+          </div>
+        </article>
+
       </div>
     </div>
   </section>
+
+  <!-- ── HOW IT WORKS ───────────────────────────────────────────────────── -->
+  <section class="bg-base-200 border-b border-base-300 py-16 md:py-20" aria-labelledby="steps-title">
+    <div class="px-6 md:px-10">
+
+      <div class="text-center mb-12">
+        <p class="text-xs font-semibold text-primary uppercase tracking-widest mb-2">É simples assim</p>
+        <h2 id="steps-title" class="text-2xl md:text-3xl font-bold text-base-content">
+          Ative seu clube em 3 passos
+        </h2>
+      </div>
+
+      <ol class="grid grid-cols-1 md:grid-cols-3 gap-6 list-none" aria-label="Passos para ativar o clube">
+
+        <li class="card bg-base-100 border border-base-300 shadow-sm">
+          <div class="card-body items-center text-center gap-3">
+            <div class="w-12 h-12 rounded-full bg-primary text-primary-content font-extrabold
+                        text-lg flex items-center justify-center shrink-0" aria-hidden="true">
+              1
+            </div>
+            <div>
+              <h3 class="font-bold text-base-content">Crie o perfil do clube</h3>
+              <p class="text-sm text-base-content/65 mt-1 leading-relaxed">
+                Nome, endereço, fotos e informações de contato. Leva menos de 5 minutos.
+              </p>
+            </div>
+          </div>
+        </li>
+
+        <li class="card bg-base-100 border border-base-300 shadow-sm">
+          <div class="card-body items-center text-center gap-3">
+            <div class="w-12 h-12 rounded-full bg-primary text-primary-content font-extrabold
+                        text-lg flex items-center justify-center shrink-0" aria-hidden="true">
+              2
+            </div>
+            <div>
+              <h3 class="font-bold text-base-content">Cadastre suas quadras</h3>
+              <p class="text-sm text-base-content/65 mt-1 leading-relaxed">
+                Adicione quadras com tipo, fotos, horários disponíveis e preços por período.
+              </p>
+            </div>
+          </div>
+        </li>
+
+        <li class="card bg-base-100 border border-base-300 shadow-sm">
+          <div class="card-body items-center text-center gap-3">
+            <div class="w-12 h-12 rounded-full bg-primary text-primary-content font-extrabold
+                        text-lg flex items-center justify-center shrink-0" aria-hidden="true">
+              3
+            </div>
+            <div>
+              <h3 class="font-bold text-base-content">Comece a receber</h3>
+              <p class="text-sm text-base-content/65 mt-1 leading-relaxed">
+                Seu clube já aparece para os jogadores. Reservas e pagamentos chegam
+                automaticamente.
+              </p>
+            </div>
+          </div>
+        </li>
+
+      </ol>
+    </div>
+  </section>
+
+  <!-- ── FAQ ───────────────────────────────────────────────────────────── -->
+  <section class="bg-base-100 border-b border-base-300 py-16 md:py-20" aria-labelledby="faq-title">
+    <div class="px-6 md:px-10 max-w-2xl mx-auto">
+
+      <div class="text-center mb-10">
+        <p class="text-xs font-semibold text-primary uppercase tracking-widest mb-2">Dúvidas</p>
+        <h2 id="faq-title" class="text-2xl md:text-3xl font-bold text-base-content">
+          Perguntas frequentes
+        </h2>
+      </div>
+
+      <div class="space-y-2" role="list">
+        @for (faq of faqs; track faq.question; let i = $index) {
+          <div class="card bg-base-200 border border-base-300 overflow-hidden" role="listitem">
+            <button
+              type="button"
+              class="w-full flex items-center justify-between gap-3 px-5 py-4 text-left
+                     hover:bg-base-300 transition-colors"
+              [attr.aria-expanded]="openFaqIndex() === i"
+              [attr.aria-controls]="'faq-answer-' + i"
+              (click)="toggleFaq(i)"
+            >
+              <span class="font-semibold text-sm text-base-content">{{ faq.question }}</span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                stroke-linejoin="round" aria-hidden="true"
+                [class]="openFaqIndex() === i
+                  ? 'text-primary rotate-180 transition-transform shrink-0'
+                  : 'text-base-content/50 rotate-0 transition-transform shrink-0'"
+              >
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </button>
+            @if (openFaqIndex() === i) {
+              <div
+                [id]="'faq-answer-' + i"
+                role="region"
+                class="px-5 pb-4 text-sm text-base-content/70 leading-relaxed"
+              >
+                {{ faq.answer }}
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── FINAL CTA ─────────────────────────────────────────────────────── -->
+  <section class="bg-primary py-16 md:py-20" aria-labelledby="cta-title">
+    <div class="px-6 md:px-10 text-center">
+
+      <h2 id="cta-title" class="text-2xl md:text-3xl font-extrabold text-primary-content mb-3">
+        Pronto para organizar seu clube?
+      </h2>
+      <p class="text-primary-content/75 text-sm md:text-base mb-8 leading-relaxed">
+        Junte-se a outros donos de quadra que já deixaram de lado as planilhas e
+        os grupos de WhatsApp.
+      </p>
+
+      <button
+        type="button"
+        class="btn btn-lg bg-base-100 text-primary border-0 rounded-full px-10 shadow-xl
+               hover:bg-base-200 hover:scale-[1.03] active:scale-[0.98] transition-transform font-bold"
+        (click)="beAdmin()"
+        aria-label="Começar como Dono de Clube"
+      >
+        Começar agora — é grátis
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+          stroke-linejoin="round" aria-hidden="true">
+          <line x1="5" y1="12" x2="19" y2="12"/>
+          <polyline points="12 5 19 12 12 19"/>
+        </svg>
+      </button>
+
+      <p class="text-primary-content/50 text-xs mt-5">
+        Sem mensalidade fixa. Taxa apenas sobre reservas realizadas pela plataforma.
+      </p>
+    </div>
+  </section>
+
+  </div><!-- /card wrapper -->
 </main>

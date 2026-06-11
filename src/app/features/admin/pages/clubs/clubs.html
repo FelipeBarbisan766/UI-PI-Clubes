@@ -1,86 +1,144 @@
-<div class="p-6 max-w-7xl mx-auto">
-  <!-- Cabeçalho -->
-  <div class="flex flex-col justify-between items-start md:flex-row  md:items-center mb-8 gap-4">
-  <div class="flex items-center gap-4">
-    <div class="avatar avatar-placeholder">
-      <div class="bg-primary/20 text-neutral-content w-15 rounded-full">
-        <span class="text-3xl text-primary ">{{ initials() }}</span>
-      </div>
-    </div>
-      <div>
-        <p class="text-base-content/60 mt-1">Olá, {{ displayName() }}</p>
-        <h1 class="text-2xl font-bold text-base-content">Selecione um clube para gerenciar</h1>
-      </div>
-  </div>
-
-    <button type="button" class="btn btn-primary text-white" (click)="openCreate()">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-      Novo Clube
-    </button>
-  </div>
-
-  <!-- Alertas -->
-  @if (clubService.error()) {
-    <div role="alert" class="alert alert-error mb-6">
-      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-      <span>Erro: {{ clubService.error() }}</span>
-    </div>
-  }
-
-  @if (clubService.loading()) {
-    <div class="flex justify-center my-10" role="status" aria-live="polite" aria-busy="true">
-      <span class="loading loading-spinner loading-lg text-primary" aria-hidden="true"></span>
-      <span class="sr-only">Carregando clubes...</span>
-    </div>
-  }
-
-  <!-- Listagem de Clubes -->
-  @if (!isFormOpen()) {
-    @if (clubService.isEmpty()) {
-      <div class="text-center py-16 text-base-content/50 border-2 border-dashed border-base-300 rounded-box">
-        <p class="text-lg">Nenhum clube cadastrado ainda.</p>
-      </div>
-    } @else {
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        @for (club of clubService.clubs(); track club.id) {
-          <div class="card bg-base-100 card-border shadow-sm hover:shadow-md transition-shadow">
-            <div class="card-body p-5">
-              <!-- Título e Ações -->
-              <div class="flex justify-between items-start">
-                <h2 class="card-title text-lg font-bold">{{ club.name }}</h2>
-              </div>
-
-              <!-- Tags de Informação -->
-              <div class="flex flex-wrap gap-2 mt-2">
-                <div class="badge badge-neutral badge-outline bg-base-200 border-none text-xs font-semibold px-3 py-2 h-auto text-base-content/70">{{ club.city }}</div>
-                <div class="badge badge-neutral badge-outline bg-base-200 border-none text-xs font-semibold px-3 py-2 h-auto text-base-content/70">{{ club.courtCount }} quadra(s)</div>
-              </div>
-
-              <!-- Descrição -->
-              <p class="text-sm text-base-content/60 mt-3 line-clamp-2 min-h-[40px]">{{ club.description }}</p>
-
-              <!-- Preço / Info Final -->
-              <div class="mt-4 pt-4 border-t border-base-200 flex items-center justify-between gap-2">
-                <div class="flex flex-col gap-1">
-                  <p class="font-bold text-primary text-xl">R$ {{ club.minPrice }}/h</p>
-                  <p class="text-xs text-base-content/50">{{ club.phoneNumber }}</p>
-                </div>
-                <button
-                  type="button"
-                  class="btn btn-outline btn-sm gap-2"
-                  aria-label="Gerenciar quadras do clube"
-                  title="Gerenciar Quadras"
-                  (click)="goToCourts(club.id)">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
-                  Quadras
-                </button>
-              </div>
-            </div>
+<div class="card p-6 max-w-7xl mx-auto">
+  <div class="card-body bg-base-100 rounded-lg shadow-sm">
+    <!-- Cabeçalho -->
+    <div class="flex flex-col justify-between items-start md:flex-row md:items-center mb-8 gap-4">
+      <div class="flex items-center gap-4">
+        <div class="avatar avatar-placeholder">
+          <div class="bg-primary/20 text-neutral-content w-15 rounded-full">
+            <span class="text-3xl text-primary">{{ initials() }}</span>
           </div>
-        }
+        </div>
+        <div>
+          <p class="text-base-content/60 mt-1">Olá, {{ displayName() }}</p>
+          <h1 class="text-2xl font-bold text-base-content">Selecione um clube para gerenciar</h1>
+        </div>
+      </div>
+
+      <button type="button" class="btn btn-primary text-white" (click)="openCreate()">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5 mr-1"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          aria-hidden="true"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 4v16m8-8H4"
+          />
+        </svg>
+        Novo Clube
+      </button>
+    </div>
+
+    <!-- Alertas -->
+    @if (clubService.error()) {
+      <div role="alert" class="alert alert-error mb-6">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="stroke-current shrink-0 h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        <span>Erro: {{ clubService.error() }}</span>
       </div>
     }
-  }
+
+    @if (clubService.loading()) {
+      <div class="flex justify-center my-10" role="status" aria-live="polite" aria-busy="true">
+        <span class="loading loading-spinner loading-lg text-primary" aria-hidden="true"></span>
+        <span class="sr-only">Carregando clubes...</span>
+      </div>
+    }
+
+    <!-- Listagem de Clubes -->
+    @if (!isFormOpen()) {
+      @if (clubService.isEmpty()) {
+        <div
+          class="text-center py-16 text-base-content/50 border-2 border-dashed border-base-300 rounded-box"
+        >
+          <p class="text-lg">Nenhum clube cadastrado ainda.</p>
+        </div>
+      } @else {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          @for (club of clubService.clubs(); track club.id) {
+            <div class="card bg-base-100 card-border shadow-sm hover:shadow-md transition-shadow">
+              <div class="card-body p-5">
+                <!-- Título e Ações -->
+                <div class="flex justify-between items-start">
+                  <h2 class="card-title text-lg font-bold">{{ club.name }}</h2>
+                </div>
+
+                <!-- Tags de Informação -->
+                <div class="flex flex-wrap gap-2 mt-2">
+                  <div
+                    class="badge badge-neutral badge-outline bg-base-200 border-none text-xs font-semibold px-3 py-2 h-auto text-base-content/70"
+                  >
+                    {{ club.city }}
+                  </div>
+                  <div
+                    class="badge badge-neutral badge-outline bg-base-200 border-none text-xs font-semibold px-3 py-2 h-auto text-base-content/70"
+                  >
+                    {{ club.courtCount }} quadra(s)
+                  </div>
+                </div>
+
+                <!-- Descrição -->
+                <p class="text-sm text-base-content/60 mt-3 line-clamp-2 min-h-[40px]">
+                  {{ club.description }}
+                </p>
+
+                <!-- Preço / Info Final -->
+                <div
+                  class="mt-4 pt-4 border-t border-base-200 flex items-center justify-between gap-2"
+                >
+                  <div class="flex flex-col gap-1">
+                    <p class="font-bold text-primary text-xl">R$ {{ club.minPrice }}/h</p>
+                    <p class="text-xs text-base-content/50">{{ club.phoneNumber }}</p>
+                  </div>
+                  <button
+                    type="button"
+                    class="btn btn-outline btn-sm gap-2"
+                    aria-label="Gerenciar quadras do clube"
+                    title="Gerenciar Quadras"
+                    (click)="goToCourts(club.id)"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                    Quadras
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    }
+  </div>
 </div>
 
 <!-- Modal Form -->
@@ -88,17 +146,23 @@
   <app-modal>
     <div role="dialog" aria-modal="true" aria-labelledby="modal-title">
       <div class="flex justify-between items-center mb-4 border-b border-base-200 pb-3">
-        <h3 id="modal-title" class="font-bold text-xl text-base-content">
-          Cadastrar Clube
-        </h3>
-        <button type="button" class="btn btn-ghost btn-sm btn-circle" aria-label="Fechar modal" (click)="closeForm()">✕</button>
+        <h3 id="modal-title" class="font-bold text-xl text-base-content">Cadastrar Clube</h3>
+        <button
+          type="button"
+          class="btn btn-ghost btn-sm btn-circle"
+          aria-label="Fechar modal"
+          (click)="closeForm()"
+        >
+          ✕
+        </button>
       </div>
 
       <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-3" novalidate>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-2">
-
           <div class="flex flex-col w-full md:col-span-2">
-            <label class="py-1 font-medium text-xs text-base-content" for="name">Nome do Clube</label>
+            <label class="py-1 font-medium text-xs text-base-content" for="name"
+              >Nome do Clube</label
+            >
             <input
               id="name"
               type="text"
@@ -108,12 +172,22 @@
               [attr.aria-invalid]="fieldInvalid('name')"
               [attr.aria-describedby]="fieldInvalid('name') ? 'name-error' : null"
               placeholder="Ex: Clube de Tênis..."
-              autofocus />
-            @if (fieldInvalid('name')) { <span id="name-error" role="alert" class="block text-error text-[11px] mt-1 font-medium px-1">Obrigatório (mín. 3 letras)</span> }
+              autofocus
+            />
+            @if (fieldInvalid('name')) {
+              <span
+                id="name-error"
+                role="alert"
+                class="block text-error text-[11px] mt-1 font-medium px-1"
+                >Obrigatório (mín. 3 letras)</span
+              >
+            }
           </div>
 
           <div class="flex flex-col w-full md:col-span-1">
-            <label class="py-1 font-medium text-xs text-base-content" for="phoneNumber">Telefone</label>
+            <label class="py-1 font-medium text-xs text-base-content" for="phoneNumber"
+              >Telefone</label
+            >
             <input
               id="phoneNumber"
               type="text"
@@ -123,12 +197,22 @@
               [class.input-error]="fieldInvalid('phoneNumber')"
               [attr.aria-invalid]="fieldInvalid('phoneNumber')"
               [attr.aria-describedby]="fieldInvalid('phoneNumber') ? 'phoneNumber-error' : null"
-              placeholder="(00) 00000-0000" />
-            @if (fieldInvalid('phoneNumber')) { <span id="phoneNumber-error" role="alert" class="block text-error text-[11px] mt-1 font-medium px-1">Obrigatório</span> }
+              placeholder="(00) 00000-0000"
+            />
+            @if (fieldInvalid('phoneNumber')) {
+              <span
+                id="phoneNumber-error"
+                role="alert"
+                class="block text-error text-[11px] mt-1 font-medium px-1"
+                >Obrigatório</span
+              >
+            }
           </div>
 
           <div class="flex flex-col w-full md:col-span-3">
-            <label class="py-1 font-medium text-xs text-base-content" for="description">Descrição</label>
+            <label class="py-1 font-medium text-xs text-base-content" for="description"
+              >Descrição</label
+            >
             <textarea
               id="description"
               formControlName="description"
@@ -136,15 +220,22 @@
               [class.textarea-error]="fieldInvalid('description')"
               [attr.aria-invalid]="fieldInvalid('description')"
               [attr.aria-describedby]="fieldInvalid('description') ? 'description-error' : null"
-              placeholder="Descreva sobre o clube..."></textarea>
-            @if (fieldInvalid('description')) { <span id="description-error" role="alert" class="block text-error text-[11px] mt-1 font-medium px-1">Obrigatória</span> }
+              placeholder="Descreva sobre o clube..."
+            ></textarea>
+            @if (fieldInvalid('description')) {
+              <span
+                id="description-error"
+                role="alert"
+                class="block text-error text-[11px] mt-1 font-medium px-1"
+                >Obrigatória</span
+              >
+            }
           </div>
         </div>
 
         <fieldset class="fieldset border border-base-200 p-3 rounded-box mt-1">
           <legend class="fieldset-legend text-sm font-semibold px-2">Endereço</legend>
           <div class="grid grid-cols-1 md:grid-cols-4 gap-x-4 gap-y-2 w-full">
-
             <div class="flex flex-col w-full md:col-span-1">
               <label class="py-1 font-medium text-xs text-base-content" for="zipCode">CEP</label>
               <input
@@ -155,8 +246,16 @@
                 class="input input-bordered input-sm w-full"
                 [class.input-error]="fieldInvalid('zipCode')"
                 [attr.aria-invalid]="fieldInvalid('zipCode')"
-                [attr.aria-describedby]="fieldInvalid('zipCode') ? 'zipCode-error' : null" />
-              @if (fieldInvalid('zipCode')) { <span id="zipCode-error" role="alert" class="block text-error text-[11px] mt-1 font-medium px-1">Obrigatório</span> }
+                [attr.aria-describedby]="fieldInvalid('zipCode') ? 'zipCode-error' : null"
+              />
+              @if (fieldInvalid('zipCode')) {
+                <span
+                  id="zipCode-error"
+                  role="alert"
+                  class="block text-error text-[11px] mt-1 font-medium px-1"
+                  >Obrigatório</span
+                >
+              }
             </div>
 
             <div class="flex flex-col w-full md:col-span-3">
@@ -168,8 +267,16 @@
                 class="input input-bordered input-sm w-full"
                 [class.input-error]="fieldInvalid('street')"
                 [attr.aria-invalid]="fieldInvalid('street')"
-                [attr.aria-describedby]="fieldInvalid('street') ? 'street-error' : null" />
-              @if (fieldInvalid('street')) { <span id="street-error" role="alert" class="block text-error text-[11px] mt-1 font-medium px-1">Obrigatória</span> }
+                [attr.aria-describedby]="fieldInvalid('street') ? 'street-error' : null"
+              />
+              @if (fieldInvalid('street')) {
+                <span
+                  id="street-error"
+                  role="alert"
+                  class="block text-error text-[11px] mt-1 font-medium px-1"
+                  >Obrigatória</span
+                >
+              }
             </div>
 
             <div class="flex flex-col w-full md:col-span-1">
@@ -181,17 +288,35 @@
                 class="input input-bordered input-sm w-full"
                 [class.input-error]="fieldInvalid('number')"
                 [attr.aria-invalid]="fieldInvalid('number')"
-                [attr.aria-describedby]="fieldInvalid('number') ? 'number-error' : null" />
-              @if (fieldInvalid('number')) { <span id="number-error" role="alert" class="block text-error text-[11px] mt-1 font-medium px-1">Obrigatório</span> }
+                [attr.aria-describedby]="fieldInvalid('number') ? 'number-error' : null"
+              />
+              @if (fieldInvalid('number')) {
+                <span
+                  id="number-error"
+                  role="alert"
+                  class="block text-error text-[11px] mt-1 font-medium px-1"
+                  >Obrigatório</span
+                >
+              }
             </div>
 
             <div class="flex flex-col w-full md:col-span-1">
-              <label class="py-1 font-medium text-xs text-base-content" for="complement">Complemento</label>
-              <input id="complement" type="text" formControlName="complement" class="input input-bordered input-sm w-full" placeholder="Opcional" />
+              <label class="py-1 font-medium text-xs text-base-content" for="complement"
+                >Complemento</label
+              >
+              <input
+                id="complement"
+                type="text"
+                formControlName="complement"
+                class="input input-bordered input-sm w-full"
+                placeholder="Opcional"
+              />
             </div>
 
             <div class="flex flex-col w-full md:col-span-2">
-              <label class="py-1 font-medium text-xs text-base-content" for="neighborhood">Bairro</label>
+              <label class="py-1 font-medium text-xs text-base-content" for="neighborhood"
+                >Bairro</label
+              >
               <input
                 id="neighborhood"
                 type="text"
@@ -199,8 +324,16 @@
                 class="input input-bordered input-sm w-full"
                 [class.input-error]="fieldInvalid('neighborhood')"
                 [attr.aria-invalid]="fieldInvalid('neighborhood')"
-                [attr.aria-describedby]="fieldInvalid('neighborhood') ? 'neighborhood-error' : null" />
-              @if (fieldInvalid('neighborhood')) { <span id="neighborhood-error" role="alert" class="block text-error text-[11px] mt-1 font-medium px-1">Obrigatório</span> }
+                [attr.aria-describedby]="fieldInvalid('neighborhood') ? 'neighborhood-error' : null"
+              />
+              @if (fieldInvalid('neighborhood')) {
+                <span
+                  id="neighborhood-error"
+                  role="alert"
+                  class="block text-error text-[11px] mt-1 font-medium px-1"
+                  >Obrigatório</span
+                >
+              }
             </div>
 
             <div class="flex flex-col w-full md:col-span-2">
@@ -212,8 +345,16 @@
                 class="input input-bordered input-sm w-full"
                 [class.input-error]="fieldInvalid('city')"
                 [attr.aria-invalid]="fieldInvalid('city')"
-                [attr.aria-describedby]="fieldInvalid('city') ? 'city-error' : null" />
-              @if (fieldInvalid('city')) { <span id="city-error" role="alert" class="block text-error text-[11px] mt-1 font-medium px-1">Obrigatória</span> }
+                [attr.aria-describedby]="fieldInvalid('city') ? 'city-error' : null"
+              />
+              @if (fieldInvalid('city')) {
+                <span
+                  id="city-error"
+                  role="alert"
+                  class="block text-error text-[11px] mt-1 font-medium px-1"
+                  >Obrigatória</span
+                >
+              }
             </div>
 
             <div class="flex flex-col w-full md:col-span-1">
@@ -225,8 +366,16 @@
                 class="input input-bordered input-sm w-full"
                 [class.input-error]="fieldInvalid('state')"
                 [attr.aria-invalid]="fieldInvalid('state')"
-                [attr.aria-describedby]="fieldInvalid('state') ? 'state-error' : null" />
-              @if (fieldInvalid('state')) { <span id="state-error" role="alert" class="block text-error text-[11px] mt-1 font-medium px-1">Obrigatório</span> }
+                [attr.aria-describedby]="fieldInvalid('state') ? 'state-error' : null"
+              />
+              @if (fieldInvalid('state')) {
+                <span
+                  id="state-error"
+                  role="alert"
+                  class="block text-error text-[11px] mt-1 font-medium px-1"
+                  >Obrigatório</span
+                >
+              }
             </div>
 
             <div class="flex flex-col w-full md:col-span-1">
@@ -238,33 +387,61 @@
                 class="input input-bordered input-sm w-full"
                 [class.input-error]="fieldInvalid('country')"
                 [attr.aria-invalid]="fieldInvalid('country')"
-                [attr.aria-describedby]="fieldInvalid('country') ? 'country-error' : null" />
-              @if (fieldInvalid('country')) { <span id="country-error" role="alert" class="block text-error text-[11px] mt-1 font-medium px-1">Obrigatório</span> }
+                [attr.aria-describedby]="fieldInvalid('country') ? 'country-error' : null"
+              />
+              @if (fieldInvalid('country')) {
+                <span
+                  id="country-error"
+                  role="alert"
+                  class="block text-error text-[11px] mt-1 font-medium px-1"
+                  >Obrigatório</span
+                >
+              }
             </div>
           </div>
         </fieldset>
 
-        
-          <div class="flex flex-col w-full mt-1">
-            <label class="py-1 font-medium text-xs text-base-content" for="images">Imagens do Clube</label>
-            <input id="images" type="file" multiple accept="image/*" (change)="onFilesSelected($event)" class="file-input file-input-bordered file-input-primary file-input-sm w-full" />
+        <div class="flex flex-col w-full mt-1">
+          <label class="py-1 font-medium text-xs text-base-content" for="images"
+            >Imagens do Clube</label
+          >
+          <input
+            id="images"
+            type="file"
+            multiple
+            accept="image/*"
+            (change)="onFilesSelected($event)"
+            class="file-input file-input-bordered file-input-primary file-input-sm w-full"
+          />
 
-            @if (selectedFiles().length > 0) {
-              <ul class="flex flex-wrap gap-2 mt-2" aria-label="Imagens selecionadas">
-                @for (file of selectedFiles(); track file.name; let i = $index) {
-                  <li class="badge badge-primary badge-sm text-primary-content gap-1 p-3 text-xs font-semibold">
-                    <span class="truncate max-w-[120px]">{{ file.name }}</span>
-                    <button type="button" class="btn btn-ghost btn-xs btn-circle hover:bg-black/20 w-4 h-4 min-h-0" aria-label="Remover imagem" (click)="removeFile(i)">✕</button>
-                  </li>
-                }
-              </ul>
-            }
-          </div>
-        
+          @if (selectedFiles().length > 0) {
+            <ul class="flex flex-wrap gap-2 mt-2" aria-label="Imagens selecionadas">
+              @for (file of selectedFiles(); track file.name; let i = $index) {
+                <li
+                  class="badge badge-primary badge-sm text-primary-content gap-1 p-3 text-xs font-semibold"
+                >
+                  <span class="truncate max-w-[120px]">{{ file.name }}</span>
+                  <button
+                    type="button"
+                    class="btn btn-ghost btn-xs btn-circle hover:bg-black/20 w-4 h-4 min-h-0"
+                    aria-label="Remover imagem"
+                    (click)="removeFile(i)"
+                  >
+                    ✕
+                  </button>
+                </li>
+              }
+            </ul>
+          }
+        </div>
 
         <div class="modal-action mt-4 pt-3 border-t border-base-200">
           <button type="button" class="btn btn-ghost btn-sm" (click)="closeForm()">Cancelar</button>
-          <button type="submit" class="btn btn-primary btn-sm text-primary-content px-6" [disabled]="!isSubmitEnabled() || clubService.loading()">
+          <button
+            type="submit"
+            class="btn btn-primary btn-sm text-primary-content px-6"
+            [disabled]="!isSubmitEnabled() || clubService.loading()"
+          >
             @if (clubService.loading()) {
               <span class="loading loading-spinner loading-xs" aria-hidden="true"></span>
             }

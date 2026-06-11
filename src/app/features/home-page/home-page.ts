@@ -1,6 +1,6 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { SearchHome } from "../../shared/components/search-home/search-home";
-import { RouterLink } from "@angular/router";
+import { Router, RouterLink } from "@angular/router";
 import { NgOptimizedImage } from '@angular/common';
 
 interface Club {
@@ -20,6 +20,10 @@ interface Club {
   styleUrl: './home-page.css',
 })
 export class HomePage {
+
+  private readonly router = inject(Router);
+
+
   readonly featuredClubs = signal<Club[]>([
     {
       id: 1,
@@ -49,4 +53,7 @@ export class HomePage {
       image: '/assets/tennishouse.jpg'
     }
   ]);
+  goTo() {
+   void this.router.navigate(['/select']); // Trocar o Nome da Rota e Do componente para o correto
+  }
 }

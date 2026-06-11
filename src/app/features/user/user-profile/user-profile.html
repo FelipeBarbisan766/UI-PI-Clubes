@@ -1,0 +1,302 @@
+<div class="bg-base-200 min-h-screen pattern-background">
+
+  <!-- Page header -->
+  <header class="bg-base-100 border-b border-base-300">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-6">
+      <h1 class="text-2xl font-bold text-base-content">Configurações do Perfil</h1>
+      <p class="text-sm text-base-content/60 mt-1">
+        Gerencie as informações visíveis no seu perfil público
+      </p>
+    </div>
+  </header>
+
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8 ">
+
+    <!-- ─── Loading skeleton ─── -->
+    @if (loading() && !user()) {
+      <div class="flex flex-col lg:flex-row gap-6" aria-busy="true" aria-label="Carregando perfil">
+        <div class="w-full lg:w-64 flex-shrink-0">
+          <div class="card bg-base-100 shadow-sm">
+            <div class="card-body items-center gap-4 py-8">
+              <div class="skeleton w-24 h-24 rounded-full"></div>
+              <div class="skeleton h-4 w-32"></div>
+              <div class="skeleton h-3 w-44"></div>
+            </div>
+          </div>
+        </div>
+        <div class="flex-1">
+          <div class="card bg-base-100 shadow-sm">
+            <div class="card-body gap-5">
+              <div class="skeleton h-5 w-40"></div>
+              <div class="skeleton h-12 w-full rounded-lg"></div>
+              <div class="skeleton h-12 w-full rounded-lg"></div>
+              <div class="skeleton h-12 w-full rounded-lg"></div>
+              <div class="flex justify-end gap-2 mt-2">
+                <div class="skeleton h-10 w-24 rounded-lg"></div>
+                <div class="skeleton h-10 w-36 rounded-lg"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- ─── Fetch error (no user loaded at all) ─── -->
+    @else if (error() && !user()) {
+      <div role="alert" class="alert alert-error max-w-lg shadow-sm">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="15" y1="9" x2="9" y2="15" />
+          <line x1="9" y1="9" x2="15" y2="15" />
+        </svg>
+        <span>{{ error() }}</span>
+      </div>
+    }
+
+    <!-- ─── Main content ─── -->
+    @else {
+      <div class="flex flex-col lg:flex-row gap-6">
+
+        <!-- Left column: identity card + meta -->
+        <aside class="w-full lg:w-64 flex-shrink-0 space-y-4" aria-label="Resumo do perfil">
+
+          <!-- Avatar + identity -->
+          <div class="card bg-base-100 shadow-sm">
+            <div class="card-body items-center gap-3 py-8">
+
+              <!-- Initials avatar -->
+              <div class="avatar placeholder" aria-hidden="true">
+                <div
+                  class="bg-gradient-to-br from-primary to-secondary text-primary-content rounded-full w-24 ring-2 ring-primary/30 ring-offset-2 ring-offset-base-100">
+                  <span class="text-3xl font-bold select-none items-center">{{ initials() }}</span>
+                </div>
+              </div>
+
+              <!-- Name & email -->
+              <div class="text-center w-full space-y-1">
+                <p class="font-semibold text-base text-base-content leading-snug">
+                  {{ user()?.name || '—' }}
+                </p>
+                <p class="text-xs text-base-content/50 break-all px-2">
+                  {{ user()?.email }}
+                </p>
+              </div>
+
+              <!-- Phone (if set) -->
+              @if (user()?.phoneNumber) {
+                <div class="flex items-center gap-1.5 text-xs text-base-content/60 mt-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 flex-shrink-0" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path
+                      d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.62 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                  </svg>
+                  <span>{{ user()?.phoneNumber }}</span>
+                </div>
+              }
+
+            </div>
+          </div>
+
+          <!-- Account meta -->
+          <div class="card bg-base-100 shadow-sm">
+            <div class="card-body py-4 gap-3">
+              <p class="text-xs font-semibold text-base-content/40 uppercase tracking-widest">
+                Conta
+              </p>
+
+              <div class="flex items-center gap-2 text-sm text-base-content/70">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-success flex-shrink-0"
+                  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                  <polyline points="22 4 12 14.01 9 11.01" />
+                </svg>
+                <span>E-mail verificado</span>
+              </div>
+
+              <div class="flex items-center gap-2 text-sm text-base-content/70">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary flex-shrink-0"
+                  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+                <span class="truncate">{{ user()?.name || 'Usuário' }}</span>
+              </div>
+            </div>
+          </div>
+
+        </aside>
+
+        <!-- Right column: edit form -->
+        <main class="flex-1 min-w-0">
+          <div class="card bg-base-100 shadow-sm">
+            <div class="card-body">
+
+              <!-- Section title -->
+              <div class="mb-6">
+                <h2 class="text-lg font-semibold text-base-content">Informações Pessoais</h2>
+                <p class="text-sm text-base-content/60 mt-0.5">
+                  Atualize seu nome e informações de contato
+                </p>
+              </div>
+
+              <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+
+                <!-- ── Name ── -->
+                <div class="form-control mb-5">
+                  <label class="label pb-1" for="profile-name">
+                    <span class="label-text font-medium text-base-content">
+                      Nome completo
+                    </span>
+                    @if (nameControl.invalid && nameControl.touched) {
+                      <span class="label-text-alt text-error" role="alert">
+                        @if (nameControl.errors?.['required']) { Campo obrigatório }
+                        @else if (nameControl.errors?.['minlength']) { Mínimo de 2 caracteres }
+                      </span>
+                    }
+                  </label>
+                  <input
+                    id="profile-name"
+                    type="text"
+                    formControlName="name"
+                    autocomplete="name"
+                    placeholder="Seu nome completo"
+                    class="input input-bordered w-full"
+                    [class.input-error]="nameControl.invalid && nameControl.touched"
+                    aria-required="true"
+                    aria-describedby="name-hint"
+                  />
+                  <div class="label pt-1" id="name-hint">
+                    <span class="label-text-alt text-base-content/50">
+                      Aparece no seu perfil e nas reservas
+                    </span>
+                  </div>
+                </div>
+
+                <!-- ── Email (read-only) ── -->
+                <div class="form-control mb-5">
+                  <label class="label pb-1" for="profile-email">
+                    <span class="label-text font-medium text-base-content">E-mail</span>
+                    <span class="label-text-alt">
+                      <span class="badge badge-sm badge-ghost gap-1 text-base-content/50">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24"
+                          fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                          <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+                          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                        </svg>
+                        Não editável
+                      </span>
+                    </span>
+                  </label>
+                  <input
+                    id="profile-email"
+                    type="email"
+                    formControlName="email"
+                    autocomplete="email"
+                    class="input input-bordered w-full bg-base-200 cursor-not-allowed text-base-content/60"
+                    aria-readonly="true"
+                    aria-describedby="email-hint"
+                  />
+                  <div class="label pt-1" id="email-hint">
+                    <span class="label-text-alt text-base-content/50">
+                      Para alterar o e-mail, entre em contato com o suporte
+                    </span>
+                  </div>
+                </div>
+
+                <!-- ── Phone ── -->
+                <div class="form-control mb-8">
+                  <label class="label pb-1" for="profile-phone">
+                    <span class="label-text font-medium text-base-content">Telefone</span>
+                    <span class="label-text-alt text-base-content/40">Opcional</span>
+                  </label>
+                  <div class="relative">
+                    <span class="absolute inset-y-0 left-3 flex items-center pointer-events-none" aria-hidden="true">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-base-content/40"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path
+                          d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.62 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                      </svg>
+                    </span>
+                    <input
+                      id="profile-phone"
+                      type="tel"
+                      formControlName="phoneNumber"
+                      autocomplete="tel"
+                      placeholder="(00) 00000-0000"
+                      class="input input-bordered w-full pl-10"
+                      aria-describedby="phone-hint"
+                    />
+                    <!-- Tip: add mask="(00) 00000-0000" [showMaskTyped]="true" from ngx-mask if installed -->
+                  </div>
+                  <div class="label pt-1" id="phone-hint">
+                    <span class="label-text-alt text-base-content/50">
+                      Usado para confirmações de reserva via WhatsApp
+                    </span>
+                  </div>
+                </div>
+
+                <div class="divider my-0"></div>
+
+                <!-- ── Feedback alerts ── -->
+                @if (successMessage()) {
+                  <div role="alert" class="alert alert-success mt-5 shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" viewBox="0 0 24 24"
+                      fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                      <polyline points="22 4 12 14.01 9 11.01" />
+                    </svg>
+                    <span>{{ successMessage() }}</span>
+                  </div>
+                }
+                @if (submitError()) {
+                  <div role="alert" class="alert alert-error mt-5 shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" viewBox="0 0 24 24"
+                      fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                      <circle cx="12" cy="12" r="10" />
+                      <line x1="15" y1="9" x2="9" y2="15" />
+                      <line x1="9" y1="9" x2="15" y2="15" />
+                    </svg>
+                    <span>{{ submitError() }}</span>
+                  </div>
+                }
+
+                <!-- ── Actions ── -->
+                <div class="card-actions justify-end mt-5 gap-2">
+                  <button
+                    type="button"
+                    class="btn btn-ghost"
+                    [disabled]="isSubmitting() || form.pristine"
+                    (click)="onReset()"
+                  >
+                    Descartar
+                  </button>
+                  <button
+                    type="submit"
+                    class="btn btn-primary min-w-36"
+                    [disabled]="isSubmitting() || form.invalid || form.pristine"
+                  >
+                    @if (isSubmitting()) {
+                      <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+                    } @else {
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                        <polyline points="17 21 17 13 7 13 7 21" />
+                        <polyline points="7 3 7 8 15 8" />
+                      </svg>
+                    }
+                    {{ isSubmitting() ? 'Salvando…' : 'Salvar alterações' }}
+                  </button>
+                </div>
+
+              </form>
+            </div>
+          </div>
+        </main>
+
+      </div>
+    }
+
+  </div>
+</div>

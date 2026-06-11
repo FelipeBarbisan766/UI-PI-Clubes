@@ -92,73 +92,79 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/admin/pages/subscriptions/subscriptions').then((m) => m.Subscriptions),
       },
-    ],
-  },
-  {
-    path: 'admin/clubs',
-    canActivate: [adminGuard],
-    component: Clubs,
-  },
-  {
-    path: 'admin/club/:clubId',
-    resolve: { 
-      clubName: clubNameResolver, 
-      clubCity: clubCityResolver,
-    },
-    component: AdminLayout,
-    canActivate: [adminGuard],
-    children: [
       {
-        path: 'dashboard',
-        data: { breadcrumb: 'Dashboard' },
+        path: 'user-profile',
         loadComponent: () =>
-          import('./features/admin/pages/dashboard/dashboard').then((m) => m.Dashboard),
+          import('./features/user/user-profile/user-profile').then((m) => m.UserProfile),
       },
       {
-        path: 'courts',
-        data: { breadcrumb: 'Quadras' },
-        loadComponent: () => import('./features/admin/pages/courts/courts').then((m) => m.Courts),
+        path: 'admin/clubs',
+        canActivate: [adminGuard],
+        component: Clubs,
       },
       {
-        path: 'court/:courtId',
-        resolve: { dynamicBreadcrumb: courtNameResolver },
+        path: 'admin/club/:clubId',
+        resolve: {
+          clubName: clubNameResolver,
+          clubCity: clubCityResolver,
+        },
+        component: AdminLayout,
+        canActivate: [adminGuard],
         children: [
           {
-            path: 'schedule',
-            data: { breadcrumb: 'Horario' },
+            path: 'dashboard',
+            data: { breadcrumb: 'Dashboard' },
             loadComponent: () =>
-              import('./features/admin/pages/schedules/schedules').then((m) => m.Schedules),
+              import('./features/admin/pages/dashboard/dashboard').then((m) => m.Dashboard),
+          },
+          {
+            path: 'courts',
+            data: { breadcrumb: 'Quadras' },
+            loadComponent: () =>
+              import('./features/admin/pages/courts/courts').then((m) => m.Courts),
+          },
+          {
+            path: 'court/:courtId',
+            resolve: { dynamicBreadcrumb: courtNameResolver },
+            children: [
+              {
+                path: 'schedule',
+                data: { breadcrumb: 'Horario' },
+                loadComponent: () =>
+                  import('./features/admin/pages/schedules/schedules').then((m) => m.Schedules),
+              },
+            ],
+          },
+          {
+            path: 'reserves',
+            data: { breadcrumb: 'Reservas' },
+            loadComponent: () =>
+              import('./features/admin/pages/reserves/reserves').then((m) => m.Reserve),
+          },
+          {
+            path: 'config',
+            data: { breadcrumb: 'Configurações' },
+            loadComponent: () =>
+              import('./features/admin/pages/config-club/config-club').then((m) => m.ConfigClub),
           },
         ],
       },
+
       {
-        path: 'reserves',
-        data: { breadcrumb: 'Reservas' },
-        loadComponent: () =>
-          import('./features/admin/pages/reserves/reserves').then((m) => m.Reserve),
+        path: 'sign-up',
+        canActivate: [guestGuard],
+        component: SignUp,
       },
       {
-        path: 'config',
-        data: { breadcrumb: 'Configurações' },
+        path: 'select',
+        canActivate: [selectRoleGuard],
         loadComponent: () =>
-          import('./features/admin/pages/config-club/config-club').then((m) => m.ConfigClub),
+          import('./features/auth/pages/select-role/select-role').then((m) => m.SelectRole),
       },
+      // {
+      //   path: '**',
+      //   redirectTo: '',
+      // },
     ],
   },
-
-  {
-    path: 'sign-up',
-    canActivate: [guestGuard],
-    component: SignUp,
-  },
-  {
-    path: 'select',
-    canActivate: [selectRoleGuard],
-    loadComponent: () =>
-      import('./features/auth/pages/select-role/select-role').then((m) => m.SelectRole),
-  },
-  // {
-  //   path: '**',
-  //   redirectTo: '',
-  // },
 ];

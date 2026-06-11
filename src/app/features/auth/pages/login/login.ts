@@ -63,7 +63,7 @@ export class Login implements AfterViewInit, OnDestroy {
       .pipe(
         take(1),
         switchMap(() => this.authService.refreshMe()),
-        tap(() => void this.router.navigateByUrl('/select')),
+        tap(() => void this.router.navigateByUrl('/clubs')),
         catchError((error: unknown) => {
           this.errorMessage.set(
             error instanceof Error ? error.message : 'Erro ao entrar com Google.'
@@ -91,7 +91,7 @@ export class Login implements AfterViewInit, OnDestroy {
       .pipe(
         take(1),
         switchMap(() => this.authService.refreshMe()),
-        tap(() => void this.router.navigateByUrl('/select')),
+        tap(() => void this.router.navigateByUrl('/clubs')),
         catchError((error: unknown) => {
           this.errorMessage.set(
             error instanceof Error ? error.message : 'Erro ao realizar login.'

@@ -37,8 +37,15 @@ export class Navbar {
       error: () => void this.router.navigateByUrl('/login'),
     });
   }
+  isAdmin = computed(() => {
+    const role = this.me()?.role?.trim().toLowerCase();
+    return role === 'admin';
+  });
 
   goToAccount(): void {
+    void this.router.navigate(['/user-profile']);
+  }
+  goToAdmin(): void {
     void this.router.navigate(['/admin/clubs']);
   }
 }

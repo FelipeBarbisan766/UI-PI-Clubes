@@ -66,6 +66,11 @@
             <li role="none">
               <a role="menuitem" (click)="goToAccount()">Minha conta</a>
             </li>
+            @if (isAdmin()) {
+              <li role="none">
+                <a role="menuitem" (click)="goToAdmin()">Administração</a>
+              </li>
+            }
             <li role="none">
               <button type="button" role="menuitem" (click)="onLogout()">
                 Sair

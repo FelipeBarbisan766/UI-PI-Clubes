@@ -16,8 +16,8 @@ export const selectRoleGuard: CanActivateFn = () => {
 
       const role = normalizeRole(user.role);
 
-      if (role === 'admin' || role === 'both' ) return router.parseUrl('/admin/clubs');
-      if (role === 'player') return router.parseUrl('/player');
+      if (role === 'admin' ) return router.parseUrl('/admin/clubs');
+      // if (role === 'player') return router.parseUrl('/player');
 
       return true;
     })

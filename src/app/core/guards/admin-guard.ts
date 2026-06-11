@@ -18,9 +18,9 @@ export const adminGuard: CanActivateFn = () => {
 
       const role = normalizeRole(user.role);
 
-      return role === 'admin' || role === 'both'
+      return role === 'admin'
         ? true
-        : router.parseUrl('/select');
+        : router.parseUrl('/');
     })
   );
 };
