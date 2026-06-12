@@ -28,7 +28,6 @@ export class ClubsList {
   private readonly router      = inject(Router);
   private readonly destroyRef  = inject(DestroyRef);
 
-  // --- Selectors do serviço ---
   readonly clubs       = this.clubService.clubs;
   readonly loading     = this.clubService.loading;
   readonly error       = this.clubService.error;
@@ -36,32 +35,26 @@ export class ClubsList {
   readonly clubsCount  = this.clubService.clubsCount;
   readonly totalPages  = this.clubService.totalPages;
 
-  // --- Signals de filtro ---
   readonly searchTerm    = signal('');
   readonly cityFilter    = signal('');
   readonly selectedTypes = signal<TypeEnum[]>([]);
   readonly currentPage   = signal(1);
 
-  // --- Query computada a partir dos filtros ---
+  // Indica se a localização foi detectada automaticamente (para mostrar badge)
+  readonly detectedCity  = signal<string | null>(null);
+
   private readonly query = computed<ClubQueryDTO>(() => ({
     name:     this.searchTerm() || undefined,
     city:     this.cityFilter() || undefined,
-    types:    this.selectedTypes().length > 0
-                ? this.selectedTypes()  
-                : undefined,
+    types:    this.selectedTypes().length > 0 ? this.selectedTypes() : undefined,
     page:     this.currentPage(),
     pageSize: PAGE_SIZE,
   }));
 
-  // --- Páginas visíveis para o componente de paginação ---
   readonly visiblePages = computed<(number | '...')[]>(() => {
     const total   = this.totalPages();
     const current = this.currentPage();
-
-    if (total <= 7) {
-      return Array.from({ length: total }, (_, i) => i + 1);
-    }
-
+    if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
     const around = new Set(
       [1, total, current - 1, current, current + 1].filter(p => p >= 1 && p <= total),
     );
@@ -75,22 +68,74 @@ export class ClubsList {
   });
 
   constructor() {
-    // Primeira carga imediata (sem debounce)
-    this.clubService
-      .getAll(this.query())
-      .pipe(take(1), takeUntilDestroyed(this.destroyRef))
-      .subscribe();
+  // Recargas reativas (debounced)
+  toObservable(this.query)
+    .pipe(
+      skip(1),
+      debounceTime(400),
+      switchMap(query => this.clubService.getAll(query)),
+      takeUntilDestroyed(this.destroyRef),
+    )
+    .subscribe();
 
-    // Recargas reativas: debounce de 400ms cobre tanto
-    // digitação em texto quanto mudanças de checkbox/página
-    toObservable(this.query)
-      .pipe(
-        skip(1),                        // ignora emissão inicial (já carregada acima)
-        debounceTime(400),
-        switchMap(query => this.clubService.getAll(query)),
-        takeUntilDestroyed(this.destroyRef),
-      )
-      .subscribe();
+  // 1️⃣ Carrega imediatamente sem filtro
+  this.clubService
+    .getAll(this.query())
+    .pipe(take(1), takeUntilDestroyed(this.destroyRef))
+    .subscribe();
+
+  // 2️⃣ Em paralelo, tenta detectar cidade — sem bloquear nada
+  this.resolveInitialCity().then(city => {
+    if (!city) return; // permissão negada/timeout → não faz nada
+    this.cityFilter.set(city);
+    this.detectedCity.set(city);
+    // o toObservable já dispara o reload automaticamente
+  });
+}
+
+  // Tenta geolocalização com timeout de 4s; resolve null em qualquer falha
+  private resolveInitialCity(): Promise<string | null> {
+    return new Promise(resolve => {
+      if (!navigator?.geolocation) return resolve(null);
+
+      const timer = setTimeout(() => resolve(null), 4000);
+
+      navigator.geolocation.getCurrentPosition(
+        async ({ coords }) => {
+          clearTimeout(timer);
+          try {
+            const city = await this.reverseGeocode(coords.latitude, coords.longitude);
+            resolve(city);
+          } catch {
+            resolve(null);
+          }
+        },
+        () => { clearTimeout(timer); resolve(null); },
+        { timeout: 4000, maximumAge: 5 * 60 * 1000 }, // cache de 5 min
+      );
+    });
+  }
+
+  private async reverseGeocode(lat: number, lng: number): Promise<string | null> {
+    const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`;
+    const res  = await fetch(url, {
+      headers: { 'Accept-Language': 'pt-BR', 'User-Agent': 'SeuAppNome/1.0' },
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    // Nominatim pode retornar city, town, village ou municipality
+    return data.address?.city
+        ?? data.address?.town
+        ?? data.address?.municipality
+        ?? data.address?.village
+        ?? null;
+  }
+
+  // Limpa filtro de localização automática
+  clearDetectedCity(): void {
+    this.detectedCity.set(null);
+    this.cityFilter.set('');
+    this.currentPage.set(1);
   }
 
   // --- Handlers de filtro ---
@@ -102,6 +147,8 @@ export class ClubsList {
 
   onCityChange(event: Event): void {
     this.cityFilter.set((event.target as HTMLInputElement).value);
+    // Se o usuário editar manualmente, descarta o badge de "detectado"
+    this.detectedCity.set(null);
     this.currentPage.set(1);
   }
 
@@ -124,8 +171,6 @@ export class ClubsList {
     this.currentPage.set(page);
   }
 
-  // --- Outros ---
-
   selectClub(club: ResponseClubDTO): void {
     this.router.navigate(['/clubs', club.id]);
   }
@@ -142,7 +187,6 @@ export class ClubsList {
     this.clubService.clearError();
   }
 
- // --- Mapa TypeEnum → label legível ---
   readonly typeLabels: Record<TypeEnum, string> = {
     [TypeEnum.None]:         'Outro',
     [TypeEnum.Futsal]:       'Futsal',
