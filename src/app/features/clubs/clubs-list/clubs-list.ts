@@ -176,7 +176,7 @@ export class ClubsList {
   }
 
   getFirstImage(club: ResponseClubDTO): string | null {
-    return club.imagesUrls?.length > 0 ? club.imagesUrls[0] : null;
+    return club.images?.length > 0 ? club.images[0].thumbUrl : null;
   }
 
   formatPrice(price: number): string {

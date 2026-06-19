@@ -82,8 +82,8 @@ function formatDate(dateStr: string): string {
 }
 
 function getFirstImage(club: ResponseClubByIdDTO | null): string | null {
-  const images = club?.imagesUrls;
-  return images?.length ? images[0] : null;
+  const images = club?.images;
+  return images?.length ? images[0].fullUrl : null;
 }
 
 function getTypeName(type: TypeEnum): string {

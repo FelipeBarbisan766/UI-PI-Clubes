@@ -12,7 +12,13 @@ export interface ResponseClubDTO {
   minPrice: number;
   courtCount: number;
   types: TypeEnum[];
-  imagesUrls: string[];
+  images: [
+    {
+      thumbUrl: string;
+      mainUrl: string;
+      fullUrl: string;
+    }
+  ];
 }
 
 export interface ResponseClubByIdDTO {
@@ -27,6 +33,12 @@ export interface ResponseClubByIdDTO {
   city: string;
   state: string;
   country: string;
-  imagesUrls: string[];
+  images: [
+    {
+      thumbUrl: string;
+      mainUrl: string;
+      fullUrl: string;
+    }
+  ];
   courts: import('./model-court').ResponseCourtDTO[];
 }

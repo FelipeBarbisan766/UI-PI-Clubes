@@ -80,8 +80,8 @@ export class HomePage implements OnInit {
   // --- Funções Auxiliares para o Template ---
   
   getCoverImage(club: ResponseClubDTO): string {
-    return club.imagesUrls && club.imagesUrls.length > 0 
-      ? club.imagesUrls[0] 
+    return club.images && club.images.length > 0 
+      ? club.images[0].thumbUrl 
       : 'assets/placeholder-club.jpg'; // Substitua pelo caminho do seu placeholder padrão
   }
 
