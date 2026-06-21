@@ -55,5 +55,11 @@ export interface ResponseCourtDTO {
   pricePerHour: number;
   description: string;
   clubId: string;
-  imagesUrls: string[];
+  images: [
+    {
+      thumbUrl: string;
+      mainUrl: string;
+      fullUrl: string;
+    }
+  ];
 }
