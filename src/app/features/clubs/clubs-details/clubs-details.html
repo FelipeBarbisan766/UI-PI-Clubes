@@ -148,10 +148,10 @@
                   [attr.aria-pressed]="selectedCourt()?.id === court.id"
                   [attr.aria-label]="'Selecionar quadra ' + court.name">
 
-                  @if (court.imagesUrls.length) {
+                  @if (court.images.length) {
                     <div class="h-32 w-full rounded-xl overflow-hidden mb-3 bg-base-200 relative">
                       <img
-                        [ngSrc]="court.imagesUrls[0]"
+                        [ngSrc]="court.images[0].thumbUrl"
                         [alt]="court.name"
                         fill
                         class="object-cover"
