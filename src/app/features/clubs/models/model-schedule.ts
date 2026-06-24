@@ -7,14 +7,22 @@ export enum DayOfWeek {
   Friday = 5,
   Saturday = 6,
 }
-
-export interface ResponseScheduleDTO {
-  id: string;
-  startTime: string;
-  endTime: string;
-  isBlocked: boolean;
-  isReserved: boolean;
-  isFixed: boolean;
-  dayOfWeek: DayOfWeek;
-  courtId: string;
+export enum ReserveStatusEnum {
+  Pending   = 0,
+  Confirmed = 1,
+  Cancelled = 2,
 }
+export interface ReserveInfoDTO {
+  id: string;
+  status: ReserveStatusEnum;
+}
+
+export interface ScheduleAvailabilityDTO {
+  scheduleId:  string;
+  startTime:   string;            // ex.: "08:00:00"
+  endTime:     string;            // ex.: "09:00:00"
+  isAvailable: boolean;           // !isBlocked && reserve == null
+  isBlocked:   boolean;           // horário fixo/bloqueado
+  reserve:     ReserveInfoDTO | null;
+}
+

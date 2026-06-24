@@ -9,7 +9,6 @@
 
   @if (error()) {
     <div class="container mx-auto max-w-4xl mt-12 px-4">
-      <!-- Utilização das novas classes de estilo do daisyUI 5: alert-soft -->
       <div role="alert" aria-live="assertive" class="alert alert-soft alert-error p-8 flex-col text-center rounded-2xl">
         <p class="font-medium">{{ error() }}</p>
         <button class="btn btn-sm btn-error rounded-full mt-2" (click)="loadClub()">
@@ -35,7 +34,6 @@
 
       @if (getFirstImage(club()); as heroUrl) {
         <div class="h-64 sm:h-96 w-full rounded-3xl overflow-hidden relative shadow-sm border border-base-200">
-          <!-- NgOptimizedImage (fill attribute requires the parent to be relative/absolute/fixed) -->
           <img
             [ngSrc]="heroUrl"
             [alt]="club()!.name"
@@ -137,7 +135,6 @@
 
             <div class="grid gap-4 sm:grid-cols-2">
               @for (court of club()!.courts; track court.id) {
-                <!-- Binding de classe nativo mais limpo agrupando lógicas -->
                 <button
                   class="rounded-2xl border bg-base-100 p-4 text-left transition-all duration-200 hover:border-primary/40 hover:shadow-md outline-none"
                   [class]="{
@@ -188,30 +185,53 @@
               </h2>
 
               <!-- Seleção de data -->
-              
+              <div
+                class="flex gap-2 overflow-x-auto pb-2 snap-x"
+                role="group"
+                aria-label="Selecione uma data">
+                @for (date of availableDates(); track date) {
+                  <button
+                    class="btn btn-sm rounded-full shrink-0 snap-start"
+                    [class.btn-primary]="selectedDate() === date"
+                    [class.btn-ghost]="selectedDate() !== date"
+                    (click)="selectDate(date)"
+                    [attr.aria-pressed]="selectedDate() === date"
+                    [attr.aria-label]="'Ver horários de ' + formatDate(date)">
+                    {{ formatDate(date) }}
+                  </button>
+                }
+              </div>
 
-              <!-- Grid de slots -->
-              @if (slotsForDate().length) {
+              <!-- Grid de slots: loading / erro / lista / vazio -->
+              @if (slotsLoading()) {
+                <div class="mt-4 flex justify-center py-8" aria-live="polite" aria-busy="true">
+                  <span class="loading loading-spinner loading-md text-primary" aria-hidden="true"></span>
+                </div>
+              } @else if (slotsError()) {
+                <div role="alert" aria-live="assertive" class="mt-4 alert alert-soft alert-error rounded-2xl text-sm">
+                  <p>{{ slotsError() }}</p>
+                </div>
+              } @else if (slotsForDate().length) {
                 <div class="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5" role="list" aria-label="Horários disponíveis">
                   @for (slot of slotsForDate(); track slot.id) {
                     <button
-                    (click)="openBookingModal(slot)"
-                    role="listitem"
-                    class="rounded-xl px-3 py-2 text-center text-sm font-medium transition-colors border"
-                    [ngClass]="{
-                     'bg-success/10 text-success border-success/20 hover:bg-success/20 cursor-pointer': slot.available,
-                      'bg-base-200 text-base-content/40 border-transparent cursor-not-allowed pointer-events-none': !slot.available && slot.fixed,
-                      'bg-error/10 text-error/60 border-transparent cursor-not-allowed pointer-events-none': !slot.available && !slot.fixed
-                    }"
-                    [attr.aria-label]="slot.startTime + (slot.available ? ', disponível' : ', indisponível')"
-                    [attr.aria-disabled]="!slot.available">
-                    
-                    {{ slot.startTime }}
-                    
-                    @if (!slot.available) {
-                      <div class="text-[10px] uppercase tracking-wider mt-0.5">{{ slot.fixed ? 'Fixo' : 'Ocupado' }}</div>
-                    }
-                  </button>
+                      (click)="openBookingModal(slot)"
+                      role="listitem"
+                      class="rounded-xl px-3 py-2 text-center text-sm font-medium transition-colors border"
+                      [ngClass]="{
+                        'bg-success/10 text-success border-success/20 hover:bg-success/20 cursor-pointer': slot.available,
+                        'bg-base-200 text-base-content/40 border-transparent cursor-not-allowed pointer-events-none': !slot.available && slot.fixed,
+                        'bg-error/10 text-error/60 border-transparent cursor-not-allowed pointer-events-none': !slot.available && !slot.fixed
+                      }"
+                      [attr.aria-label]="slot.startTime + (slot.available ? ', disponível' : ', indisponível')"
+                      [attr.aria-disabled]="!slot.available">
+
+                      {{ slot.startTime }}
+
+                      @if (!slot.available) {
+                        <div class="text-[10px] uppercase tracking-wider mt-0.5">{{ slot.fixed ? 'Fixo' : 'Ocupado' }}</div>
+                      }
+                    </button>
                   }
                 </div>
               } @else {
@@ -272,7 +292,6 @@
       </div>
     </div>
 
-    <!-- Implementação acessível e nativa para o Backdrop do DaisyUI -->
     <form method="dialog" class="modal-backdrop">
       <button (click)="closeBookingModal()" aria-label="Fechar janela">Fechar</button>
     </form>
