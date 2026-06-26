@@ -53,136 +53,147 @@
 
   </div>
 
-  <!-- ── Table card ── -->
-  <div class="card bg-base-100 shadow-sm border border-base-200 rounded-box">
-    <div class="overflow-x-auto">
-      <table class="table table-zebra w-full" aria-label="Lista de reservas">
-
-        <thead>
-          <tr>
-            <th scope="col">Jogador</th>
-            <th scope="col">Quadra</th>
-            <th scope="col">Data</th>
-            <th scope="col">Horário</th>
-            <th scope="col">Valor</th>
-            <th scope="col">Status</th>
-            <th scope="col" class="text-right">Ações</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          @for (r of filtered(); track trackById($index, r)) {
-            <tr class="hover">
-
-              <!-- Player -->
-              <td class="font-medium">{{ r.player }}</td>
-
-              <!-- Court -->
-              <td class="text-base-content/60">{{ r.court }}</td>
-
-              <!-- Date -->
-              <td>{{ formatDate(r.date) }}</td>
-
-              <!-- Time -->
-              <td>{{ r.time }}</td>
-
-              <!-- Price -->
-              <td class="font-medium">{{ formatPrice(r.price) }}</td>
-
-              <!-- Status badge -->
-              <td>
-                <span
-                  class="badge badge-outline"
-                  [class]="statusConfig[r.status].badgeClass"
-                  aria-label="Status: {{ statusConfig[r.status].label }}"
-                >
-                  {{ statusConfig[r.status].label }}
-                </span>
-              </td>
-
-              <!-- Actions -->
-              <td>
-                <div class="flex items-center justify-end gap-1">
-
-                  @if (r.status === 'pending') {
-
-                    <!-- Confirm -->
-                    <button
-                      type="button"
-                      class="btn btn-ghost btn-sm btn-square text-success"
-                      (click)="confirm(r.id)"
-                      [attr.aria-label]="'Confirmar reserva de ' + r.player"
-                      title="Confirmar"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
-                           viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                           stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
-                           aria-hidden="true">
-                        <path d="M20 6 9 17l-5-5"/>
-                      </svg>
-                    </button>
-
-                    <!-- Cancel -->
-                    <button
-                      type="button"
-                      class="btn btn-ghost btn-sm btn-square text-error"
-                      (click)="cancel(r.id)"
-                      [attr.aria-label]="'Cancelar reserva de ' + r.player"
-                      title="Cancelar"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
-                           viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                           stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
-                           aria-hidden="true">
-                        <path d="M18 6 6 18M6 6l12 12"/>
-                      </svg>
-                    </button>
-
-                  }
-
-                  <!-- WhatsApp -->
-                  <button
-                    type="button"
-                    class="btn btn-ghost btn-sm btn-square"
-                    (click)="openWhatsApp(r.phone)"
-                    [attr.aria-label]="'Abrir WhatsApp de ' + r.player"
-                    title="WhatsApp"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
-                         viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                         aria-hidden="true">
-                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                    </svg>
-                  </button>
-
-                </div>
-              </td>
-
-            </tr>
-          }
-
-          @empty {
-            <tr>
-              <td colspan="7" class="py-12 text-center text-base-content/50">
-                <div class="flex flex-col items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 opacity-30"
-                       viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                       stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
-                       aria-hidden="true">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                    <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
-                    <line x1="3" y1="10" x2="21" y2="10"/>
-                  </svg>
-                  <span>Nenhuma reserva encontrada.</span>
-                </div>
-              </td>
-            </tr>
-          }
-        </tbody>
-
-      </table>
+  <!-- ── Loading skeleton ── -->
+  @if (isLoading()) {
+    <div class="card bg-base-100 shadow-sm border border-base-200 rounded-box p-6 space-y-3"
+         aria-busy="true" aria-label="Carregando reservas">
+      @for (_ of [1, 2, 3, 4]; track $index) {
+        <div class="skeleton h-10 w-full"></div>
+      }
     </div>
-  </div>
+  }
+
+  <!-- ── Error state ── -->
+  @else if (error()) {
+    <div role="alert" class="alert alert-error">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0"
+           viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+           aria-hidden="true">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  <!-- ── Table card ── -->
+  @else {
+    <div class="card bg-base-100 shadow-sm border border-base-200 rounded-box">
+      <div class="overflow-x-auto">
+        <table class="table table-zebra w-full" aria-label="Lista de reservas">
+
+          <thead>
+            <tr>
+              <th scope="col">Jogador</th>
+              <th scope="col">Quadra</th>
+              <th scope="col">Data</th>
+              <th scope="col">Horário</th>
+              <th scope="col">Valor</th>
+              <th scope="col">Status</th>
+              <th scope="col" class="text-right">Ações</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (r of filtered(); track trackById($index, r)) {
+              <tr class="hover">
+
+                <!-- Player -->
+                <td class="font-medium">{{ r.player }}</td>
+
+                <!-- Court -->
+                <td class="text-base-content/60">{{ r.court }}</td>
+
+                <!-- Date -->
+                <td>{{ formatDate(r.date) }}</td>
+
+                <!-- Time -->
+                <td>{{ r.time }}</td>
+
+                <!-- Price -->
+                <td class="font-medium">{{ formatPrice(r.pricePerHour) }}</td>
+
+                <!-- Status badge -->
+                <td>
+                  <span
+                    class="badge badge-outline"
+                    [class]="statusConfig[r.status].badgeClass"
+                    aria-label="Status: {{ statusConfig[r.status].label }}"
+                  >
+                    {{ statusConfig[r.status].label }}
+                  </span>
+                </td>
+
+                <!-- Actions -->
+                <td>
+                  <div class="flex items-center justify-end gap-1">
+
+                    @if (r.status === 'pending') {
+
+                      <!-- Confirm -->
+                      <button
+                        type="button"
+                        class="btn btn-ghost btn-sm btn-square text-success"
+                        (click)="confirm(r.id)"
+                        [attr.aria-label]="'Confirmar reserva de ' + r.player"
+                        title="Confirmar"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
+                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                             aria-hidden="true">
+                          <path d="M20 6 9 17l-5-5"/>
+                        </svg>
+                      </button>
+
+                      <!-- Cancel -->
+                      <button
+                        type="button"
+                        class="btn btn-ghost btn-sm btn-square text-error"
+                        (click)="cancel(r.id)"
+                        [attr.aria-label]="'Cancelar reserva de ' + r.player"
+                        title="Cancelar"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
+                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                             aria-hidden="true">
+                          <path d="M18 6 6 18M6 6l12 12"/>
+                        </svg>
+                      </button>
+
+                    }
+
+                  </div>
+                </td>
+
+              </tr>
+            }
+
+            @empty {
+              <tr>
+                <td colspan="7" class="py-12 text-center text-base-content/50">
+                  <div class="flex flex-col items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 opacity-30"
+                         viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                         aria-hidden="true">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                      <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+                      <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                    <span>Nenhuma reserva encontrada.</span>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+
+        </table>
+      </div>
+    </div>
+  }
 
 </section>
