@@ -18,7 +18,7 @@ export interface ReserveInfoDTO {
 }
 
 export interface ScheduleAvailabilityDTO {
-  scheduleId:  string;
+  id:  string;
   startTime:   string;            // ex.: "08:00:00"
   endTime:     string;            // ex.: "09:00:00"
   isAvailable: boolean;           // !isBlocked && reserve == null

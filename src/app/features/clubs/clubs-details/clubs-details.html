@@ -1,7 +1,10 @@
 <div class="min-h-screen flex flex-col bg-base-100 text-base-content pt-20">
- 
   @if (loading()) {
-    <div class="flex flex-col items-center justify-center py-32 gap-4 text-base-content/60" aria-live="polite" aria-busy="true">
+    <div
+      class="flex flex-col items-center justify-center py-32 gap-4 text-base-content/60"
+      aria-live="polite"
+      aria-busy="true"
+    >
       <span class="loading loading-spinner loading-lg text-primary" aria-hidden="true"></span>
       <p class="text-sm">Carregando clube...</p>
     </div>
@@ -9,7 +12,11 @@
 
   @if (error()) {
     <div class="container mx-auto max-w-4xl mt-12 px-4">
-      <div role="alert" aria-live="assertive" class="alert alert-soft alert-error p-8 flex-col text-center rounded-2xl">
+      <div
+        role="alert"
+        aria-live="assertive"
+        class="alert alert-soft alert-error p-8 flex-col text-center rounded-2xl"
+      >
         <p class="font-medium">{{ error() }}</p>
         <button class="btn btn-sm btn-error rounded-full mt-2" (click)="loadClub()">
           Tentar novamente
@@ -19,42 +26,69 @@
   }
 
   @if (club() && !loading()) {
-
     <div class="container mx-auto max-w-7xl px-4 mt-6 space-y-6">
-      
       <a
         [routerLink]="['/clubs']"
         class="inline-flex items-center gap-1.5 text-sm text-base-content/60 hover:text-base-content transition-colors w-fit"
-        aria-label="Voltar para lista de clubes">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+        aria-label="Voltar para lista de clubes"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="size-4"
+          aria-hidden="true"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
+          />
         </svg>
         Voltar
       </a>
 
       @if (getFirstImage(club()); as heroUrl) {
-        <div class="h-64 sm:h-96 w-full rounded-3xl overflow-hidden relative shadow-sm border border-base-200">
-          <img
-            [ngSrc]="heroUrl"
-            [alt]="club()!.name"
-            fill
-            priority
-            class="object-cover"
-          />
+        <div
+          class="h-64 sm:h-96 w-full rounded-3xl overflow-hidden relative shadow-sm border border-base-200"
+        >
+          <img [ngSrc]="heroUrl" [alt]="club()!.name" fill priority class="object-cover" />
         </div>
       }
 
-      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 border-b border-base-200">
+      <div
+        class="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 border-b border-base-200"
+      >
         <div>
           <h1 class="text-3xl font-bold text-base-content">{{ club()!.name }}</h1>
           <div class="mt-2 flex flex-wrap items-center gap-2 text-sm text-base-content/70">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4 shrink-0" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="size-4 shrink-0"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+              />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"
+              />
             </svg>
             <span>
               {{ club()!.street }}, {{ club()!.number }}
-              @if (club()!.neighborhood) { — {{ club()!.neighborhood }} }
+              @if (club()!.neighborhood) {
+                — {{ club()!.neighborhood }}
+              }
               · {{ club()!.city }}/{{ club()!.state }}
             </span>
           </div>
@@ -67,14 +101,16 @@
               target="_blank"
               rel="noopener noreferrer"
               class="btn btn-success btn-sm rounded-full text-success-content"
-              aria-label="Entrar em contato pelo WhatsApp">
+              aria-label="Entrar em contato pelo WhatsApp"
+            >
               WhatsApp
             </a>
 
             <a
               [href]="'tel:' + club()!.phoneNumber"
               class="btn btn-outline btn-sm rounded-full"
-              aria-label="Ligar para o clube">
+              aria-label="Ligar para o clube"
+            >
               Ligar
             </a>
           }
@@ -84,7 +120,6 @@
 
     <div class="container mx-auto max-w-7xl py-8 px-4">
       <div class="grid gap-8 lg:grid-cols-3">
-
         <aside class="lg:col-span-1" aria-label="Informações do clube">
           <div class="rounded-2xl border border-base-200 bg-base-100 p-6 shadow-sm sticky top-24">
             <h2 class="font-semibold text-base-content mb-2">Sobre</h2>
@@ -104,13 +139,14 @@
             </address>
             @if (mapUrl()) {
               <div class="mt-4 rounded-lg overflow-hidden border border-base-300">
-                <iframe 
-                  width="100%" 
-                  height="300" 
-                  style="border:0;" 
-                  loading="lazy" 
-                  allowfullscreen 
-                  [src]="mapUrl()">
+                <iframe
+                  width="100%"
+                  height="300"
+                  style="border: 0"
+                  loading="lazy"
+                  allowfullscreen
+                  [src]="mapUrl()"
+                >
                 </iframe>
               </div>
             }
@@ -129,7 +165,6 @@
         </aside>
 
         <div class="lg:col-span-2 space-y-8">
-
           <section aria-labelledby="courts-heading">
             <h2 id="courts-heading" class="text-xl font-bold text-base-content mb-4">Quadras</h2>
 
@@ -139,12 +174,12 @@
                   class="rounded-2xl border bg-base-100 p-4 text-left transition-all duration-200 hover:border-primary/40 hover:shadow-md outline-none"
                   [class]="{
                     'ring-2 ring-primary border-primary': selectedCourt()?.id === court.id,
-                    'border-base-200': selectedCourt()?.id !== court.id
+                    'border-base-200': selectedCourt()?.id !== court.id,
                   }"
                   (click)="selectCourt(court)"
                   [attr.aria-pressed]="selectedCourt()?.id === court.id"
-                  [attr.aria-label]="'Selecionar quadra ' + court.name">
-
+                  [attr.aria-label]="'Selecionar quadra ' + court.name"
+                >
                   @if (court.images.length) {
                     <div class="h-32 w-full rounded-xl overflow-hidden mb-3 bg-base-200 relative">
                       <img
@@ -170,7 +205,8 @@
                   </div>
 
                   <p class="mt-3 font-bold text-primary text-base">
-                    {{ formatPrice(court.pricePerHour) }}<span class="text-xs font-normal text-base-content/50">/hora</span>
+                    {{ formatPrice(court.pricePerHour)
+                    }}<span class="text-xs font-normal text-base-content/50">/hora</span>
                   </p>
                 </button>
               }
@@ -188,7 +224,8 @@
               <div
                 class="flex gap-2 overflow-x-auto pb-2 snap-x"
                 role="group"
-                aria-label="Selecione uma data">
+                aria-label="Selecione uma data"
+              >
                 @for (date of availableDates(); track date) {
                   <button
                     class="btn btn-sm rounded-full shrink-0 snap-start"
@@ -196,7 +233,8 @@
                     [class.btn-ghost]="selectedDate() !== date"
                     (click)="selectDate(date)"
                     [attr.aria-pressed]="selectedDate() === date"
-                    [attr.aria-label]="'Ver horários de ' + formatDate(date)">
+                    [attr.aria-label]="'Ver horários de ' + formatDate(date)"
+                  >
                     {{ formatDate(date) }}
                   </button>
                 }
@@ -205,96 +243,201 @@
               <!-- Grid de slots: loading / erro / lista / vazio -->
               @if (slotsLoading()) {
                 <div class="mt-4 flex justify-center py-8" aria-live="polite" aria-busy="true">
-                  <span class="loading loading-spinner loading-md text-primary" aria-hidden="true"></span>
+                  <span
+                    class="loading loading-spinner loading-md text-primary"
+                    aria-hidden="true"
+                  ></span>
                 </div>
               } @else if (slotsError()) {
-                <div role="alert" aria-live="assertive" class="mt-4 alert alert-soft alert-error rounded-2xl text-sm">
+                <div
+                  role="alert"
+                  aria-live="assertive"
+                  class="mt-4 alert alert-soft alert-error rounded-2xl text-sm"
+                >
                   <p>{{ slotsError() }}</p>
                 </div>
               } @else if (slotsForDate().length) {
-                <div class="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5" role="list" aria-label="Horários disponíveis">
+                <div
+                  class="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5"
+                  role="list"
+                  aria-label="Horários disponíveis"
+                >
                   @for (slot of slotsForDate(); track slot.id) {
                     <button
                       (click)="openBookingModal(slot)"
                       role="listitem"
                       class="rounded-xl px-3 py-2 text-center text-sm font-medium transition-colors border"
                       [ngClass]="{
-                        'bg-success/10 text-success border-success/20 hover:bg-success/20 cursor-pointer': slot.available,
-                        'bg-base-200 text-base-content/40 border-transparent cursor-not-allowed pointer-events-none': !slot.available && slot.fixed,
-                        'bg-error/10 text-error/60 border-transparent cursor-not-allowed pointer-events-none': !slot.available && !slot.fixed
+                        'bg-success/10 text-success border-success/20 hover:bg-success/20 cursor-pointer':
+                          slot.available,
+                        'bg-base-200 text-base-content/40 border-transparent cursor-not-allowed pointer-events-none':
+                          !slot.available && slot.fixed,
+                        'bg-error/10 text-error/60 border-transparent cursor-not-allowed pointer-events-none':
+                          !slot.available && !slot.fixed,
                       }"
-                      [attr.aria-label]="slot.startTime + (slot.available ? ', disponível' : ', indisponível')"
-                      [attr.aria-disabled]="!slot.available">
-
+                      [attr.aria-label]="
+                        slot.startTime + (slot.available ? ', disponível' : ', indisponível')
+                      "
+                      [attr.aria-disabled]="!slot.available"
+                    >
                       {{ slot.startTime }}
 
                       @if (!slot.available) {
-                        <div class="text-[10px] uppercase tracking-wider mt-0.5">{{ slot.fixed ? 'Fixo' : 'Ocupado' }}</div>
+                        <div class="text-[10px] uppercase tracking-wider mt-0.5">
+                          {{ slot.fixed ? 'Fixo' : 'Ocupado' }}
+                        </div>
                       }
                     </button>
                   }
                 </div>
               } @else {
-                <div class="mt-4 p-8 text-center rounded-2xl border border-dashed border-base-200 text-base-content/50 text-sm">
+                <div
+                  class="mt-4 p-8 text-center rounded-2xl border border-dashed border-base-200 text-base-content/50 text-sm"
+                >
                   Nenhum horário disponível para esta data.
                 </div>
               }
             </section>
           }
-
         </div>
       </div>
     </div>
-
   }
 
-  <!-- Modal usando atributos recomendados pelo daisyUI e a11y HTML nativa -->
   <dialog
     id="booking-modal"
     class="modal"
     [class.modal-open]="bookingModalOpen()"
     role="dialog"
     aria-modal="true"
-    aria-labelledby="booking-modal-title">
-
+    aria-labelledby="booking-modal-title"
+  >
     <div class="modal-box rounded-3xl max-w-md">
-      <h3 id="booking-modal-title" class="font-bold text-xl text-base-content mb-4">Confirmar Reserva</h3>
+      @if (bookingSuccess()) {
+        <!-- ── Estado: sucesso ─────────────────────────────────────────────── -->
+        <div class="flex flex-col items-center gap-4 py-6 text-center" aria-live="polite">
+          <div class="flex items-center justify-center size-16 rounded-full bg-success/10">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="size-8 text-success"
+              aria-hidden="true"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-xl font-bold text-base-content">Reserva confirmada!</h3>
+            <p class="mt-1 text-sm text-base-content/60">Sua quadra foi reservada com sucesso.</p>
+          </div>
+          <button
+            class="btn btn-primary rounded-full w-full mt-2"
+            (click)="closeBookingModal()"
+            aria-label="Fechar confirmação de reserva"
+          >
+            Fechar
+          </button>
+        </div>
+      } @else {
+        <!-- ── Estado: formulário de confirmação ──────────────────────────── -->
+        <h3 id="booking-modal-title" class="font-bold text-xl text-base-content mb-4">
+          Confirmar Reserva
+        </h3>
 
-      @if (bookingSlot() && selectedCourt() && club()) {
-        <div class="rounded-2xl border border-base-200 bg-base-100 p-5 space-y-3 text-sm text-base-content/80">
-          <p class="flex justify-between"><span class="font-medium text-base-content/60">Clube</span> <span class="font-semibold">{{ club()!.name }}</span></p>
-          <p class="flex justify-between"><span class="font-medium text-base-content/60">Quadra</span> <span class="font-semibold">{{ selectedCourt()!.name }}</span></p>
-          <p class="flex justify-between"><span class="font-medium text-base-content/60">Data</span> <span class="font-semibold">{{ formatDate(bookingSlot()!.date) }}</span></p>
-          <p class="flex justify-between"><span class="font-medium text-base-content/60">Horário</span> <span class="font-semibold">{{ bookingSlot()!.startTime }} — {{ bookingSlot()!.endTime }}</span></p>
-          
-          <div class="divider my-2"></div>
-          
-          <p class="flex justify-between items-center">
-            <span class="font-medium text-base-content/60">Total</span> 
-            <span class="text-2xl font-bold text-primary">{{ formatPrice(selectedCourt()!.pricePerHour) }}</span>
-          </p>
+        @if (bookingSlot() && selectedCourt() && club()) {
+          <div
+            class="rounded-2xl border border-base-200 bg-base-100 p-5 space-y-3 text-sm text-base-content/80"
+          >
+            <p class="flex justify-between">
+              <span class="font-medium text-base-content/60">Clube</span>
+              <span class="font-semibold">{{ club()!.name }}</span>
+            </p>
+            <p class="flex justify-between">
+              <span class="font-medium text-base-content/60">Quadra</span>
+              <span class="font-semibold">{{ selectedCourt()!.name }}</span>
+            </p>
+            <p class="flex justify-between">
+              <span class="font-medium text-base-content/60">Data</span>
+              <span class="font-semibold">{{ formatDate(bookingSlot()!.date) }}</span>
+            </p>
+            <p class="flex justify-between">
+              <span class="font-medium text-base-content/60">Horário</span>
+              <span class="font-semibold"
+                >{{ bookingSlot()!.startTime }} — {{ bookingSlot()!.endTime }}</span
+              >
+            </p>
+
+            <div class="divider my-2"></div>
+
+            <p class="flex justify-between items-center">
+              <span class="font-medium text-base-content/60">Total</span>
+              <span class="text-2xl font-bold text-primary">{{
+                formatPrice(selectedCourt()!.pricePerHour)
+              }}</span>
+            </p>
+          </div>
+        }
+
+        <!-- Erro da API -->
+        @if (bookingError()) {
+          <div
+            role="alert"
+            aria-live="assertive"
+            class="mt-4 alert alert-soft alert-error rounded-2xl text-sm"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="size-4 shrink-0"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
+              />
+            </svg>
+            <span>{{ bookingError() }}</span>
+          </div>
+        }
+
+        <div class="modal-action mt-6 flex gap-3">
+          <button
+            class="btn btn-ghost rounded-full flex-1"
+            (click)="closeBookingModal()"
+            [disabled]="isConfirming()"
+            aria-label="Cancelar reserva"
+          >
+            Cancelar
+          </button>
+          <button
+            class="btn btn-primary rounded-full flex-1"
+            (click)="confirmBooking()"
+            [disabled]="isConfirming()"
+            [attr.aria-busy]="isConfirming()"
+            aria-label="Confirmar reserva"
+          >
+            @if (isConfirming()) {
+              <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+              Confirmando...
+            } @else {
+              Confirmar
+            }
+          </button>
         </div>
       }
-
-      <div class="modal-action mt-6 flex gap-3">
-        <button
-          class="btn btn-ghost rounded-full flex-1"
-          (click)="closeBookingModal()"
-          aria-label="Cancelar reserva">
-          Cancelar
-        </button>
-        <button
-          class="btn btn-primary rounded-full flex-1"
-          (click)="confirmBooking()"
-          aria-label="Confirmar reserva">
-          Confirmar
-        </button>
-      </div>
     </div>
 
     <form method="dialog" class="modal-backdrop">
-      <button (click)="closeBookingModal()" aria-label="Fechar janela">Fechar</button>
+      <button (click)="closeBookingModal()" [disabled]="isConfirming()" aria-label="Fechar janela">
+        Fechar
+      </button>
     </form>
   </dialog>
-
 </div>
