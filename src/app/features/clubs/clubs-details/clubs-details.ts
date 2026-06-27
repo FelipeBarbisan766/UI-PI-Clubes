@@ -8,7 +8,7 @@ import {
   Signal,
   signal,
 } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { NgOptimizedImage, NgClass } from '@angular/common';
 import { EMPTY, catchError, distinctUntilChanged, map, switchMap } from 'rxjs';
@@ -16,7 +16,9 @@ import { TypeEnum, SurfaceEnum, ResponseCourtDTO } from '../models/model-court';
 import { ResponseClubByIdDTO } from '../models/model-club';
 import { ServiceClub } from '../services/service-club';
 import { ServiceSchedule } from '../services/service-schedule';
+import { ServiceReserve } from '../services/service-reserve';
 import { ScheduleAvailabilityDTO } from '../models/model-schedule';
+import { AuthService } from '../../../core/services/auth-service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 const TYPE_LABELS: Record<TypeEnum, string> = {
@@ -115,7 +117,7 @@ function buildAvailableDates(days = 7): string[] {
  */
 function mapAvailabilityToSlots(dtos: ScheduleAvailabilityDTO[], date: string): TimeSlot[] {
   return dtos.map(dto => ({
-    id:        dto.scheduleId,
+    id:        dto.id,
     date,
     startTime: dto.startTime.slice(0, 5),
     endTime:   dto.endTime.slice(0, 5),
@@ -146,8 +148,11 @@ export interface TimeSlot {
 })
 export class ClubsDetail {
   private readonly route           = inject(ActivatedRoute);
+  private readonly router          = inject(Router);
   private readonly clubService     = inject(ServiceClub);
   private readonly scheduleService = inject(ServiceSchedule);
+  private readonly reserveService  = inject(ServiceReserve);
+  private readonly authService     = inject(AuthService);
   private readonly destroyRef      = inject(DestroyRef);
   private readonly sanitizer       = inject(DomSanitizer);
 
@@ -175,6 +180,11 @@ export class ClubsDetail {
   readonly slotsForDate     = signal<TimeSlot[]>([]);
   readonly bookingSlot      = signal<TimeSlot | null>(null);
   readonly bookingModalOpen = signal(false);
+
+  // ── Estado do fluxo de confirmação ──
+  readonly isConfirming  = signal(false);
+  readonly bookingError  = signal<string | null>(null);
+  readonly bookingSuccess = signal(false);
 
   /** Tipos únicos de todas as quadras do clube (usado na sidebar). */
   readonly courtTypes = computed(() =>
@@ -278,25 +288,64 @@ export class ClubsDetail {
 
   openBookingModal(slot: TimeSlot): void {
     this.bookingSlot.set(slot);
+    this.bookingError.set(null);
+    this.bookingSuccess.set(false);
     this.bookingModalOpen.set(true);
   }
 
   closeBookingModal(): void {
     this.bookingModalOpen.set(false);
+    this.bookingError.set(null);
+    this.bookingSuccess.set(false);
+    this.isConfirming.set(false);
   }
 
   confirmBooking(): void {
-    // this.reserveService.create({ ... }).subscribe(() => { ... });
-    this.closeBookingModal();
+    // Usuário não autenticado → redireciona para login preservando a rota atual
+    if (!this.authService.isAuthenticated()) {
+      this.closeBookingModal();
+      this.router.navigate(['/login'], {
+        queryParams: { returnUrl: this.router.url },
+      });
+      return;
+    }
+
+    const slot = this.bookingSlot();
+    if (!slot) return;
+
+    this.isConfirming.set(true);
+    this.bookingError.set(null);
+
+    // 1️⃣ Busca o perfil do jogador para obter o playerId
+    // 2️⃣ Com o playerId em mãos, cria a reserva
+    this.authService.getPlayerMe().pipe(
+      switchMap(player =>
+        this.reserveService.create({
+          date:       `${slot.date}T00:00:00`,
+          scheduleId: slot.id,
+          playerId:   player.id,
+        })
+      ),
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe({
+      next: () => {
+        this.isConfirming.set(false);
+        this.bookingSuccess.set(true);
+      },
+      error: (err: Error) => {
+        this.isConfirming.set(false);
+        this.bookingError.set(err.message);
+      },
+    });
   }
 
   // ── Helpers expostos ao template ─────────────────────────────────────────
 
-  readonly sanitizePhone = sanitizePhone;
-  readonly formatPrice   = formatPrice;
-  readonly formatDate    = formatDate;
-  readonly getFirstImage = getFirstImage;
-  readonly getTypeName   = getTypeName;
+  readonly sanitizePhone  = sanitizePhone;
+  readonly formatPrice    = formatPrice;
+  readonly formatDate     = formatDate;
+  readonly getFirstImage  = getFirstImage;
+  readonly getTypeName    = getTypeName;
   readonly getSurfaceName = getSurfaceName;
 
   // ── Helpers privados ─────────────────────────────────────────────────────
@@ -308,5 +357,8 @@ export class ClubsDetail {
     this.slotsForDate.set([]);
     this.bookingSlot.set(null);
     this.bookingModalOpen.set(false);
+    this.bookingError.set(null);
+    this.bookingSuccess.set(false);
+    this.isConfirming.set(false);
   }
 }
