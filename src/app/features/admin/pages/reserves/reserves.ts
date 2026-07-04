@@ -4,17 +4,17 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 
 import { ReserveService } from '../../services/service-reserve';
-import { Reservation, ReservationStatus } from '../../models/model-reserve';
+import { Reservation, StatusEnum } from '../../models/model-reserve';
 
 interface StatusConfig {
   label:      string;
   badgeClass: string;
 }
 
-const STATUS_CONFIG: Record<ReservationStatus, StatusConfig> = {
-  pending:   { label: 'Pendente',   badgeClass: 'badge-warning' },
-  confirmed: { label: 'Confirmada', badgeClass: 'badge-success' },
-  cancelled: { label: 'Cancelada',  badgeClass: 'badge-error'   },
+const STATUS_CONFIG: Record<StatusEnum, StatusConfig> = {
+  [StatusEnum.Pendente]:   { label: 'Pendente',   badgeClass: 'badge-warning' },
+  [StatusEnum.Confirmada]: { label: 'Confirmada', badgeClass: 'badge-success' },
+  [StatusEnum.Recusada]: { label: 'Cancelada',  badgeClass: 'badge-error'   },
 };
 
 @Component({
@@ -34,7 +34,7 @@ export class Reserve implements OnInit {
 
   // ── Filtros ───────────────────────────────────────────────────────────────
   protected readonly searchControl = new FormControl('', { nonNullable: true });
-  protected readonly filterControl = new FormControl<'all' | ReservationStatus>('all', { nonNullable: true });
+  protected readonly filterControl = new FormControl<'all' | StatusEnum >('all', { nonNullable: true });
 
   private readonly search$       = toSignal(this.searchControl.valueChanges, { initialValue: '' });
   private readonly filterStatus$ = toSignal(this.filterControl.valueChanges, { initialValue: 'all' as const });
@@ -53,7 +53,7 @@ export class Reserve implements OnInit {
   });
 
   protected readonly pendingCount = computed(
-    () => this.reserveService.reservations().filter(r => r.status === 'pending').length
+    () => this.reserveService.reservations().filter(r => r.status === 'AguardandoConfirmacao').length
   );
 
   // ── Lifecycle ─────────────────────────────────────────────────────────────
