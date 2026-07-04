@@ -5,8 +5,7 @@ import { catchError, EMPTY, finalize, Observable } from 'rxjs';
 import {
   ApiReservation,
   Reservation,
-  ReservationStatus,
-  STATUS_MAP,
+  StatusEnum,
 } from '../models/model-reserve';
 import { environment } from '../../../../environments/environment.development';
 
@@ -42,22 +41,46 @@ export class ReserveService {
       );
   }
 
-  // ── Mutations (atualização local otimista — adicione chamadas PATCH aqui
-  //   quando os endpoints de status estiverem disponíveis) ──────────────────
   confirm(id: string): void {
-    this.updateStatus(id, 'confirmed');
+    this._isLoading.set(true);
+    this._error.set(null);
+
+    this.http.put(`${this.apiUrl}/reserve/status/${id}?status=Confirmada`, null, {
+      withCredentials: true,
+    }).pipe(
+      catchError(err => this.handleError(err)),
+      finalize(() => this._isLoading.set(false)),
+    )
+    .subscribe(() => {
+      // Atualiza o status da reserva localmente
+      const updatedReservations = this._reservations().map(r =>
+        r.id === id ? { ...r, status: StatusEnum.Confirmada } : r
+      );
+      this._reservations.set(updatedReservations);
+    });
   }
+  
 
   cancel(id: string): void {
-    this.updateStatus(id, 'cancelled');
+    this._isLoading.set(true);
+    this._error.set(null);
+
+    this.http.put(`${this.apiUrl}/reserve/status/${id}?status=Recusada`, null, {
+      withCredentials: true,
+    }).pipe(
+      catchError(err => this.handleError(err)),
+      finalize(() => this._isLoading.set(false)),
+    )
+    .subscribe(() => {
+      // Atualiza o status da reserva localmente
+      const updatedReservations = this._reservations().map(r =>
+        r.id === id ? { ...r, status: StatusEnum.Recusada } : r
+      );
+      this._reservations.set(updatedReservations);
+    });
   }
 
-  // ── Private helpers ──────────────────────────────────────────────────────
-  private updateStatus(id: string, status: ReservationStatus): void {
-    this._reservations.update(list =>
-      list.map(r => r.id === id ? { ...r, status } : r)
-    );
-  }
+  
 
   private mapReservation(r: ApiReservation): Reservation {
     return {
@@ -66,7 +89,7 @@ export class ReserveService {
       court:  r.schedule.court.name,
       date:   r.date.slice(0, 10),
       time:   `${r.schedule.startTime.slice(0, 5)} – ${r.schedule.endTime.slice(0, 5)}`,
-      status: STATUS_MAP[r.status] ?? 'pending',
+      status: StatusEnum[r.status as keyof typeof StatusEnum] ?? StatusEnum.Pendente,
       pricePerHour:  r.schedule.court.pricePerHour,
     };
   }

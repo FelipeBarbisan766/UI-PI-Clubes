@@ -24,9 +24,11 @@ export interface ApiCourt {
   type:  string;
 }
 
-// ── View model (usado no componente) ─────────────────────────────────────────
-
-export type ReservationStatus = 'pending' | 'confirmed' | 'cancelled';
+export enum StatusEnum {
+  Pendente = 'AguardandoConfirmacao',
+  Confirmada = 'Confirmada',
+  Recusada = 'Recusada'
+}
 
 export interface Reservation {
   id:     string;
@@ -34,14 +36,6 @@ export interface Reservation {
   court:  string;
   date:   string; // "YYYY-MM-DD"
   time:   string; // "HH:mm – HH:mm"
-  status: ReservationStatus;
+  status: StatusEnum;
   pricePerHour:  number;
 }
-
-// ── Mapeamento StatusEnum (PascalCase C#) → union type local ─────────────────
-
-export const STATUS_MAP: Record<string, ReservationStatus> = {
-  Pending:   'pending',
-  Confirmed: 'confirmed',
-  Cancelled: 'cancelled',
-};
