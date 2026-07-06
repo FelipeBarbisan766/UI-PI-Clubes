@@ -1,7 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { Observable, tap, catchError, throwError } from 'rxjs';
-import { ResponseScheduleDTO, CreateScheduleDTO, UpdateScheduleDTO } from '../models/model-schedule';
+import {
+  ResponseScheduleDTO,
+  CreateScheduleDTO,
+  UpdateScheduleDTO,
+  CreateBulkScheduleDTO,
+  ResponseBulkScheduleDTO,
+} from '../models/model-schedule';
 import { environment } from '../../../../environments/environment';
 
 @Injectable({
@@ -66,16 +72,27 @@ export class ServiceSchedule {
       catchError((err) => this.handleError(err)),
     );
   }
+  createBulk(courtId: string, dto: CreateBulkScheduleDTO): Observable<ResponseBulkScheduleDTO> {
+    this._loading.set(true);
+    this._error.set(null);
 
+    return this.http
+      .post<ResponseBulkScheduleDTO>(`${this.apiUrl}/court/${courtId}/bulk`, dto)
+      .pipe(
+        tap((result) => {
+          this._schedules.update((schedules) => [...schedules, ...result.created]);
+          this._loading.set(false);
+        }),
+        catchError((err) => this.handleError(err)),
+      );
+  }
   update(id: string, dto: UpdateScheduleDTO): Observable<ResponseScheduleDTO> {
     this._loading.set(true);
     this._error.set(null);
 
     return this.http.put<ResponseScheduleDTO>(`${this.apiUrl}/${id}`, dto).pipe(
       tap((updated) => {
-        this._schedules.update((schedules) =>
-          schedules.map((s) => (s.id === id ? updated : s)),
-        );
+        this._schedules.update((schedules) => schedules.map((s) => (s.id === id ? updated : s)));
         if (this._selectedSchedule()?.id === id) {
           this._selectedSchedule.set(updated);
         }
@@ -112,8 +129,7 @@ export class ServiceSchedule {
   }
 
   private handleError(err: unknown): Observable<never> {
-    const message =
-      err instanceof Error ? err.message : 'Ocorreu um erro inesperado.';
+    const message = err instanceof Error ? err.message : 'Ocorreu um erro inesperado.';
     this._error.set(message);
     this._loading.set(false);
     return throwError(() => err);

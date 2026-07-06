@@ -6,18 +6,18 @@ import {
   signal,
   computed,
 } from '@angular/core';
-import {
-  FormBuilder,
-  Validators,
-  ReactiveFormsModule,
-} from '@angular/forms';
+import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ServiceSchedule } from '../../services/service-schedule';
-import { DayOfWeek, ResponseScheduleDTO } from '../../models/model-schedule';
+import {
+  DayOfWeek,
+  ResponseBulkScheduleDTO,
+  ResponseScheduleDTO,
+} from '../../models/model-schedule';
 import { Modal } from '../../../../shared/components/modal/modal';
 
-type FormMode = 'create' | 'edit' | null;
+type FormMode = 'create' | 'edit' | 'bulk' | null;
 
 @Component({
   selector: 'app-schedule',
@@ -50,6 +50,9 @@ export class Schedules implements OnInit {
   protected readonly isFormOpen = computed(() => this.formMode() !== null);
   protected readonly isEditing = computed(() => this.formMode() === 'edit');
 
+  protected readonly selectedDays = signal<DayOfWeek[]>([]);
+  protected readonly bulkResult = signal<ResponseBulkScheduleDTO | null>(null);
+
   // --- Form ---
   protected readonly form = this.fb.group({
     startTime: ['', Validators.required],
@@ -71,6 +74,72 @@ export class Schedules implements OnInit {
     this.scheduleService.getByCourtId(this.courtId).subscribe();
   }
 
+  protected readonly scheduleGroups = computed(() => {
+    const schedules = this.scheduleService.schedules();
+
+    return this.dayOfWeekOptions
+      .map((day) => ({
+        day: day.value,
+        label: day.label,
+        schedules: schedules
+          .filter((s) => s.dayOfWeek === day.value)
+          .sort((a, b) => a.startTime.localeCompare(b.startTime)),
+      }))
+      .filter((group) => group.schedules.length > 0);
+  });
+
+  protected readonly bulkForm = this.fb.group({
+    startTime: ['', Validators.required],
+    endTime: ['', Validators.required],
+    slotDurationMinutes: [60, [Validators.required, Validators.min(15)]],
+  });
+
+  private readonly bulkFormStatus = toSignal(this.bulkForm.statusChanges, {
+    initialValue: this.bulkForm.status,
+  });
+
+  protected readonly isBulkSubmitEnabled = computed(
+    () => this.bulkFormStatus() === 'VALID' && this.selectedDays().length > 0,
+  );
+  protected openBulkCreate(): void {
+    this.bulkForm.reset({ startTime: '', endTime: '', slotDurationMinutes: 60 });
+    this.selectedDays.set([]);
+    this.bulkResult.set(null);
+    this.formMode.set('bulk');
+  }
+
+  protected toggleDay(day: DayOfWeek): void {
+    this.selectedDays.update((days) =>
+      days.includes(day) ? days.filter((d) => d !== day) : [...days, day],
+    );
+  }
+
+  protected isDaySelected(day: DayOfWeek): boolean {
+    return this.selectedDays().includes(day);
+  }
+
+  protected onBulkSubmit(): void {
+    if (!this.isBulkSubmitEnabled()) {
+      this.bulkForm.markAllAsTouched();
+      return;
+    }
+
+    const { startTime, endTime, slotDurationMinutes } = this.bulkForm.getRawValue();
+
+    this.scheduleService
+      .createBulk(this.courtId, {
+        daysOfWeek: this.selectedDays(),
+        startTime: startTime!,
+        endTime: endTime!,
+        slotDurationMinutes: slotDurationMinutes!,
+        courtId: this.courtId,
+      })
+      .subscribe({
+        next: (result) => this.bulkResult.set(result),
+        error: (err: unknown) => console.error('Erro ao criar horários em massa', err),
+      });
+  }
+
   // --- Form actions ---
 
   protected openCreate(): void {
@@ -90,9 +159,6 @@ export class Schedules implements OnInit {
     this.form.reset({
       startTime: schedule.startTime,
       endTime: schedule.endTime,
-      isBlocked: schedule.isBlocked,
-      isReserved: schedule.isReserved,
-      isFixed: schedule.isFixed,
       dayOfWeek: schedule.dayOfWeek,
     });
     this.editingId.set(schedule.id);
@@ -103,6 +169,9 @@ export class Schedules implements OnInit {
     this.formMode.set(null);
     this.editingId.set(null);
     this.form.reset();
+    this.bulkForm.reset();
+    this.selectedDays.set([]);
+    this.bulkResult.set(null);
   }
 
   protected onSubmit(): void {
@@ -119,16 +188,12 @@ export class Schedules implements OnInit {
   }
 
   private _submitCreate(): void {
-    const { startTime, endTime, isBlocked, isReserved, isFixed, dayOfWeek } =
-      this.form.getRawValue();
+    const { startTime, endTime, dayOfWeek } = this.form.getRawValue();
 
     this.scheduleService
       .create({
         startTime: startTime!,
         endTime: endTime!,
-        isBlocked: isBlocked!,
-        isReserved: isReserved!,
-        isFixed: isFixed!,
         dayOfWeek: dayOfWeek!,
         courtId: this.courtId,
       })
@@ -144,16 +209,12 @@ export class Schedules implements OnInit {
     const id = this.editingId();
     if (id === null) return;
 
-    const { startTime, endTime, isBlocked, isReserved, isFixed, dayOfWeek } =
-      this.form.getRawValue();
+    const { startTime, endTime, dayOfWeek } = this.form.getRawValue();
 
     this.scheduleService
       .update(id, {
         startTime: startTime!,
         endTime: endTime!,
-        isBlocked: isBlocked!,
-        isReserved: isReserved!,
-        isFixed: isFixed!,
         dayOfWeek: dayOfWeek!,
       })
       .subscribe({ next: () => this.closeForm() });
@@ -168,9 +229,7 @@ export class Schedules implements OnInit {
   protected confirmDelete(): void {
     const id = this.deleteConfirmId();
     if (id === null) return;
-    this.scheduleService
-      .delete(id)
-      .subscribe({ next: () => this.deleteConfirmId.set(null) });
+    this.scheduleService.delete(id).subscribe({ next: () => this.deleteConfirmId.set(null) });
   }
 
   protected cancelDelete(): void {
@@ -185,6 +244,10 @@ export class Schedules implements OnInit {
 
   protected fieldInvalid(field: string): boolean {
     const ctrl = this.form.get(field);
+    return !!(ctrl?.invalid && ctrl?.touched);
+  }
+  protected bulkFieldInvalid(field: string): boolean {
+    const ctrl = this.bulkForm.get(field);
     return !!(ctrl?.invalid && ctrl?.touched);
   }
 }
