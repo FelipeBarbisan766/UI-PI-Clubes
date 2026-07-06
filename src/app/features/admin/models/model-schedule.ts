@@ -11,9 +11,6 @@ export enum DayOfWeek {
 export interface CreateScheduleDTO {
   startTime: string; // "HH:mm:ss"
   endTime: string;   // "HH:mm:ss"
-  isBlocked: boolean;
-  isReserved: boolean;
-  isFixed: boolean;
   dayOfWeek: DayOfWeek;
   courtId: string;
 }
@@ -21,9 +18,6 @@ export interface CreateScheduleDTO {
 export interface UpdateScheduleDTO {
   startTime: string;
   endTime: string;
-  isBlocked: boolean;
-  isReserved: boolean;
-  isFixed: boolean;
   dayOfWeek: DayOfWeek;
 }
 
@@ -31,9 +25,25 @@ export interface ResponseScheduleDTO {
   id: string;
   startTime: string;
   endTime: string;
-  isBlocked: boolean;
-  isReserved: boolean;
-  isFixed: boolean;
   dayOfWeek: DayOfWeek;
   courtId: string;
+}
+export interface CreateBulkScheduleDTO {
+  daysOfWeek: DayOfWeek[];
+  startTime: string; // "HH:mm"
+  endTime: string;   // "HH:mm"
+  slotDurationMinutes: number;
+  courtId: string;
+}
+
+export interface ScheduleConflictDTO {
+  dayOfWeek: DayOfWeek;
+  startTime: string;
+  endTime: string;
+  reason: string;
+}
+
+export interface ResponseBulkScheduleDTO {
+  created: ResponseScheduleDTO[];
+  conflicts: ScheduleConflictDTO[];
 }
