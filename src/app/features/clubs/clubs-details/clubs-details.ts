@@ -111,10 +111,6 @@ function buildAvailableDates(days = 7): string[] {
   });
 }
 
-/**
- * Mapeia os DTOs da API para o formato interno TimeSlot.
- * O .NET serializa TimeOnly como "HH:mm:ss", então fazemos slice(0,5).
- */
 function mapAvailabilityToSlots(dtos: ScheduleAvailabilityDTO[], date: string): TimeSlot[] {
   return dtos.map(dto => ({
     id:        dto.id,
@@ -122,20 +118,17 @@ function mapAvailabilityToSlots(dtos: ScheduleAvailabilityDTO[], date: string): 
     startTime: dto.startTime.slice(0, 5),
     endTime:   dto.endTime.slice(0, 5),
     available: dto.isAvailable,
-    fixed:     dto.isBlocked,
   }));
 }
 
 // ── View model ───────────────────────────────────────────────────────────────
 
-/** Representa um slot de horário para exibição no template. */
 export interface TimeSlot {
   id:        string;
-  date:      string;      // 'YYYY-MM-DD'
-  startTime: string;      // 'HH:mm'
-  endTime:   string;      // 'HH:mm'
-  available: boolean;     // isAvailable da API
-  fixed:     boolean;     // isBlocked da API (horário fixo ocupado)
+  date:      string;      
+  startTime: string;      
+  endTime:   string;      
+  available: boolean;     
 }
 
 // ── Componente ───────────────────────────────────────────────────────────────
@@ -191,17 +184,12 @@ export class ClubsDetail {
     [...new Set(this.club()?.courts.map(c => c.type) ?? [])]
   );
 
-  /**
-   * Sinal derivado que combina quadra + data selecionadas.
-   * Serve de gatilho reativo para o carregamento de slots.
-   */
   private readonly courtAndDate = computed(() => ({
     court: this.selectedCourt(),
     date:  this.selectedDate(),
   }));
 
   constructor() {
-    // 1️⃣ Carrega o clube quando o parâmetro de rota muda.
     effect((onCleanup) => {
       const clubId = this.routeClubId();
       if (!clubId) {
@@ -232,8 +220,6 @@ export class ClubsDetail {
       }
     });
 
-    // 3️⃣ Busca os slots na API sempre que quadra ou data mudam.
-    //    switchMap garante que requisições anteriores são canceladas automaticamente.
     toObservable(this.courtAndDate)
       .pipe(
         switchMap(({ court, date }) => {
@@ -244,8 +230,6 @@ export class ClubsDetail {
 
           return this.scheduleService.getAvailability(court.id, date).pipe(
             map(dtos => mapAvailabilityToSlots(dtos, date)),
-            // O erro já é tratado (e exibido via slotsError) dentro do serviço.
-            // Aqui apenas evitamos que o stream externo quebre.
             catchError(() => EMPTY),
           );
         }),
@@ -301,7 +285,6 @@ export class ClubsDetail {
   }
 
   confirmBooking(): void {
-    // Usuário não autenticado → redireciona para login preservando a rota atual
     if (!this.authService.isAuthenticated()) {
       this.closeBookingModal();
       this.router.navigate(['/login'], {
@@ -316,8 +299,6 @@ export class ClubsDetail {
     this.isConfirming.set(true);
     this.bookingError.set(null);
 
-    // 1️⃣ Busca o perfil do jogador para obter o playerId
-    // 2️⃣ Com o playerId em mãos, cria a reserva
     this.authService.getPlayerMe().pipe(
       switchMap(player =>
         this.reserveService.create({

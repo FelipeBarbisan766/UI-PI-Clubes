@@ -240,7 +240,6 @@
                 }
               </div>
 
-              <!-- Grid de slots: loading / erro / lista / vazio -->
               @if (slotsLoading()) {
                 <div class="mt-4 flex justify-center py-8" aria-live="polite" aria-busy="true">
                   <span
@@ -270,23 +269,21 @@
                       [ngClass]="{
                         'bg-success/10 text-success border-success/20 hover:bg-success/20 cursor-pointer':
                           slot.available,
-                        'bg-base-200 text-base-content/40 border-transparent cursor-not-allowed pointer-events-none':
-                          !slot.available && slot.fixed,
                         'bg-error/10 text-error/60 border-transparent cursor-not-allowed pointer-events-none':
-                          !slot.available && !slot.fixed,
+                          !slot.available,
                       }"
                       [attr.aria-label]="
-                        slot.startTime + (slot.available ? ', disponível' : ', indisponível')
+                        slot.startTime + ' - ' + slot.endTime + (slot.available ? ' disponível' : ' indisponível')
                       "
                       [attr.aria-disabled]="!slot.available"
                     >
-                      {{ slot.startTime }}
+                      {{ slot.startTime + ' - ' + slot.endTime + (slot.available ? ' disponível' : ' indisponível') }}
 
-                      @if (!slot.available) {
+                      <!-- @if (!slot.available) {
                         <div class="text-[10px] uppercase tracking-wider mt-0.5">
                           {{ slot.fixed ? 'Fixo' : 'Ocupado' }}
                         </div>
-                      }
+                      } -->
                     </button>
                   }
                 </div>
