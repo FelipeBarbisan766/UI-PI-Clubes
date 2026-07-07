@@ -214,7 +214,10 @@ export class Clubs implements OnInit {
         images: this.selectedFiles() ?? undefined,
       })
       .subscribe({
-        next: () => this.closeForm(),
+        next: () => {
+          this.closeForm();
+          this.clubService.getAllByAdminId(adminId).subscribe();
+        },
         error: (err: unknown) => {
           console.error('Erro ao criar clube', err);
         },

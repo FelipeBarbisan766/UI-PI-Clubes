@@ -5,5 +5,7 @@
     <router-outlet />
   </main>
 
-  <app-footer />
+  @if (showFooter()) {
+    <app-footer />
+  }
 </div>
