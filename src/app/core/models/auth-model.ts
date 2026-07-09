@@ -12,12 +12,8 @@ export interface MeResponse {
 
 export interface AdminMeResponse {
   id: string;
-  name: string;
-  email: string;
 }
 
 export interface PlayerMeResponse {
   id: string;
-  name: string;
-  email: string;
 }

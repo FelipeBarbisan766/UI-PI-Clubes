@@ -98,6 +98,11 @@ export const routes: Routes = [
           import('./features/user/user-profile/user-profile').then((m) => m.UserProfile),
       },
       {
+        path: 'user-reserves',
+        loadComponent: () =>
+          import('./features/user/user-reserves/user-reserves').then((m) => m.UserReserve),
+      },
+      {
         path: 'admin/clubs',
         canActivate: [adminGuard],
         component: Clubs,
