@@ -2,23 +2,24 @@
 
 export interface ApiReservation {
   id: string;
-  date: string;       // DateTime → "2026-03-03T00:00:00"
-  status: string;     // StatusEnum como string: "Pending" | "Confirmed" | "Cancelled"
-  player: ApiPlayer;
-  schedule: ApiSchedule;
+  date: string;       
+  status: string;     
+  club: Club;
+  schedule: Schedule;
 }
 
-export interface ApiPlayer {
+export interface Club {
   name: string;
+  phoneNumber: string;
 }
 
-export interface ApiSchedule {
-  startTime: string;  // TimeOnly → "HH:mm:ss"
+export interface Schedule {
+  startTime: string;  
   endTime:   string;
-  court:     ApiCourt;
+  court:     Court;
 }
 
-export interface ApiCourt {
+export interface Court {
   name:  string;
   pricePerHour: number;
   type:  string;
@@ -32,10 +33,11 @@ export enum StatusEnum {
 
 export interface Reservation {
   id:     string;
-  player: string;
+  club:   string;
+  phone: string;
   court:  string;
-  date:   string; // "YYYY-MM-DD"
-  time:   string; // "HH:mm – HH:mm"
+  date:   string; 
+  time:   string; 
   status: StatusEnum;
   pricePerHour:  number;
 }

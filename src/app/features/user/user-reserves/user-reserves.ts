@@ -48,7 +48,7 @@ export class UserReserve implements OnInit {
     const status = this.filterStatus$();
 
     return this.reserveService.reservations().filter(r => {
-      const matchSearch = r.player.toLowerCase().includes(query)
+      const matchSearch = r.club.toLowerCase().includes(query)
                        || r.court.toLowerCase().includes(query);
       const matchStatus = status === 'all' || r.status === status;
       return matchSearch && matchStatus;

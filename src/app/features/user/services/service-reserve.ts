@@ -62,7 +62,8 @@ export class UserReserveService {
   private mapReservation(r: ApiReservation): Reservation {
     return {
       id:     r.id,
-      player: r.player.name,
+      club:   r.club.name,
+      phone:  r.club.phoneNumber,
       court:  r.schedule.court.name,
       date:   r.date.slice(0, 10),
       time:   `${r.schedule.startTime.slice(0, 5)} – ${r.schedule.endTime.slice(0, 5)}`,
