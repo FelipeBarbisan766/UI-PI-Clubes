@@ -100,7 +100,7 @@
               <tr class="hover">
 
                 <!-- Player -->
-                <td class="font-medium">{{ r.player }}</td>
+                <td class="font-medium">{{ r.club }}</td>
 
                 <!-- Court -->
                 <td class="text-base-content/60">{{ r.court }}</td>
@@ -136,7 +136,7 @@
                         type="button"
                         class="btn btn-ghost btn-sm btn-square text-error"
                         (click)="cancel(r.id)"
-                        [attr.aria-label]="'Cancelar reserva de ' + r.player"
+                        [attr.aria-label]="'Cancelar reserva de ' + r.club"
                         title="Cancelar"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
