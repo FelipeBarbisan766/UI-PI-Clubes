@@ -12,11 +12,12 @@ import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angula
 import { finalize } from 'rxjs';
 import { AuthService } from '../../../core/services/auth-service';
 import { UpdateProfileDTO, UserProfileService } from '../services/service-user';
+import { NgxMaskDirective } from 'ngx-mask';
 
 @Component({
   selector: 'app-user-profile',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule,NgxMaskDirective],
   templateUrl: './user-profile.html',
 })
 export class UserProfile implements OnInit {

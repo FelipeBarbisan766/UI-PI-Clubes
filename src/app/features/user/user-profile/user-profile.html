@@ -198,9 +198,9 @@
                     aria-describedby="email-hint"
                   />
                   <div class="label pt-1" id="email-hint">
-                    <span class="label-text-alt text-base-content/50">
+                    <!-- <span class="label-text-alt text-base-content/50">
                       Para alterar o e-mail, entre em contato com o suporte
-                    </span>
+                    </span> -->
                   </div>
                 </div>
 
@@ -208,7 +208,7 @@
                 <div class="form-control mb-8">
                   <label class="label pb-1" for="profile-phone">
                     <span class="label-text font-medium text-base-content">Telefone</span>
-                    <span class="label-text-alt text-base-content/40">Opcional</span>
+                    <!-- <span class="label-text-alt text-base-content/40">Opcional</span> -->
                   </label>
                   <div class="relative">
                     <span class="absolute inset-y-0 left-3 flex items-center pointer-events-none" aria-hidden="true">
@@ -223,11 +223,11 @@
                       type="tel"
                       formControlName="phoneNumber"
                       autocomplete="tel"
+                      mask="(00) 00000-0000"
                       placeholder="(00) 00000-0000"
                       class="input input-bordered w-full pl-10"
                       aria-describedby="phone-hint"
                     />
-                    <!-- Tip: add mask="(00) 00000-0000" [showMaskTyped]="true" from ngx-mask if installed -->
                   </div>
                   <div class="label pt-1" id="phone-hint">
                     <span class="label-text-alt text-base-content/50">
