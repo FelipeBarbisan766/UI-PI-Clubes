@@ -1,8 +1,10 @@
-<nav class="fixed top-0 start-0 z-50 w-full transition-all duration-300 border-b border-white/5 bg-neutral/80 backdrop-blur-md">
+<nav
+  class="fixed top-0 start-0 z-50 w-full transition-all duration-300 border-b border-white/5 bg-neutral/80 backdrop-blur-md"
+>
   <div class="container mx-auto max-w-6xl px-4">
     <div class="navbar min-h-4 px-0">
       <div class="flex-1">
-        <p class="font-destaque text-xl text-white font-bold">Clubera</p>
+        <a (click)="goToHome()" class="font-destaque text-xl text-white font-bold">Clubera</a>
       </div>
 
       <div class="hidden md:flex flex-none">
@@ -49,7 +51,7 @@
           <button
             class="btn btn-sm rounded-full btn-outline text-white border-white/30 hover:bg-white/10"
             popovertarget="user-menu-popover"
-            style="anchor-name:--user-menu-anchor"
+            style="anchor-name: --user-menu-anchor"
             aria-haspopup="menu"
             aria-controls="user-menu-popover"
           >
@@ -60,11 +62,14 @@
             id="user-menu-popover"
             popover
             class="dropdown menu w-56 rounded-box bg-base-100 shadow-sm"
-            style="position-anchor:--user-menu-anchor"
+            style="position-anchor: --user-menu-anchor"
             role="menu"
           >
             <li role="none">
-              <a role="menuitem" (click)="goToAccount()">Minha conta</a>
+              <a role="menuitem" (click)="goToAccount()">Minha Conta</a>
+            </li>
+            <li role="none">
+              <a role="menuitem" (click)="goToReserves()">Minhas Reservas</a>
             </li>
             @if (isAdmin()) {
               <li role="none">
@@ -72,9 +77,7 @@
               </li>
             }
             <li role="none">
-              <button type="button" role="menuitem" (click)="onLogout()">
-                Sair
-              </button>
+              <button type="button" role="menuitem" (click)="onLogout()">Sair</button>
             </li>
           </ul>
         }

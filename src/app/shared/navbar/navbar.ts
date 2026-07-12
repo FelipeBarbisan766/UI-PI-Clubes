@@ -45,6 +45,9 @@ export class Navbar {
   goToAccount(): void {
     void this.router.navigate(['/user-profile']);
   }
+  goToReserves(): void {
+    void this.router.navigate(['/user-reserves']);
+  }
   goToAdmin(): void {
     void this.router.navigate(['/admin/clubs']);
   }

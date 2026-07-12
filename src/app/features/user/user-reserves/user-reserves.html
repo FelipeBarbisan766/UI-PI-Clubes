@@ -30,9 +30,9 @@
       <input
         type="search"
         class="grow"
-        placeholder="Buscar por jogador ou quadra…"
+        placeholder="Buscar por clube ou quadra…"
         [formControl]="searchControl"
-        aria-label="Buscar reservas por jogador ou quadra"
+        aria-label="Buscar reservas por clube ou quadra"
       />
     </label>
 
@@ -85,7 +85,7 @@
 
           <thead>
             <tr>
-              <th scope="col">Jogador</th>
+              <th scope="col">Clube</th>
               <th scope="col">Quadra</th>
               <th scope="col">Data</th>
               <th scope="col">Horário</th>
@@ -99,7 +99,6 @@
             @for (r of filtered(); track trackById($index, r)) {
               <tr class="hover">
 
-                <!-- Player -->
                 <td class="font-medium">{{ r.club }}</td>
 
                 <!-- Court -->

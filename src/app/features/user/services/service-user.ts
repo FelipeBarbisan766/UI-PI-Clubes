@@ -41,7 +41,6 @@ export class UserProfileService {
       );
   }
 
-  // Requires PUT /users/{id} endpoint on the backend
   update(id: string, dto: UpdateProfileDTO): Observable<ResponseUserDTO> {
     this._loading.set(true);
     this._error.set(null);
