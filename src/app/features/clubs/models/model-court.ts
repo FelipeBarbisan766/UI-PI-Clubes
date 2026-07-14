@@ -30,20 +30,20 @@ export enum TypeEnum {
 }
 
 export enum SurfaceEnum {
-    None = 0,
-    Saibro = 1,
-    PisoDuro = 2,
-    GramaNatural = 3,
-    GramaSintética = 4,
-    Madeira = 5,
-    PisoVinílico = 6,
-    PisoAcrílico = 7,
-    PisoEmborrachado = 8,
-    Areia = 9,
-    Carpete = 10,
-    Asfalto = 11,
-    TerraBatida = 12,
-    PisoModular = 13
+    None = 'None',
+    Saibro = 'Saibro',
+    PisoDuro = 'PisoDuro',
+    GramaNatural = 'GramaNatural',
+    GramaSintética = 'GramaSintética',
+    Madeira = 'Madeira',
+    PisoVinílico = 'PisoVinílico',
+    PisoAcrílico = 'PisoAcrílico',
+    PisoEmborrachado = 'PisoEmborrachado',
+    Areia = 'Areia',
+    Carpete = 'Carpete',
+    Asfalto = 'Asfalto',
+    TerraBatida = 'TerraBatida',
+    PisoModular = 'PisoModular'
 }
 
 export interface ResponseCourtDTO {
@@ -62,4 +62,25 @@ export interface ResponseCourtDTO {
       fullUrl: string;
     }
   ];
+}
+export interface CourtState {
+  courts: ResponseCourtDTO[];
+  selectedCourt: ResponseCourtDTO | null;
+  loading: boolean;
+  error: string | null;
+}
+export interface CourtQueryDTO {
+  name?: string;
+  city?: string;
+  types?: TypeEnum[];   
+  page?: number;
+  pageSize?: number;
+}
+
+export interface PagedResultDTO<T> {
+  data: T[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
 }

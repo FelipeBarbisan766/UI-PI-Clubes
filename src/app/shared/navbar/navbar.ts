@@ -27,6 +27,10 @@ export class Navbar {
     void this.router.navigate(['/clubs']);
   }
 
+  goToCourtsList() {
+    void this.router.navigate(['/courts']);
+  }
+
   goToSignUp() {
     void this.router.navigate(['/sign-up']);
   }

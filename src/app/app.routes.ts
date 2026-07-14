@@ -26,6 +26,11 @@ export const routes: Routes = [
           import('./features/clubs/clubs-list/clubs-list').then((m) => m.ClubsList),
       },
       {
+        path: 'courts',
+        loadComponent: () =>
+          import('./features/clubs/courts-list/courts-list').then((m) => m.CourtsList),
+      },
+      {
         path: 'clubs/:clubId',
         loadComponent: () =>
           import('./features/clubs/clubs-details/clubs-details').then((m) => m.ClubsDetail),
