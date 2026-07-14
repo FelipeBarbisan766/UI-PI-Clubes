@@ -42,3 +42,18 @@ export interface ResponseClubByIdDTO {
   ];
   courts: import('./model-court').ResponseCourtDTO[];
 }
+export interface ClubQueryDTO {
+  name?: string;
+  city?: string;
+  types?: TypeEnum[];   
+  page?: number;
+  pageSize?: number;
+}
+
+export interface PagedResultDTO<T> {
+  data: T[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}

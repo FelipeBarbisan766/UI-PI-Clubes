@@ -10,30 +10,30 @@ import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { NgOptimizedImage } from '@angular/common';
 import { debounceTime, skip, switchMap, take } from 'rxjs';
-import { ServiceClub } from '../services/service-club';
-import { ClubQueryDTO, ResponseClubDTO } from '../models/model-club';
+import { ServiceCourt } from '../services/service-court';
+import { CourtQueryDTO, ResponseCourtDTO } from '../models/model-court';
 import { TypeEnum } from '../models/model-court';
 
 const PAGE_SIZE = 10;
 
 @Component({
-  selector: 'app-clubs-list',
+  selector: 'app-courts-list',
   imports: [NgOptimizedImage],
-  templateUrl: './clubs-list.html',
-  styleUrl: './clubs-list.css',
+  templateUrl: './courts-list.html',
+  styleUrl: './courts-list.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ClubsList {
-  private readonly clubService = inject(ServiceClub);
+export class CourtsList {
+  private readonly courtService = inject(ServiceCourt);
   private readonly router      = inject(Router);
   private readonly destroyRef  = inject(DestroyRef);
 
-  readonly clubs       = this.clubService.clubs;
-  readonly loading     = this.clubService.loading;
-  readonly error       = this.clubService.error;
-  readonly isEmpty     = this.clubService.isEmpty;
-  readonly clubsCount  = this.clubService.clubsCount;
-  readonly totalPages  = this.clubService.totalPages;
+  readonly courts       = this.courtService.courts;
+  readonly loading     = this.courtService.loading;
+  readonly error       = this.courtService.error;
+  readonly isEmpty     = this.courtService.isEmpty;
+  readonly courtsCount  = this.courtService.courtsCount;
+  readonly totalPages  = this.courtService.totalPages;
 
   readonly searchTerm    = signal('');
   readonly cityFilter    = signal('');
@@ -43,7 +43,7 @@ export class ClubsList {
   // Indica se a localização foi detectada automaticamente (para mostrar badge)
   readonly detectedCity  = signal<string | null>(null);
 
-  private readonly query = computed<ClubQueryDTO>(() => ({
+  private readonly query = computed<CourtQueryDTO>(() => ({
     name:     this.searchTerm() || undefined,
     city:     this.cityFilter() || undefined,
     types:    this.selectedTypes().length > 0 ? this.selectedTypes() : undefined,
@@ -73,27 +73,23 @@ export class ClubsList {
     .pipe(
       skip(1),
       debounceTime(400),
-      switchMap(query => this.clubService.getAll(query)),
+      switchMap(query => this.courtService.getAll(query)),
       takeUntilDestroyed(this.destroyRef),
     )
     .subscribe();
 
-  // 1️⃣ Carrega imediatamente sem filtro
-  this.clubService
+  this.courtService
     .getAll(this.query())
     .pipe(take(1), takeUntilDestroyed(this.destroyRef))
     .subscribe();
 
-  // 2️⃣ Em paralelo, tenta detectar cidade — sem bloquear nada
   this.resolveInitialCity().then(city => {
     if (!city) return; // permissão negada/timeout → não faz nada
     this.cityFilter.set(city);
     this.detectedCity.set(city);
-    // o toObservable já dispara o reload automaticamente
   });
 }
 
-  // Tenta geolocalização com timeout de 4s; resolve null em qualquer falha
   private resolveInitialCity(): Promise<string | null> {
     return new Promise(resolve => {
       if (!navigator?.geolocation) return resolve(null);
@@ -123,7 +119,6 @@ export class ClubsList {
     });
     if (!res.ok) return null;
     const data = await res.json();
-    // Nominatim pode retornar city, town, village ou municipality
     return data.address?.city
         ?? data.address?.town
         ?? data.address?.municipality
@@ -131,7 +126,6 @@ export class ClubsList {
         ?? null;
   }
 
-  // Limpa filtro de localização automática
   clearDetectedCity(): void {
     this.detectedCity.set(null);
     this.cityFilter.set('');
@@ -147,7 +141,6 @@ export class ClubsList {
 
   onCityChange(event: Event): void {
     this.cityFilter.set((event.target as HTMLInputElement).value);
-    // Se o usuário editar manualmente, descarta o badge de "detectado"
     this.detectedCity.set(null);
     this.currentPage.set(1);
   }
@@ -171,12 +164,12 @@ export class ClubsList {
     this.currentPage.set(page);
   }
 
-  selectClub(club: ResponseClubDTO): void {
-    this.router.navigate(['/clubs', club.id]);
+  selectCourt(court: ResponseCourtDTO): void {
+    this.router.navigate(['/courts', court.id]);
   }
 
-  getFirstImage(club: ResponseClubDTO): string | null {
-    return club.images?.length > 0 ? club.images[0].thumbUrl : null;
+  getFirstImage(court: ResponseCourtDTO): string | null {
+    return court.images?.length > 0 ? court.images[0].thumbUrl : null;
   }
 
   formatPrice(price: number): string {
@@ -184,7 +177,7 @@ export class ClubsList {
   }
 
   clearError(): void {
-    this.clubService.clearError();
+    this.courtService.clearError();
   }
 
   readonly typeLabels: Record<TypeEnum, string> = {

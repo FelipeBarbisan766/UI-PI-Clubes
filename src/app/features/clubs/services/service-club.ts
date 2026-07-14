@@ -1,25 +1,9 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { Observable, tap, catchError, throwError } from 'rxjs';
-import { ResponseClubDTO, ResponseClubByIdDTO } from '../models/model-club';
 import { environment } from '../../../../environments/environment';
 import { TypeEnum } from '../models/model-court';
-
-export interface ClubQueryDTO {
-  name?: string;
-  city?: string;
-  types?: TypeEnum[];   
-  page?: number;
-  pageSize?: number;
-}
-
-export interface PagedResultDTO<T> {
-  data: T[];
-  totalCount: number;
-  page: number;
-  pageSize: number;
-  totalPages: number;
-}
+import { ClubQueryDTO, PagedResultDTO, ResponseClubByIdDTO, ResponseClubDTO } from '../models/model-club';
 
 @Injectable({
   providedIn: 'root',
