@@ -28,8 +28,9 @@ export class MainLayout {
   }
 
   private checkFooterVisibility(url: string): void {
+    const routesWithFooter = new Set(['/', '/clubs', '/plans']);
     const path = url.split('?')[0].split('#')[0];
     
-    this.showFooter.set(path === '/' || path === '/clubs');
+    this.showFooter.set(routesWithFooter.has(path));
   }
 }

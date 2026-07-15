@@ -1,8 +1,8 @@
 <main
-  class="min-h-screen w-full pattern-background flex flex-col items-center justify-center px-4 py-12 pt-20"
+  class="min-h-screen w-full bg-base-200 flex flex-col items-center px-4 py-12 pt-20"
 >
   <!-- ── Header ─────────────────────────────────────────────────────────── -->
-  <header class="text-center mb-10 max-w-2xl">
+  <header class="text-center mb-12 max-w-2xl">
     <h1 class="text-3xl md:text-4xl font-bold mb-3">Escolha seu plano</h1>
     <p class="text-sm md:text-base text-base-content/70">
       Selecione o plano ideal para o seu negócio e gerencie seus clubes com facilidade.
@@ -11,25 +11,29 @@
 
   <!-- ── Loading skeleton ───────────────────────────────────────────────── -->
   @if (isLoading()) {
-    <div class="w-full max-w-3xl flex flex-col gap-4" aria-busy="true" aria-label="Carregando planos">
+    <div
+      class="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+      aria-busy="true"
+      aria-label="Carregando planos"
+    >
       @for (item of skeletonItems; track item) {
-        <div class="skeleton h-36 w-full rounded-2xl" aria-hidden="true"></div>
+        <div class="skeleton h-80 w-full rounded-2xl" aria-hidden="true"></div>
       }
     </div>
   }
 
   <!-- ── Error state ────────────────────────────────────────────────────── -->
   @if (!isLoading() && errorMessage()) {
-    <div class="w-full max-w-3xl">
-      <div class="alert alert-error" role="alert" aria-live="assertive">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+    <div class="w-full max-w-md">
+      <div class="alert alert-error alert-soft flex-col text-center gap-3 py-8" role="alert" aria-live="assertive">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
         </svg>
         <span>{{ errorMessage() }}</span>
         <button
           type="button"
-          class="btn btn-sm btn-ghost"
+          class="btn btn-sm btn-error rounded-full"
           (click)="retryLoad()"
           aria-label="Tentar novamente"
         >
@@ -41,73 +45,81 @@
 
   <!-- ── Empty state ────────────────────────────────────────────────────── -->
   @if (!isLoading() && !errorMessage() && plans().length === 0) {
-    <div class="text-center text-base-content/60">
+    <div class="text-center text-base-content/60 py-16">
       <p>Nenhum plano disponível no momento.</p>
     </div>
   }
 
   <!-- ── Plan cards ─────────────────────────────────────────────────────── -->
   @if (!isLoading() && !errorMessage() && plans().length > 0) {
-    <ul class="w-full max-w-3xl flex flex-col gap-4" aria-label="Planos disponíveis">
+    <ul
+      class="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch"
+      aria-label="Planos disponíveis"
+    >
       @for (plan of plans(); track plan.id) {
-        <li>
+        <li class="flex">
           <article
-            class="card bg-base-100 shadow-sm transition-shadow hover:shadow-md"
-            [class.ring-2]="plan.id === popularPlanId()"
-            [class.ring-primary]="plan.id === popularPlanId()"
+            class="card w-full bg-base-100 border border-base-300 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+            [class.border-primary]="plan.id === popularPlanId()"
+            [class.shadow-lg]="plan.id === popularPlanId()"
+            [class.lg:scale-105]="plan.id === popularPlanId()"
           >
-            <div class="card-body flex-row flex-wrap items-center justify-between gap-6">
+            <div class="card-body gap-5">
 
-              <!-- Left: plan details -->
-              <div class="flex-1 min-w-0">
-                <div class="flex flex-wrap items-center gap-2 mb-1">
-                  <h2 class="text-xl font-bold">{{ plan.name }}</h2>
-                  @if (plan.id === popularPlanId()) {
-                    <span class="badge badge-primary badge-sm" aria-label="Plano mais popular">
-                      Mais popular
-                    </span>
-                  }
-                </div>
-
-                <p class="text-sm text-base-content/70 mb-4">{{ plan.description }}</p>
-
-                <ul class="flex flex-wrap gap-x-5 gap-y-2 text-sm text-base-content/80" aria-label="Recursos do plano">
-                  <li class="flex items-center gap-1.5">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                    </svg>
-                    <span>
-                      {{ plan.quantClub }}
-                      {{ plan.quantClub === 1 ? 'clube' : 'clubes' }}
-                    </span>
-                  </li>
-
-                  <li class="flex items-center gap-1.5">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064"/>
-                    </svg>
-                    <span>{{ plan.quantCourt }} quadras por clube</span>
-                  </li>
-
-                  <li class="flex items-center gap-1.5">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                    </svg>
-                    <span>Renova a cada {{ plan.durationDays }} dias</span>
-                  </li>
-                </ul>
+              <!-- Plan name + badge -->
+              <div class="flex items-center justify-between gap-2">
+                <h2 class="text-lg font-bold">{{ plan.name }}</h2>
+                @if (plan.id === popularPlanId()) {
+                  <span class="badge badge-primary badge-sm text-white" aria-label="Plano mais popular">
+                    Mais popular
+                  </span>
+                }
               </div>
 
-              <!-- Right: price + CTA -->
-              <div class="flex flex-col items-center gap-3 shrink-0">
-                <div class="text-center" aria-label="Preço do plano">
-                  <span class="text-3xl font-bold">{{ formatPrice(plan.price) }}</span>
-                  <span class="text-sm text-base-content/60 block">{{ formatDuration(plan.durationDays) }}</span>
-                </div>
+              <p class="text-sm text-base-content/70 -mt-3">{{ plan.description }}</p>
 
+              <!-- Price -->
+              <div aria-label="Preço do plano" class="pb-1">
+                <span class="text-4xl font-bold" [class.text-primary]="plan.id === popularPlanId()">
+                  {{ formatPrice(plan.price) }}
+                </span>
+                <span class="text-sm text-base-content/60">{{ formatDuration(plan.durationDays) }}</span>
+              </div>
+
+              <div class="divider my-0"></div>
+
+              <!-- Features -->
+              <ul class="flex flex-col gap-3 text-sm text-base-content/80 grow" aria-label="Recursos do plano">
+                <li class="flex items-center gap-2.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                  </svg>
+                  <span>
+                    {{ plan.quantClub }}
+                    {{ plan.quantClub === 1 ? 'clube' : 'clubes' }}
+                  </span>
+                </li>
+
+                <li class="flex items-center gap-2.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-primary lucide lucide-map-pin-icon lucide-map-pin"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+                  <span>{{ plan.quantCourt }} quadras por clube</span>
+                </li>
+
+                <li class="flex items-center gap-2.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                  </svg>
+                  <span>Renova a cada {{ plan.durationDays }} dias</span>
+                </li>
+              </ul>
+
+              <!-- CTA -->
+              <div class="card-actions">
                 <button
                   type="button"
-                  class="btn btn-primary rounded-full text-white px-8"
+                  class="btn w-full rounded-full bg-primary text-white border-none shadow-none font-bold"
+                  [class.btn-primary]="plan.id === popularPlanId()"
+                  [class.btn-outline]="plan.id !== popularPlanId()"
                   (click)="selectPlan(plan.id)"
                   [attr.aria-label]="'Assinar o plano ' + plan.name"
                 >
