@@ -4,8 +4,21 @@
     <div class="flex flex-col justify-between items-start md:flex-row md:items-center mb-8 gap-4">
       <div class="flex items-center gap-4">
         <div class="avatar avatar-placeholder">
-          <div class="bg-neutral text-neutral-content w-15 rounded-full">
-            <span class="text-2xl font-bold">{{ initials() }}</span>
+          <div
+            class="w-24 h-24 rounded-full bg-neutral text-neutral-content relative overflow-hidden"
+          >
+            @if (avatarUrl(); as avatarUrl) {
+              <img
+                [ngSrc]="avatarUrl"
+                fill
+                [alt]="displayName() + ' Avatar'"
+                class="object-cover"
+              />
+            } @else {
+              <span class="text-3xl font-semibold flex items-center justify-center w-full h-full">
+                {{ initials() }}
+              </span>
+            }
           </div>
         </div>
         <div>

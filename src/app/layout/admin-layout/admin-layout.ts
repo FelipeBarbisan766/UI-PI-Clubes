@@ -3,10 +3,11 @@ import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { BreadCrumb } from "../../shared/components/bread-crumb/bread-crumb";
 import { AuthService } from '../../core/services/auth-service';
 import { take } from 'rxjs';
+import { NgOptimizedImage } from '@angular/common';
 
 @Component({
   selector: 'app-admin-layout',
-  imports: [RouterOutlet, BreadCrumb],
+  imports: [RouterOutlet, BreadCrumb,NgOptimizedImage],
   templateUrl: './admin-layout.html',
   styleUrl: './admin-layout.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -22,6 +23,7 @@ export class AdminLayout implements OnInit {
   readonly clubCity = input('');
 
   private readonly me = this.authService.me;
+  readonly avatarUrl = computed(() => this.me()?.avatarUrl);
   readonly displayName = computed(() => this.me()?.name?.trim() || 'Usuário');
   readonly initials = computed(() => {
     const name = this.me()?.name?.trim();
