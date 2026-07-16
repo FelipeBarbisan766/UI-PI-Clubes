@@ -13,11 +13,12 @@ import { finalize } from 'rxjs';
 import { AuthService } from '../../../core/services/auth-service';
 import { UpdateProfileDTO, UserProfileService } from '../services/service-user';
 import { NgxMaskDirective } from 'ngx-mask';
+import { NgOptimizedImage } from '@angular/common';
 
 @Component({
   selector: 'app-user-profile',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule,NgxMaskDirective],
+  imports: [ReactiveFormsModule,NgxMaskDirective, NgOptimizedImage],
   templateUrl: './user-profile.html',
 })
 export class UserProfile implements OnInit {
@@ -61,6 +62,7 @@ export class UserProfile implements OnInit {
       .getById(userId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(user => {
+        user.avatarUrl; 
         this.form.patchValue({
           name: user.name,
           email: user.email,

@@ -17,12 +17,13 @@ import { AuthService } from '../../../../core/services/auth-service';
 import { Modal } from '../../../../shared/components/modal/modal';
 import { ViaCepService } from '../../../../core/services/via-cep'; 
 import { NgxMaskDirective } from 'ngx-mask';
+import { NgOptimizedImage } from '@angular/common';
 
 type FormMode = 'create' | 'edit' | null;
 
 @Component({
   selector: 'app-club',
-  imports: [ReactiveFormsModule, Modal, NgxMaskDirective],
+  imports: [ReactiveFormsModule, Modal, NgxMaskDirective, NgOptimizedImage],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './clubs.html',
 })
@@ -34,6 +35,8 @@ export class Clubs implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
 
   private readonly me = this.authService.me;
+  
+  readonly avatarUrl = computed(() => this.me()?.avatarUrl);
   readonly displayName = computed(() => this.me()?.name?.trim() || 'Usuário');
   readonly initials = computed(() => {
     const name = this.me()?.name?.trim();

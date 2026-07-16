@@ -7,6 +7,7 @@ export interface ResponseUserDTO {
   id: string;
   name: string;
   email: string;
+  avatarUrl: string;
   phoneNumber: string;
 }
 
