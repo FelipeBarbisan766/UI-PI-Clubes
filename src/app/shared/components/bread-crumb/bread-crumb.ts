@@ -5,7 +5,6 @@ import { BreadcrumbService } from './bread-crumb-service';
 
 @Component({
   selector: 'app-breadcrumb',
-  standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './bread-crumb.html',
     

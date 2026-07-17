@@ -1,10 +1,14 @@
 <div class="breadcrumbs text-sm mb-6" aria-label="Breadcrumb">
   <ul>
-    <li>
-      <a routerLink="/admin/clubs">Início</a>
-    </li>
-
     @if (breadcrumbs$ | async; as crumbs) {
+      <li>
+        @if (crumbs.length > 0) {
+          <a routerLink="/admin/clubs">Início</a>
+        } @else {
+          <span class="font-semibold text-base-content/70" aria-current="page">Início</span>
+        }
+      </li>
+
       @for (crumb of crumbs; track crumb.url ?? crumb.label; let last = $last) {
         <li>
           @if (!last) {

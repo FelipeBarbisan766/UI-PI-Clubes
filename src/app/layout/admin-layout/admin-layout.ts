@@ -53,7 +53,7 @@ export class AdminLayout implements OnInit {
 
 
   goToOverview(): void {
-    this.router.navigate(['/admin/club', this.currentClubId, 'overview']);
+    this.router.navigate(['/admin/club', this.currentClubId, 'dashboard']);
   }
 
   goToCourts(): void {

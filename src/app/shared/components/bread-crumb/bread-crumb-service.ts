@@ -14,50 +14,64 @@ export class BreadcrumbService {
   private breadcrumbsSubject = new BehaviorSubject<Breadcrumb[]>([]);
   breadcrumbs$ = this.breadcrumbsSubject.asObservable();
 
+  private readonly dynamicBreadcrumbResolveKeys = ['clubName', 'dynamicBreadcrumb'];
+
   constructor() {
-    this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
-      const root = this.router.routerState.snapshot.root;
-      const breadcrumbs: Breadcrumb[] = [];
-      this.buildBreadcrumbTree(root, [], breadcrumbs);
-      this.breadcrumbsSubject.next(breadcrumbs);
-    });
+    this.updateBreadcrumbs();
+
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe(() => this.updateBreadcrumbs());
+  }
+
+  private updateBreadcrumbs(): void {
+    const root = this.router.routerState.snapshot.root;
+    const breadcrumbs: Breadcrumb[] = [];
+    this.buildBreadcrumbTree(root, [], breadcrumbs);
+    this.breadcrumbsSubject.next(breadcrumbs);
   }
 
   private buildBreadcrumbTree(
     route: ActivatedRouteSnapshot | null,
     parentUrl: string[],
     breadcrumbs: Breadcrumb[],
-  ) {
-    if (route) {
-      const routeUrl = parentUrl.concat(route.url.map((url) => url.path).filter((p) => p));
+  ): void {
+    if (!route) {
+      return;
+    }
 
-      // Pega a configuração exata deste segmento da rota (sem herança do pai)
-      const routeConfig = route.routeConfig;
-      let label = '';
+    const routeConfig = route.routeConfig;
+    const segments = route.url.map((segment) => segment.path).filter((path) => path);
+    const routeUrl = parentUrl.concat(segments);
 
-      // Verifica se ESTA rota específica definiu o resolver dinâmico ou o nome estático
-      if (routeConfig?.resolve?.['clubName']) {
-        label = route.data['clubName'];
-      } else if (routeConfig?.data?.['breadcrumb']) {
-        label = route.data['breadcrumb'];
-      }
+    const staticLabel = routeConfig?.data?.['breadcrumb'];
+    if (staticLabel) {
+      const breadcrumbUrlOverride = routeConfig?.data?.['breadcrumbUrl'];
+      const url = breadcrumbUrlOverride
+        ? '/' + parentUrl.concat(breadcrumbUrlOverride).join('/')
+        : '/' + routeUrl.join('/');
 
-      if (label) {
-        const breadcrumb = {
-          label: label,
-          url: '/' + routeUrl.join('/'),
-        };
+      this.pushBreadcrumb(breadcrumbs, { label: staticLabel, url });
+    }
 
-        // Evita duplicatas pela URL (caso existam rotas com path: '')
-        if (
-          breadcrumbs.length === 0 ||
-          breadcrumbs[breadcrumbs.length - 1].url !== breadcrumb.url
-        ) {
-          breadcrumbs.push(breadcrumb);
-        }
-      }
+    const resolveKeys = routeConfig?.resolve ? Object.keys(routeConfig.resolve) : [];
+    const dynamicKey = resolveKeys.find((key) => this.dynamicBreadcrumbResolveKeys.includes(key));
 
-      this.buildBreadcrumbTree(route.firstChild, routeUrl, breadcrumbs);
+    if (dynamicKey && route.data[dynamicKey]) {
+      this.pushBreadcrumb(breadcrumbs, {
+        label: route.data[dynamicKey],
+        url: '/' + routeUrl.join('/'),
+      });
+    }
+
+    this.buildBreadcrumbTree(route.firstChild, routeUrl, breadcrumbs);
+  }
+
+  private pushBreadcrumb(breadcrumbs: Breadcrumb[], breadcrumb: Breadcrumb): void {
+    const previous = breadcrumbs[breadcrumbs.length - 1];
+
+    if (!previous || previous.url !== breadcrumb.url) {
+      breadcrumbs.push(breadcrumb);
     }
   }
 }
