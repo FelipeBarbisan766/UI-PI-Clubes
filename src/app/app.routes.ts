@@ -122,8 +122,12 @@ export const routes: Routes = [
         canActivate: [adminGuard],
         children: [
           {
+            path: '',
+            pathMatch: 'full',
+            redirectTo: 'dashboard',
+          },
+          {
             path: 'dashboard',
-            data: { breadcrumb: 'Dashboard' },
             loadComponent: () =>
               import('./features/admin/pages/dashboard/dashboard').then((m) => m.Dashboard),
           },
@@ -135,11 +139,16 @@ export const routes: Routes = [
           },
           {
             path: 'court/:courtId',
+            data: { breadcrumb: 'Quadras', breadcrumbUrl: 'courts' },
             resolve: { dynamicBreadcrumb: courtNameResolver },
             children: [
               {
+                path: '',
+                pathMatch: 'full',
+                redirectTo: 'schedule',
+              },
+              {
                 path: 'schedule',
-                data: { breadcrumb: 'Horario' },
                 loadComponent: () =>
                   import('./features/admin/pages/schedules/schedules').then((m) => m.Schedules),
               },

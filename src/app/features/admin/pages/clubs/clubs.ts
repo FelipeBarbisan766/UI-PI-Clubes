@@ -127,7 +127,7 @@ export class Clubs implements OnInit {
   // --- Navigation ---
 
   protected goToCourts(clubId: string): void {
-    this.router.navigate(['/admin/club', clubId, 'courts']);
+    this.router.navigate(['/admin/club', clubId, 'dashboard']);
   }
 
   // --- Form actions ---
