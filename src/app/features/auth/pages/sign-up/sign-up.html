@@ -2,30 +2,31 @@
   <app-toast-alert [message]="msg" type="error" (dismiss)="errorMessage.set(null)" />
 }
 
-<main class="min-h-screen w-full pattern-background flex items-center justify-center px-4">
+<div class="w-full min-h-[calc(100vh-var(--nav-h))] pattern-background flex items-center justify-center px-4 py-12">
   <div
-    class="card w-full max-w-lg bg-white shadow-xl rounded-3xl overflow-hidden border border-gray-100"
+    class="card w-full max-w-lg bg-base-100 shadow-xl rounded-3xl overflow-hidden border border-base-300"
   >
     <div class="card-body p-6 md:p-8">
       <div class="text-center mb-6">
-        <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Crie sua conta</h1>
-        <p class="text-gray-500 text-sm">Preencha seus dados para reservar as melhores quadras.</p>
+        <h1 class="text-2xl md:text-3xl font-bold text-base-content mb-2">Crie sua conta</h1>
+        <p class="text-base-content/60 text-sm">Preencha seus dados para reservar as melhores quadras.</p>
       </div>
 
-      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate class="flex flex-col gap-4">
         <div class="form-group">
-          <label for="name" class="label text-gray-700 font-medium px-0 pb-2">
-            <span class="label-text font-medium">Nome completo</span>
+          <label for="name" class="text-sm font-medium text-base-content block pb-2">
+            Nome completo
           </label>
 
           <div
-            class="input-wrapper flex items-center gap-2 bg-white border border-gray-200 rounded-lg focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-colors"
+            class="input w-full"
+            [class.input-error]="form.controls.name.invalid && form.controls.name.touched"
           >
             <input
               id="name"
               type="text"
               formControlName="name"
-              class="grow px-3 py-2 bg-transparent outline-none text-sm"
+              class="grow text-sm"
               [attr.aria-invalid]="form.controls.name.invalid && form.controls.name.touched"
               [attr.aria-describedby]="
                 form.controls.name.invalid && form.controls.name.touched ? 'name-error' : null
@@ -50,17 +51,18 @@
         </div>
 
         <div class="form-group">
-          <label for="email" class="label text-gray-700 font-medium px-0 pb-2">
-            <span class="label-text font-medium">E-mail</span>
+          <label for="email" class="text-sm font-medium text-base-content block pb-2">
+            E-mail
           </label>
           <div
-            class="input-wrapper flex items-center gap-2 bg-white border border-gray-200 rounded-lg focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-colors"
+            class="input w-full"
+            [class.input-error]="form.controls.email.invalid && form.controls.email.touched"
           >
             <input
               id="email"
               type="email"
               formControlName="email"
-              class="grow px-3 py-2 bg-transparent outline-none text-sm"
+              class="grow text-sm"
               [attr.aria-invalid]="form.controls.email.invalid && form.controls.email.touched"
               [attr.aria-describedby]="
                 form.controls.email.invalid && form.controls.email.touched ? 'email-error' : null
@@ -82,17 +84,18 @@
         </div>
 
         <div class="form-group">
-          <label for="password" class="label text-gray-700 font-medium px-0 pb-2">
-            <span class="label-text font-medium">Senha</span>
+          <label for="password" class="text-sm font-medium text-base-content block pb-2">
+            Senha
           </label>
           <div
-            class="input-wrapper flex items-center gap-2 bg-white border border-gray-200 rounded-lg focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-colors"
+            class="input w-full"
+            [class.input-error]="form.controls.password.invalid && form.controls.password.touched"
           >
             <input
               id="password"
               type="password"
               formControlName="password"
-              class="grow px-3 py-2 bg-transparent outline-none text-sm"
+              class="grow text-sm"
               [attr.aria-invalid]="form.controls.password.invalid && form.controls.password.touched"
               [attr.aria-describedby]="
                 form.controls.password.invalid && form.controls.password.touched
@@ -117,17 +120,21 @@
         </div>
 
         <div class="form-group">
-          <label for="confirmPassword" class="label text-gray-700 font-medium px-0 pb-2">
-            <span class="label-text font-medium">Confirmar senha</span>
+          <label for="confirmPassword" class="text-sm font-medium text-base-content block pb-2">
+            Confirmar senha
           </label>
           <div
-            class="input-wrapper flex items-center gap-2 bg-white border border-gray-200 rounded-lg focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-colors"
+            class="input w-full"
+            [class.input-error]="
+              (form.controls.confirmPassword.invalid && form.controls.confirmPassword.touched) ||
+              (form.hasError('passwordMismatch') && form.controls.confirmPassword.touched)
+            "
           >
             <input
               id="confirmPassword"
               type="password"
               formControlName="confirmPassword"
-              class="grow px-3 py-2 bg-transparent outline-none text-sm"
+              class="grow text-sm"
               [attr.aria-invalid]="
                 (form.controls.confirmPassword.invalid && form.controls.confirmPassword.touched) ||
                 (form.hasError('passwordMismatch') && form.controls.confirmPassword.touched)
@@ -175,15 +182,17 @@
             }
           </button>
         </div>
+
         <div class="flex items-center gap-3" aria-hidden="true">
-            <hr class="flex-1 border-gray-200" />
-            <span class="text-gray-400 text-xs">ou</span>
-            <hr class="flex-1 border-gray-200" />
-          </div>
-          <div #googleBtn aria-label="Cadastrar com Google" class="flex justify-center"></div>
-          
-          <div class="text-center pt-1">
-          <p class="text-gray-500 text-xs md:text-sm">
+          <hr class="flex-1 border-base-300" />
+          <span class="text-base-content/40 text-xs">ou</span>
+          <hr class="flex-1 border-base-300" />
+        </div>
+
+        <div #googleBtn aria-label="Cadastrar com Google" class="flex justify-center"></div>
+
+        <div class="text-center pt-1">
+          <p class="text-base-content/60 text-xs md:text-sm">
             Já tem uma conta?
             <a
               routerLink="/login"
@@ -196,4 +205,4 @@
       </form>
     </div>
   </div>
-</main>
+</div>
