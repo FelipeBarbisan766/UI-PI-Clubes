@@ -1,37 +1,48 @@
 <nav
-  class="fixed top-0 start-0 z-50 w-full transition-all duration-300 border-b border-white/5 bg-neutral/80 backdrop-blur-md"
+  aria-label="Principal"
+  class="fixed top-0 inset-x-0 z-50 h-[var(--nav-h)] transition-all duration-300 border-b border-white/5 bg-neutral/80 backdrop-blur-md"
 >
-  <div class="container mx-auto max-w-6xl px-4">
-    <div class="navbar min-h-4 px-0">
-      <div class="flex-1">
-        <a (click)="goToHome()" class="font-destaque text-xl text-white font-bold">Clubera</a>
+  <div class="container mx-auto max-w-6xl px-4 h-full">
+    <div class="navbar h-full min-h-0 p-0">
+
+      <div class="navbar-start">
+        <button
+          type="button"
+          (click)="goToHome()"
+          class="font-destaque text-xl text-white font-bold"
+        >
+          Clubera
+        </button>
       </div>
 
-      <div class="hidden md:flex flex-none">
+      <div class="navbar-center hidden md:flex">
         <ul class="menu menu-horizontal px-1 gap-1">
           <li>
-            <a
+            <button
+              type="button"
               (click)="goToHome()"
               class="text-gray-300 hover:text-white hover:bg-white/10 rounded-lg font-medium text-sm transition-colors"
             >
               Início
-            </a>
+            </button>
           </li>
           <li>
-            <a
+            <button
+              type="button"
               (click)="goToClubsList()"
               class="text-gray-300 hover:text-white hover:bg-white/10 rounded-lg font-medium text-sm transition-colors"
             >
               Clubes
-            </a>
+            </button>
           </li>
           <li>
-            <a
+            <button
+              type="button"
               (click)="goToCourtsList()"
               class="text-gray-300 hover:text-white hover:bg-white/10 rounded-lg font-medium text-sm transition-colors"
             >
               Quadras
-            </a>
+            </button>
           </li>
 
           @if (!isAuthenticated()) {
@@ -47,16 +58,20 @@
         </ul>
       </div>
 
-      <div class="flex-none ml-4">
+      <div class="navbar-end gap-2">
+        <app-themeselector />
+
         @if (!isAuthenticated()) {
-          <a
+          <button
+            type="button"
             (click)="goToSignUp()"
             class="btn btn-sm rounded-full btn-primary border-none text-white shadow-none font-bold"
           >
             Cadastrar-se
-          </a>
+          </button>
         } @else {
           <button
+            type="button"
             class="btn btn-sm rounded-full btn-outline text-white border-white/30 hover:bg-white/10"
             popovertarget="user-menu-popover"
             style="anchor-name: --user-menu-anchor"
@@ -69,19 +84,19 @@
           <ul
             id="user-menu-popover"
             popover
-            class="dropdown menu w-56 rounded-box bg-base-100 shadow-sm"
+            class="dropdown dropdown-end menu w-56 rounded-box bg-base-100 shadow-sm mt-2"
             style="position-anchor: --user-menu-anchor"
             role="menu"
           >
             <li role="none">
-              <a role="menuitem" (click)="goToAccount()">Minha Conta</a>
+              <button type="button" role="menuitem" (click)="goToAccount()">Minha Conta</button>
             </li>
             <li role="none">
-              <a role="menuitem" (click)="goToReserves()">Minhas Reservas</a>
+              <button type="button" role="menuitem" (click)="goToReserves()">Minhas Reservas</button>
             </li>
             @if (isAdmin()) {
               <li role="none">
-                <a role="menuitem" (click)="goToAdmin()">Administração</a>
+                <button type="button" role="menuitem" (click)="goToAdmin()">Administração</button>
               </li>
             }
             <li role="none">
@@ -89,9 +104,50 @@
             </li>
           </ul>
         }
+
+        <!-- Menu mobile: contém os links de navegação que somem em telas pequenas -->
+        <div class="md:hidden">
+          <button
+            type="button"
+            class="btn btn-sm btn-ghost btn-circle text-white"
+            popovertarget="mobile-nav-menu"
+            style="anchor-name: --mobile-nav-anchor"
+            aria-haspopup="menu"
+            aria-controls="mobile-nav-menu"
+            aria-label="Abrir menu de navegação"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              aria-hidden="true">
+              <path d="M4 5h16"/><path d="M4 12h16"/><path d="M4 19h16"/>
+            </svg>
+          </button>
+
+          <ul
+            id="mobile-nav-menu"
+            popover
+            class="dropdown dropdown-end menu w-56 rounded-box bg-base-100 shadow-sm mt-2"
+            style="position-anchor: --mobile-nav-anchor"
+            role="menu"
+          >
+            <li role="none">
+              <button type="button" role="menuitem" (click)="goToHome()">Início</button>
+            </li>
+            <li role="none">
+              <button type="button" role="menuitem" (click)="goToClubsList()">Clubes</button>
+            </li>
+            <li role="none">
+              <button type="button" role="menuitem" (click)="goToCourtsList()">Quadras</button>
+            </li>
+            @if (!isAuthenticated()) {
+              <li role="none">
+                <a role="menuitem" [routerLink]="['/login']">Entrar</a>
+              </li>
+            }
+          </ul>
+        </div>
       </div>
 
-      <app-themeselector />
     </div>
   </div>
 </nav>

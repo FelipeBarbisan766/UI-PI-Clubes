@@ -1,7 +1,15 @@
-<div class="min-h-screen flex flex-col relative pattern-background">
-  <app-navbar/>
-  
-  <main class="flex-grow w-full mt-16">
+<div class="min-h-screen flex flex-col relative pattern-background [--nav-h:3.75rem] md:[--nav-h:4.5rem]">
+
+  <a
+    href="#main-content"
+    class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:start-2 focus:z-[60] focus:btn focus:btn-sm"
+  >
+    Pular para o conteúdo
+  </a>
+
+  <app-navbar />
+
+  <main id="main-content" class="flex-grow w-full" style="padding-top: var(--nav-h)">
     <router-outlet />
   </main>
 
