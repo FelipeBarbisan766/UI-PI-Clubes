@@ -1,13 +1,16 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { catchError, EMPTY, finalize, Observable } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { catchError, EMPTY, finalize, Observable, tap } from 'rxjs';
 
 import {
   ApiReservation,
+  PagedResult,
   Reservation,
+  ReserveQueryParams,
   StatusEnum,
 } from '../models/model-reserve';
 import { environment } from '../../../../environments/environment.development';
+
 
 @Injectable({ providedIn: 'root' })
 export class ReserveService {
@@ -16,28 +19,46 @@ export class ReserveService {
 
   // ── State ────────────────────────────────────────────────────────────────
   private readonly _reservations = signal<Reservation[]>([]);
+  private readonly _totalCount   = signal(0);
+  private readonly _totalPages   = signal(1);
   private readonly _isLoading    = signal(false);
   private readonly _error        = signal<string | null>(null);
 
   readonly reservations = this._reservations.asReadonly();
+  readonly totalCount   = this._totalCount.asReadonly();
+  readonly totalPages   = this._totalPages.asReadonly();
   readonly isLoading    = this._isLoading.asReadonly();
   readonly error        = this._error.asReadonly();
 
   // ── Load ─────────────────────────────────────────────────────────────────
-  loadByClubId(clubId: string): void {
+  loadByClubId(clubId: string, params: ReserveQueryParams): Observable<PagedResult<ApiReservation>> {
     this._isLoading.set(true);
     this._error.set(null);
 
-    this.http
-      .get<ApiReservation[]>(`${this.apiUrl}/reserve/club/${clubId}/details`, {
+    let httpParams = new HttpParams()
+      .set('page', params.page)
+      .set('pageSize', params.pageSize);
+
+    if (params.name) {
+      httpParams = httpParams.set('name', params.name);
+    }
+    if (params.status !== undefined) {
+      httpParams = httpParams.set('status', params.status);
+    }
+
+    return this.http
+      .get<PagedResult<ApiReservation>>(`${this.apiUrl}/reserve/club/${clubId}/details`, {
+        params: httpParams,
         withCredentials: true,
       })
       .pipe(
         catchError(err => this.handleError(err)),
+        tap(result => {
+          this._reservations.set(result.data.map(r => this.mapReservation(r)));
+          this._totalCount.set(result.totalCount);
+          this._totalPages.set(result.totalPages);
+        }),
         finalize(() => this._isLoading.set(false)),
-      )
-      .subscribe(data =>
-        this._reservations.set(data.map(r => this.mapReservation(r)))
       );
   }
 
@@ -52,14 +73,12 @@ export class ReserveService {
       finalize(() => this._isLoading.set(false)),
     )
     .subscribe(() => {
-      // Atualiza o status da reserva localmente
       const updatedReservations = this._reservations().map(r =>
         r.id === id ? { ...r, status: StatusEnum.Confirmada } : r
       );
       this._reservations.set(updatedReservations);
     });
   }
-  
 
   cancel(id: string): void {
     this._isLoading.set(true);
@@ -72,15 +91,12 @@ export class ReserveService {
       finalize(() => this._isLoading.set(false)),
     )
     .subscribe(() => {
-      // Atualiza o status da reserva localmente
       const updatedReservations = this._reservations().map(r =>
         r.id === id ? { ...r, status: StatusEnum.Recusada } : r
       );
       this._reservations.set(updatedReservations);
     });
   }
-
-  
 
   private mapReservation(r: ApiReservation): Reservation {
     return {

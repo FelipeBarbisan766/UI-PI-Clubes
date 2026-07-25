@@ -1,10 +1,12 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { catchError, EMPTY, finalize, Observable } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { catchError, EMPTY, finalize, Observable, tap } from 'rxjs';
 
 import {
   ApiReservation,
+  PagedResult,
   Reservation,
+  ReserveQueryParams,
   StatusEnum,
 } from '../models/model-reserve';
 import { environment } from '../../../../environments/environment.development';
@@ -16,28 +18,47 @@ export class UserReserveService {
 
   // ── State ────────────────────────────────────────────────────────────────
   private readonly _reservations = signal<Reservation[]>([]);
-  private readonly _isLoading    = signal(false);
-  private readonly _error        = signal<string | null>(null);
+  private readonly _totalCount = signal(0);
+  private readonly _totalPages = signal(1);
+  private readonly _isLoading = signal(false);
+  private readonly _error = signal<string | null>(null);
 
   readonly reservations = this._reservations.asReadonly();
-  readonly isLoading    = this._isLoading.asReadonly();
-  readonly error        = this._error.asReadonly();
+  readonly totalCount = this._totalCount.asReadonly();
+  readonly totalPages = this._totalPages.asReadonly();
+  readonly isLoading = this._isLoading.asReadonly();
+  readonly error = this._error.asReadonly();
 
   // ── Load ─────────────────────────────────────────────────────────────────
-  loadByPlayerId(playerId: string): void {
+  loadByPlayerId(
+    playerId: string,
+    params: ReserveQueryParams,
+  ): Observable<PagedResult<ApiReservation>> {
     this._isLoading.set(true);
     this._error.set(null);
 
-    this.http
-      .get<ApiReservation[]>(`${this.apiUrl}/reserve/player/${playerId}/details`, {
+    let httpParams = new HttpParams().set('page', params.page).set('pageSize', params.pageSize);
+
+    if (params.name) {
+      httpParams = httpParams.set('name', params.name);
+    }
+    if (params.status !== undefined) {
+      httpParams = httpParams.set('status', params.status);
+    }
+
+    return this.http
+      .get<PagedResult<ApiReservation>>(`${this.apiUrl}/reserve/player/${playerId}/details`, {
+        params: httpParams,
         withCredentials: true,
       })
       .pipe(
-        catchError(err => this.handleError(err)),
+        catchError((err) => this.handleError(err)),
+        tap((result) => {
+          this._reservations.set(result.data.map((r) => this.mapReservation(r)));
+          this._totalCount.set(result.totalCount);
+          this._totalPages.set(result.totalPages);
+        }),
         finalize(() => this._isLoading.set(false)),
-      )
-      .subscribe(data =>
-        this._reservations.set(data.map(r => this.mapReservation(r)))
       );
   }
 
@@ -45,30 +66,32 @@ export class UserReserveService {
     this._isLoading.set(true);
     this._error.set(null);
 
-    this.http.put(`${this.apiUrl}/reserve/status/${id}?status=Recusada`, null, {
-      withCredentials: true,
-    }).pipe(
-      catchError(err => this.handleError(err)),
-      finalize(() => this._isLoading.set(false)),
-    )
-    .subscribe(() => {
-      const updatedReservations = this._reservations().map(r =>
-        r.id === id ? { ...r, status: StatusEnum.Recusada } : r
-      );
-      this._reservations.set(updatedReservations);
-    });
+    this.http
+      .put(`${this.apiUrl}/reserve/status/${id}?status=Recusada`, null, {
+        withCredentials: true,
+      })
+      .pipe(
+        catchError((err) => this.handleError(err)),
+        finalize(() => this._isLoading.set(false)),
+      )
+      .subscribe(() => {
+        const updatedReservations = this._reservations().map((r) =>
+          r.id === id ? { ...r, status: StatusEnum.Recusada } : r,
+        );
+        this._reservations.set(updatedReservations);
+      });
   }
 
   private mapReservation(r: ApiReservation): Reservation {
     return {
-      id:     r.id,
-      club:   r.club.name,
-      phone:  r.club.phoneNumber,
-      court:  r.schedule.court.name,
-      date:   r.date.slice(0, 10),
-      time:   `${r.schedule.startTime.slice(0, 5)} – ${r.schedule.endTime.slice(0, 5)}`,
+      id: r.id,
+      club: r.club.name,
+      phone: r.club.phoneNumber,
+      court: r.schedule.court.name,
+      date: r.date.slice(0, 10),
+      time: `${r.schedule.startTime.slice(0, 5)} – ${r.schedule.endTime.slice(0, 5)}`,
       status: StatusEnum[r.status as keyof typeof StatusEnum] ?? StatusEnum.Pendente,
-      pricePerHour:  r.schedule.court.pricePerHour,
+      pricePerHour: r.schedule.court.pricePerHour,
     };
   }
 

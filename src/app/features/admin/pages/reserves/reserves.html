@@ -45,10 +45,10 @@
       [formControl]="filterControl"
       aria-label="Filtrar por status da reserva"
     >
-      <option value="all">Todos os status</option>
-      <option value="pending">Pendentes</option>
-      <option value="confirmed">Confirmadas</option>
-      <option value="cancelled">Canceladas</option>
+     <option value="all">Todos os status</option>
+<option [value]="StatusEnum.Pendente">Pendentes</option>
+<option [value]="StatusEnum.Confirmada">Confirmadas</option>
+<option [value]="StatusEnum.Recusada">Canceladas</option>
     </select>
 
   </div>
@@ -97,7 +97,7 @@
           </thead>
 
           <tbody>
-            @for (r of filtered(); track trackById($index, r)) {
+            @for (r of reservations(); track trackById($index, r)) {
               <tr class="hover">
 
                 <!-- Player -->
@@ -130,7 +130,7 @@
                 <td>
                   <div class="flex items-center justify-end gap-1">
 
-                    @if (r.status === 'AguardandoConfirmacao') {
+                    @if (r.status === StatusEnum.Pendente) {
 
                       <!-- Confirm -->
                       <button
@@ -190,7 +190,27 @@
               </tr>
             }
           </tbody>
+<div class="flex items-center justify-between gap-3 p-4 border-t border-base-200">
+  <div class="flex items-center gap-2 text-sm text-base-content/60">
+    <span>Itens por página:</span>
+    <select
+      class="select select-bordered select-sm"
+      [value]="pageSize()"
+      (change)="onPageSizeChange(+$any($event.target).value)"
+      aria-label="Itens por página"
+    >
+      @for (size of pageSizeOptions; track size) {
+        <option [value]="size">{{ size }}</option>
+      }
+    </select>
+  </div>
 
+  <div class="join">
+    <button type="button" class="join-item btn btn-sm" [disabled]="page() === 1" (click)="prevPage()" aria-label="Página anterior">«</button>
+    <button type="button" class="join-item btn btn-sm btn-disabled">Página {{ page() }} de {{ totalPages() }}</button>
+    <button type="button" class="join-item btn btn-sm" [disabled]="page() >= totalPages()" (click)="nextPage()" aria-label="Próxima página">»</button>
+  </div>
+</div>
         </table>
       </div>
     </div>
