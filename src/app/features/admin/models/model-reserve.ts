@@ -39,3 +39,18 @@ export interface Reservation {
   status: StatusEnum;
   pricePerHour:  number;
 }
+
+export interface ReserveQueryParams {
+  page: number;
+  pageSize: number;
+  name?: string;
+  status?: StatusEnum;
+}
+
+export interface PagedResult<T> {
+  data:       T[];
+  totalCount: number;
+  page:       number;
+  pageSize:   number;
+  totalPages: number;
+}

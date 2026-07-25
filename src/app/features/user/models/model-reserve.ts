@@ -2,8 +2,8 @@
 
 export interface ApiReservation {
   id: string;
-  date: string;       
-  status: string;     
+  date: string;
+  status: string;
   club: Club;
   schedule: Schedule;
 }
@@ -14,30 +14,45 @@ export interface Club {
 }
 
 export interface Schedule {
-  startTime: string;  
-  endTime:   string;
-  court:     Court;
+  startTime: string;
+  endTime: string;
+  court: Court;
 }
 
 export interface Court {
-  name:  string;
+  name: string;
   pricePerHour: number;
-  type:  string;
+  type: string;
 }
 
 export enum StatusEnum {
   Pendente = 'AguardandoConfirmacao',
   Confirmada = 'Confirmada',
-  Recusada = 'Recusada'
+  Recusada = 'Recusada',
 }
 
 export interface Reservation {
-  id:     string;
-  club:   string;
+  id: string;
+  club: string;
   phone: string;
-  court:  string;
-  date:   string; 
-  time:   string; 
+  court: string;
+  date: string;
+  time: string;
   status: StatusEnum;
-  pricePerHour:  number;
+  pricePerHour: number;
+}
+
+export interface ReserveQueryParams {
+  page: number;
+  pageSize: number;
+  name?: string;
+  status?: StatusEnum;
+}
+
+export interface PagedResult<T> {
+  data: T[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
 }
