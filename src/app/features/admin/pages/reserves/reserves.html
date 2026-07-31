@@ -207,7 +207,7 @@
 
   <div class="join">
     <button type="button" class="join-item btn btn-sm" [disabled]="page() === 1" (click)="prevPage()" aria-label="Página anterior">«</button>
-    <button type="button" class="join-item btn btn-sm btn-disabled">Página {{ page() }} de {{ totalPages() }}</button>
+    <button type="button" class="join-item btn btn-sm">Página {{ page() }} de {{ totalPages() }}</button>
     <button type="button" class="join-item btn btn-sm" [disabled]="page() >= totalPages()" (click)="nextPage()" aria-label="Próxima página">»</button>
   </div>
 </div>
