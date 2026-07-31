@@ -54,7 +54,7 @@ export class UserReserve implements OnInit {
 
   private readonly playerId = signal<string | null>(null);
   protected readonly page = signal(1);
-  protected readonly pageSize = signal<number>(PAGE_SIZE_OPTIONS[1]);
+  protected readonly pageSize = signal<number>(PAGE_SIZE_OPTIONS[0]);
 
   private readonly search$ = toSignal(
     this.searchControl.valueChanges.pipe(debounceTime(300), distinctUntilChanged()),
@@ -82,7 +82,6 @@ private readonly queryState$ = toObservable(this.queryState);
 
   // ── Lifecycle ─────────────────────────────────────────────────────────────
   ngOnInit(): void {
-    // 1. Busca o jogador logado e seta o playerId
     this.authService.getPlayerMe().pipe(
       takeUntilDestroyed(this.destroyRef),
     ).subscribe({
@@ -90,7 +89,6 @@ private readonly queryState$ = toObservable(this.queryState);
       error: (err: Error) => console.error('Erro ao carregar jogador:', err),
     });
 
-    // 2. Busca ou filtro de status mudaram → volta pra página 1
     merge(
       this.searchControl.valueChanges.pipe(debounceTime(300), distinctUntilChanged()),
       this.filterControl.valueChanges,
@@ -98,7 +96,6 @@ private readonly queryState$ = toObservable(this.queryState);
       takeUntilDestroyed(this.destroyRef),
     ).subscribe(() => this.page.set(1));
 
-    // 3. Qualquer mudança relevante (playerId/page/pageSize/name/status) → recarrega do backend
     this.queryState$.pipe(
       filter((state): state is typeof state & { playerId: string } => state.playerId !== null),
       switchMap(state =>

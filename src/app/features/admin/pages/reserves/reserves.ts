@@ -46,7 +46,7 @@ export class Reserve implements OnInit {
 
   private readonly clubId     = signal<string | null>(null);
   protected readonly page     = signal(1);
-  protected readonly pageSize = signal<number>(PAGE_SIZE_OPTIONS[1]);
+  protected readonly pageSize = signal<number>(PAGE_SIZE_OPTIONS[0]);
 
   private readonly search$       = toSignal(
     this.searchControl.valueChanges.pipe(debounceTime(300), distinctUntilChanged()),

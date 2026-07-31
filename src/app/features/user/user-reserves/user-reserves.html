@@ -167,7 +167,6 @@
                   </div>
                 </td>
               </tr>
-
             } @empty {
               <tr>
                 <td colspan="7" class="py-12 text-center text-base-content/50">
@@ -198,42 +197,42 @@
             <div class="flex items-center gap-2 text-sm text-base-content/60">
               <span>Itens por página:</span>
               <select
-              class="select select-bordered select-sm"
-              [value]="pageSize()"
-              (change)="onPageSizeChange(+$any($event.target).value)"
-              aria-label="Itens por página"
-            >
-              @for (size of pageSizeOptions; track size) {
-                <option [value]="size">{{ size }}</option>
-              }
-            </select>
+                class="select select-bordered select-sm"
+                [value]="pageSize()"
+                (change)="onPageSizeChange(+$any($event.target).value)"
+                aria-label="Itens por página"
+              >
+                @for (size of pageSizeOptions; track size) {
+                  <option [value]="size">{{ size }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="join">
+              <button
+                type="button"
+                class="join-item btn btn-sm"
+                [disabled]="page() === 1"
+                (click)="prevPage()"
+                aria-label="Página anterior"
+              >
+                «
+              </button>
+              <button type="button" class="join-item btn btn-sm">
+                Página {{ page() }} de {{ totalPages() }}
+              </button>
+              <button
+                type="button"
+                class="join-item btn btn-sm"
+                [disabled]="page() >= totalPages()"
+                (click)="nextPage()"
+                aria-label="Próxima página"
+              >
+                »
+              </button>
+            </div>
           </div>
-          
-          <div class="join">
-            <button
-              type="button"
-              class="join-item btn btn-sm"
-              [disabled]="page() === 1"
-              (click)="prevPage()"
-              aria-label="Página anterior"
-            >
-              «
-            </button>
-            <button type="button" class="join-item btn btn-sm btn-disabled">
-              Página {{ page() }} de {{ totalPages() }}
-            </button>
-            <button
-              type="button"
-              class="join-item btn btn-sm"
-              [disabled]="page() >= totalPages()"
-              (click)="nextPage()"
-              aria-label="Próxima página"
-            >
-              »
-            </button>
-          </div>
-        </div>
-      </table>
+        </table>
       </div>
     </div>
   }
