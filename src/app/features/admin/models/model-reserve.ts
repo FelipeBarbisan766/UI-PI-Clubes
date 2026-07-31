@@ -1,9 +1,9 @@
 // ── API response shape (espelha ResponseReserveDetailDTO do backend) ─────────
 
-export interface ApiReservation {
+export interface ResponseReserveDetailDTO {
   id: string;
   date: string;       // DateTime → "2026-03-03T00:00:00"
-  status: string;     // StatusEnum como string: "Pending" | "Confirmed" | "Cancelled"
+  status: StatusEnum;     // StatusEnum como string: "Pending" | "Confirmed" | "Cancelled"
   player: ApiPlayer;
   schedule: ApiSchedule;
 }
