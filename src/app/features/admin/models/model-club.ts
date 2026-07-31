@@ -1,4 +1,5 @@
 import { TypeEnum } from './model-court';
+import { ResponseReserveDetailDTO } from './model-reserve';
 
 export interface CreateClubDTO {
   adminId: string;
@@ -43,6 +44,13 @@ export interface ResponseClubDTO {
   courtCount: number;
   types: TypeEnum[];
   imagesUrls: string[];
+}
+
+export interface ResponseDashboardDTO {
+  quantCourt: number;
+  quantReserveToday: number;
+  countPlayers: number;
+  clubReserve: ResponseReserveDetailDTO[];
 }
 
 export interface ResponseClubByIdDTO {

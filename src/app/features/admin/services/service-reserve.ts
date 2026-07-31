@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { catchError, EMPTY, finalize, Observable, tap } from 'rxjs';
 
 import {
-  ApiReservation,
+  ResponseReserveDetailDTO,
   PagedResult,
   Reservation,
   ReserveQueryParams,
@@ -31,7 +31,7 @@ export class ReserveService {
   readonly error        = this._error.asReadonly();
 
   // ── Load ─────────────────────────────────────────────────────────────────
-  loadByClubId(clubId: string, params: ReserveQueryParams): Observable<PagedResult<ApiReservation>> {
+  loadByClubId(clubId: string, params: ReserveQueryParams): Observable<PagedResult<ResponseReserveDetailDTO>> {
     this._isLoading.set(true);
     this._error.set(null);
 
@@ -47,7 +47,7 @@ export class ReserveService {
     }
 
     return this.http
-      .get<PagedResult<ApiReservation>>(`${this.apiUrl}/reserve/club/${clubId}/details`, {
+      .get<PagedResult<ResponseReserveDetailDTO>>(`${this.apiUrl}/reserve/club/${clubId}/details`, {
         params: httpParams,
         withCredentials: true,
       })
@@ -98,7 +98,7 @@ export class ReserveService {
     });
   }
 
-  private mapReservation(r: ApiReservation): Reservation {
+  private mapReservation(r: ResponseReserveDetailDTO): Reservation {
     return {
       id:     r.id,
       player: r.player.name,

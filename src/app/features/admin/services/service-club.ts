@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { Observable, tap, catchError, throwError } from 'rxjs';
-import { ResponseClubDTO, ResponseClubByIdDTO, CreateClubDTO, UpdateClubDTO } from '../models/model-club';
+import { ResponseClubDTO, ResponseClubByIdDTO, CreateClubDTO, UpdateClubDTO, ResponseDashboardDTO } from '../models/model-club';
 import { environment } from '../../../../environments/environment';
 
 export interface ClubState {
@@ -21,12 +21,14 @@ export class ServiceClub {
   // --- State ---
   private readonly _clubs = signal<ResponseClubDTO[]>([]);
   private readonly _selectedClub = signal<ResponseClubByIdDTO | null>(null);
+  private readonly _dashboard = signal<ResponseDashboardDTO | null>(null);
   private readonly _loading = signal<boolean>(false);
   private readonly _error = signal<string | null>(null);
 
   // --- Selectors (public, readonly) ---
   readonly clubs = this._clubs.asReadonly();
   readonly selectedClub = this._selectedClub.asReadonly();
+  readonly dashboard = this._dashboard.asReadonly();
   readonly loading = this._loading.asReadonly();
   readonly error = this._error.asReadonly();
 
@@ -55,6 +57,19 @@ export class ServiceClub {
     return this.http.get<ResponseClubByIdDTO>(`${this.apiUrl}/${id}`).pipe(
       tap((club) => {
         this._selectedClub.set(club);
+        this._loading.set(false);
+      }),
+      catchError((err) => this.handleError(err)),
+    );
+  }
+
+  getDashboard(clubId: string): Observable<ResponseDashboardDTO> {
+    this._loading.set(true);
+    this._error.set(null);
+
+    return this.http.get<ResponseDashboardDTO>(`${this.apiUrl}/${clubId}/dashboard`).pipe(
+      tap((dashboard) => {
+        this._dashboard.set(dashboard);
         this._loading.set(false);
       }),
       catchError((err) => this.handleError(err)),
