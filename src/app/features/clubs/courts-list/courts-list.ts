@@ -165,7 +165,7 @@ export class CourtsList {
   }
 
   selectCourt(court: ResponseCourtDTO): void {
-    this.router.navigate(['/courts', court.id]);
+    this.router.navigate(['clubs', court.clubId, 'court', court.id]);
   }
 
   getFirstImage(court: ResponseCourtDTO): string | null {
