@@ -36,6 +36,11 @@ export const routes: Routes = [
           import('./features/clubs/clubs-details/clubs-details').then((m) => m.ClubsDetail),
       },
       {
+        path: 'clubs/:clubId/court/:courtId',
+        loadComponent: () =>
+          import('./features/clubs/clubs-details/clubs-details').then((m) => m.ClubsDetail),
+      },
+      {
         path: 'login',
         canActivate: [guestGuard],
         loadComponent: () => import('./features/auth/pages/login/login').then((m) => m.Login),

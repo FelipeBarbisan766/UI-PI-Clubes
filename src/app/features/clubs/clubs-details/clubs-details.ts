@@ -7,10 +7,12 @@ import {
   inject,
   Signal,
   signal,
+  Injector,
+  afterNextRender,
 } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { NgOptimizedImage, NgClass } from '@angular/common';
+import { NgOptimizedImage, NgClass, ViewportScroller } from '@angular/common';
 import { EMPTY, catchError, distinctUntilChanged, map, switchMap } from 'rxjs';
 import { TypeEnum, SurfaceEnum, ResponseCourtDTO } from '../models/model-court';
 import { ResponseClubByIdDTO } from '../models/model-club';
@@ -112,26 +114,22 @@ function buildAvailableDates(days = 7): string[] {
 }
 
 function mapAvailabilityToSlots(dtos: ScheduleAvailabilityDTO[], date: string): TimeSlot[] {
-  return dtos.map(dto => ({
-    id:        dto.id,
+  return dtos.map((dto) => ({
+    id: dto.id,
     date,
     startTime: dto.startTime.slice(0, 5),
-    endTime:   dto.endTime.slice(0, 5),
+    endTime: dto.endTime.slice(0, 5),
     available: dto.isAvailable,
   }));
 }
 
-// ── View model ───────────────────────────────────────────────────────────────
-
 export interface TimeSlot {
-  id:        string;
-  date:      string;      
-  startTime: string;      
-  endTime:   string;      
-  available: boolean;     
+  id: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  available: boolean;
 }
-
-// ── Componente ───────────────────────────────────────────────────────────────
 
 @Component({
   selector: 'app-clubs-detail',
@@ -140,68 +138,93 @@ export interface TimeSlot {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ClubsDetail {
-  private readonly route           = inject(ActivatedRoute);
-  private readonly router          = inject(Router);
-  private readonly clubService     = inject(ServiceClub);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly clubService = inject(ServiceClub);
   private readonly scheduleService = inject(ServiceSchedule);
-  private readonly reserveService  = inject(ServiceReserve);
-  private readonly authService     = inject(AuthService);
-  private readonly destroyRef      = inject(DestroyRef);
-  private readonly sanitizer       = inject(DomSanitizer);
+  private readonly reserveService = inject(ServiceReserve);
+  private readonly authService = inject(AuthService);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly sanitizer = inject(DomSanitizer);
+  private readonly injector = inject(Injector);
+  private readonly viewportScroller = inject(ViewportScroller);
 
   private readonly routeClubId = toSignal(
     this.route.paramMap.pipe(
-      map(params => params.get('clubId')),
+      map((params) => params.get('clubId')),
       distinctUntilChanged(),
     ),
     { initialValue: this.route.snapshot.paramMap.get('clubId') },
   );
 
+  private readonly routeCourtId = toSignal(
+    this.route.paramMap.pipe(
+      map((params) => params.get('courtId')),
+      distinctUntilChanged(),
+    ),
+    { initialValue: this.route.snapshot.paramMap.get('courtId') },
+  );
+
   // ── Estado do clube (delegado ao serviço) ──
-  readonly club    = this.clubService.selectedClub;
+  readonly club = this.clubService.selectedClub;
   readonly loading = this.clubService.loading;
-  readonly error   = this.clubService.error;
+  readonly error = this.clubService.error;
 
   // ── Estado dos slots (delegado ao serviço) ──
   readonly slotsLoading = this.scheduleService.loading;
-  readonly slotsError   = this.scheduleService.error;
+  readonly slotsError = this.scheduleService.error;
 
   // ── Estado local de UI ──
-  readonly selectedCourt    = signal<ResponseCourtDTO | null>(null);
-  readonly selectedDate     = signal<string>('');
-  readonly availableDates   = signal<string[]>([]);
-  readonly slotsForDate     = signal<TimeSlot[]>([]);
-  readonly bookingSlot      = signal<TimeSlot | null>(null);
+  readonly selectedCourt = signal<ResponseCourtDTO | null>(null);
+  readonly selectedDate = signal<string>('');
+  readonly availableDates = signal<string[]>([]);
+  readonly slotsForDate = signal<TimeSlot[]>([]);
+  readonly bookingSlot = signal<TimeSlot | null>(null);
   readonly bookingModalOpen = signal(false);
 
   // ── Estado do fluxo de confirmação ──
-  readonly isConfirming  = signal(false);
-  readonly bookingError  = signal<string | null>(null);
+  readonly isConfirming = signal(false);
+  readonly bookingError = signal<string | null>(null);
   readonly bookingSuccess = signal(false);
 
   /** Tipos únicos de todas as quadras do clube (usado na sidebar). */
-  readonly courtTypes = computed(() =>
-    [...new Set(this.club()?.courts.map(c => c.type) ?? [])]
-  );
+  readonly courtTypes = computed(() => [...new Set(this.club()?.courts.map((c) => c.type) ?? [])]);
 
   private readonly courtAndDate = computed(() => ({
     court: this.selectedCourt(),
-    date:  this.selectedDate(),
+    date: this.selectedDate(),
   }));
 
   constructor() {
     effect((onCleanup) => {
       const clubId = this.routeClubId();
       if (!clubId) {
-        this.resetCourtSelection();
+        this.selectedCourt.set(null);
+        this.resetBookingUiState();
         return;
       }
-      this.resetCourtSelection();
+      this.selectedCourt.set(null); // evita "vazar" a quadra do clube anterior enquanto carrega
+      this.resetBookingUiState();
       const subscription = this.clubService.getById(clubId).subscribe();
       onCleanup(() => subscription.unsubscribe());
     });
 
-    // 2️⃣ Reconstrói a lista de datas disponíveis quando uma quadra é selecionada.
+    effect(() => {
+      const club = this.club();
+      const courtId = this.routeCourtId();
+      if (!club) return;
+
+      if (courtId) {
+        const court = club.courts.find((c) => c.id === courtId) ?? null;
+        this.selectedCourt.set(court);
+        if (court) {
+          this.scrollToSchedule();
+        }
+      } else {
+        this.selectedCourt.set(null);
+      }
+    });
+
     effect(() => {
       const court = this.selectedCourt();
       if (!court) {
@@ -229,13 +252,13 @@ export class ClubsDetail {
           if (!court || !date) return EMPTY;
 
           return this.scheduleService.getAvailability(court.id, date).pipe(
-            map(dtos => mapAvailabilityToSlots(dtos, date)),
+            map((dtos) => mapAvailabilityToSlots(dtos, date)),
             catchError(() => EMPTY),
           );
         }),
         takeUntilDestroyed(this.destroyRef),
       )
-      .subscribe(slots => this.slotsForDate.set(slots));
+      .subscribe((slots) => this.slotsForDate.set(slots));
   }
 
   // ── URL do mapa ──────────────────────────────────────────────────────────
@@ -299,40 +322,42 @@ export class ClubsDetail {
     this.isConfirming.set(true);
     this.bookingError.set(null);
 
-    this.authService.getPlayerMe().pipe(
-      switchMap(player =>
-        this.reserveService.create({
-          date:       `${slot.date}T00:00:00`,
-          scheduleId: slot.id,
-          playerId:   player.id,
-        })
-      ),
-      takeUntilDestroyed(this.destroyRef),
-    ).subscribe({
-      next: () => {
-        this.isConfirming.set(false);
-        this.bookingSuccess.set(true);
-      },
-      error: (err: Error) => {
-        this.isConfirming.set(false);
-        this.bookingError.set(err.message);
-      },
-    });
+    this.authService
+      .getPlayerMe()
+      .pipe(
+        switchMap((player) =>
+          this.reserveService.create({
+            date: `${slot.date}T00:00:00`,
+            scheduleId: slot.id,
+            playerId: player.id,
+          }),
+        ),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: () => {
+          this.isConfirming.set(false);
+          this.bookingSuccess.set(true);
+        },
+        error: (err: Error) => {
+          this.isConfirming.set(false);
+          this.bookingError.set(err.message);
+        },
+      });
   }
 
   // ── Helpers expostos ao template ─────────────────────────────────────────
 
-  readonly sanitizePhone  = sanitizePhone;
-  readonly formatPrice    = formatPrice;
-  readonly formatDate     = formatDate;
-  readonly getFirstImage  = getFirstImage;
-  readonly getTypeName    = getTypeName;
+  readonly sanitizePhone = sanitizePhone;
+  readonly formatPrice = formatPrice;
+  readonly formatDate = formatDate;
+  readonly getFirstImage = getFirstImage;
+  readonly getTypeName = getTypeName;
   readonly getSurfaceName = getSurfaceName;
 
   // ── Helpers privados ─────────────────────────────────────────────────────
 
-  private resetCourtSelection(): void {
-    this.selectedCourt.set(null);
+  private resetBookingUiState(): void {
     this.selectedDate.set('');
     this.availableDates.set([]);
     this.slotsForDate.set([]);
@@ -341,5 +366,10 @@ export class ClubsDetail {
     this.bookingError.set(null);
     this.bookingSuccess.set(false);
     this.isConfirming.set(false);
+  }
+  private scrollToSchedule(): void {
+    afterNextRender(() => this.viewportScroller.scrollToAnchor('slots-section'), {
+      injector: this.injector,
+    });
   }
 }

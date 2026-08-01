@@ -1,4 +1,4 @@
-<div class="min-h-screen flex flex-col bg-base-100 text-base-content pt-20">
+<div class="min-h-screen flex flex-col bg-base-100 text-base-content">
   @if (loading()) {
     <div
       class="flex flex-col items-center justify-center py-32 gap-4 text-base-content/60"
@@ -215,10 +215,11 @@
 
           <!-- Horários disponíveis -->
           @if (selectedCourt()) {
-            <section aria-labelledby="slots-heading">
+            <section id="slots-section" aria-labelledby="slots-heading" class="scroll-mt-24">
               <h2 id="slots-heading" class="text-xl font-bold text-base-content mb-4">
                 Horários — {{ selectedCourt()!.name }}
               </h2>
+              ...
 
               <!-- Seleção de data -->
               <div
@@ -273,11 +274,19 @@
                           !slot.available,
                       }"
                       [attr.aria-label]="
-                        slot.startTime + ' - ' + slot.endTime + (slot.available ? ' disponível' : ' indisponível')
+                        slot.startTime +
+                        ' - ' +
+                        slot.endTime +
+                        (slot.available ? ' disponível' : ' indisponível')
                       "
                       [attr.aria-disabled]="!slot.available"
                     >
-                      {{ slot.startTime + ' - ' + slot.endTime + (slot.available ? ' disponível' : ' indisponível') }}
+                      {{
+                        slot.startTime +
+                          ' - ' +
+                          slot.endTime +
+                          (slot.available ? ' disponível' : ' indisponível')
+                      }}
 
                       <!-- @if (!slot.available) {
                         <div class="text-[10px] uppercase tracking-wider mt-0.5">
