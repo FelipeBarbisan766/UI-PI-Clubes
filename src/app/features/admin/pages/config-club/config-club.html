@@ -53,7 +53,7 @@
             </h2>
             <div class="flex flex-wrap gap-2">
               <span
-                class="inline-flex items-center gap-1 rounded-full bg-base-200 px-3 py-1 text-xs font-semibold text-base-content/60"
+                class="inline-flex items-center gap-1 rounded-lg bg-base-200 px-3 py-1 text-xs font-semibold text-base-content/60"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -83,7 +83,7 @@
           <div class="flex gap-2 shrink-0">
             <button
               type="button"
-              class="btn btn-ghost btn-sm rounded-full gap-2 border border-base-300 hover:border-primary hover:text-primary font-semibold"
+              class="btn btn-ghost btn-sm rounded-lg gap-2 border border-base-300 hover:border-primary hover:text-primary font-semibold"
               aria-label="Editar configurações do clube"
               (click)="openEdit()"
             >
@@ -106,7 +106,7 @@
             </button>
             <button
               type="button"
-              class="btn btn-ghost btn-sm rounded-full gap-2 border border-base-300 hover:border-error hover:text-error font-semibold"
+              class="btn btn-ghost btn-sm rounded-lg gap-2 border border-base-300 hover:border-error hover:text-error font-semibold"
               aria-label="Excluir clube"
               (click)="requestDelete()"
             >
@@ -284,7 +284,7 @@
               id="name"
               type="text"
               formControlName="name"
-              class="input input-bordered input-sm rounded-xl w-full"
+              class="input input-bordered input-sm rounded-lg w-full"
               [class.input-error]="fieldInvalid('name')"
               [attr.aria-invalid]="fieldInvalid('name')"
               [attr.aria-describedby]="fieldInvalid('name') ? 'name-error' : null"
@@ -312,7 +312,7 @@
               type="text"
               formControlName="phoneNumber"
               mask="(00) 00000-0000"
-              class="input input-bordered input-sm rounded-xl w-full"
+              class="input input-bordered input-sm rounded-lg w-full"
               [class.input-error]="fieldInvalid('phoneNumber')"
               [attr.aria-invalid]="fieldInvalid('phoneNumber')"
               [attr.aria-describedby]="fieldInvalid('phoneNumber') ? 'phoneNumber-error' : null"
@@ -337,7 +337,7 @@
             <textarea
               id="description"
               formControlName="description"
-              class="textarea textarea-bordered textarea-sm rounded-xl h-20 resize-none w-full"
+              class="textarea textarea-bordered textarea-sm rounded-lg h-20 resize-none w-full"
               [class.textarea-error]="fieldInvalid('description')"
               [attr.aria-invalid]="fieldInvalid('description')"
               [attr.aria-describedby]="fieldInvalid('description') ? 'description-error' : null"
@@ -371,7 +371,7 @@
                 type="text"
                 formControlName="zipCode"
                 mask="00000-000"
-                class="input input-bordered input-sm rounded-xl w-full bg-base-100"
+                class="input input-bordered input-sm rounded-lg w-full bg-base-100"
                 [class.input-error]="fieldInvalid('zipCode')"
                 [attr.aria-invalid]="fieldInvalid('zipCode')"
                 [attr.aria-describedby]="fieldInvalid('zipCode') ? 'zipCode-error' : null"
@@ -396,7 +396,7 @@
                 id="street"
                 type="text"
                 formControlName="street"
-                class="input input-bordered input-sm rounded-xl w-full bg-base-100"
+                class="input input-bordered input-sm rounded-lg w-full bg-base-100"
                 [class.input-error]="fieldInvalid('street')"
                 [attr.aria-invalid]="fieldInvalid('street')"
                 [attr.aria-describedby]="fieldInvalid('street') ? 'street-error' : null"
@@ -421,7 +421,7 @@
                 id="number"
                 type="text"
                 formControlName="number"
-                class="input input-bordered input-sm rounded-xl w-full bg-base-100"
+                class="input input-bordered input-sm rounded-lg w-full bg-base-100"
                 [class.input-error]="fieldInvalid('number')"
                 [attr.aria-invalid]="fieldInvalid('number')"
                 [attr.aria-describedby]="fieldInvalid('number') ? 'number-error' : null"
@@ -446,7 +446,7 @@
                 id="complement"
                 type="text"
                 formControlName="complement"
-                class="input input-bordered input-sm rounded-xl w-full bg-base-100"
+                class="input input-bordered input-sm rounded-lg w-full bg-base-100"
                 placeholder="Opcional"
               />
             </div>
@@ -461,7 +461,7 @@
                 id="neighborhood"
                 type="text"
                 formControlName="neighborhood"
-                class="input input-bordered input-sm rounded-xl w-full bg-base-100"
+                class="input input-bordered input-sm rounded-lg w-full bg-base-100"
                 [class.input-error]="fieldInvalid('neighborhood')"
                 [attr.aria-invalid]="fieldInvalid('neighborhood')"
                 [attr.aria-describedby]="fieldInvalid('neighborhood') ? 'neighborhood-error' : null"
@@ -486,7 +486,7 @@
                 id="city"
                 type="text"
                 formControlName="city"
-                class="input input-bordered input-sm rounded-xl w-full bg-base-100"
+                class="input input-bordered input-sm rounded-lg w-full bg-base-100"
                 [class.input-error]="fieldInvalid('city')"
                 [attr.aria-invalid]="fieldInvalid('city')"
                 [attr.aria-describedby]="fieldInvalid('city') ? 'city-error' : null"
@@ -511,7 +511,7 @@
                 id="state"
                 type="text"
                 formControlName="state"
-                class="input input-bordered input-sm rounded-xl w-full bg-base-100"
+                class="input input-bordered input-sm rounded-lg w-full bg-base-100"
                 [class.input-error]="fieldInvalid('state')"
                 [attr.aria-invalid]="fieldInvalid('state')"
                 [attr.aria-describedby]="fieldInvalid('state') ? 'state-error' : null"
@@ -536,7 +536,7 @@
                 id="country"
                 type="text"
                 formControlName="country"
-                class="input input-bordered input-sm rounded-xl w-full bg-base-100"
+                class="input input-bordered input-sm rounded-lg w-full bg-base-100"
                 [class.input-error]="fieldInvalid('country')"
                 [attr.aria-invalid]="fieldInvalid('country')"
                 [attr.aria-describedby]="fieldInvalid('country') ? 'country-error' : null"
@@ -557,14 +557,14 @@
         <div class="flex justify-end items-center gap-3 pt-4 mt-1 border-t border-base-200">
           <button
             type="button"
-            class="btn btn-ghost btn-sm rounded-full px-5"
+            class="btn btn-ghost btn-sm rounded-lg px-5"
             (click)="closeForm()"
           >
             Cancelar
           </button>
           <button
             type="submit"
-            class="btn btn-primary btn-sm rounded-full px-7 font-semibold text-primary-content"
+            class="btn btn-primary btn-sm text-white rounded-lg px-7 font-semibold text-primary-content"
             [disabled]="!isSubmitEnabled() || clubService.loading()"
           >
             @if (clubService.loading()) {

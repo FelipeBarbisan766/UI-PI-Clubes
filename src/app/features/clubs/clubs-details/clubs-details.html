@@ -18,7 +18,7 @@
         class="alert alert-soft alert-error p-8 flex-col text-center rounded-2xl"
       >
         <p class="font-medium">{{ error() }}</p>
-        <button class="btn btn-sm btn-error rounded-full mt-2" (click)="loadClub()">
+        <button class="btn btn-sm btn-error rounded-lg mt-2" (click)="loadClub()">
           Tentar novamente
         </button>
       </div>
@@ -219,7 +219,7 @@
               <h2 id="slots-heading" class="text-xl font-bold text-base-content mb-4">
                 Horários — {{ selectedCourt()!.name }}
               </h2>
-              ...
+              
 
               <!-- Seleção de data -->
               <div
@@ -415,7 +415,7 @@
 
         <div class="modal-action mt-6 flex gap-3">
           <button
-            class="btn btn-ghost rounded-full flex-1"
+            class="btn btn-ghost rounded-lg flex-1"
             (click)="closeBookingModal()"
             [disabled]="isConfirming()"
             aria-label="Cancelar reserva"
@@ -423,7 +423,7 @@
             Cancelar
           </button>
           <button
-            class="btn btn-primary rounded-full flex-1"
+            class="btn btn-primary text-white rounded-lg flex-1"
             (click)="confirmBooking()"
             [disabled]="isConfirming()"
             [attr.aria-busy]="isConfirming()"
