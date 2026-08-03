@@ -1,7 +1,7 @@
-<div class="drawer lg:drawer-open">
+<div class="flex-1 overflow-y-auto drawer lg:drawer-open">
   <input id="admin-drawer" type="checkbox" class="drawer-toggle" />
 
-  <div class="drawer-content flex flex-col min-h-screen bg-base-100">
+  <div class="drawer-content flex flex-col bg-base-100">
 
     <nav class="navbar w-full bg-base-300 lg:hidden">
       <label for="admin-drawer" aria-label="Abrir menu" class="btn btn-square btn-ghost">
@@ -14,7 +14,7 @@
       <span class="px-2 font-semibold">{{ clubName() }}</span>
     </nav>
 
-    <div class="p-4 flex-1">
+    <div class="p-4 flex-1 overflow-y-auto">
       <div class="mx-auto max-w-7xl w-full">
         <div class="px-4">
           <app-breadcrumb></app-breadcrumb>

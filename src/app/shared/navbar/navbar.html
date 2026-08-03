@@ -2,7 +2,7 @@
   aria-label="Principal"
   class="fixed top-0 inset-x-0 z-50 h-[var(--nav-h)] transition-all duration-300 border-b border-white/5 bg-neutral/80 backdrop-blur-md"
 >
-  <div class="container mx-auto max-w-6xl px-4 h-full">
+  <div class="container mx-auto px-4 h-full">
     <div class="navbar h-full min-h-0 p-0">
 
       <div class="navbar-start">
@@ -13,9 +13,9 @@
         >
           Clubera
         </button>
-      </div>
 
-      <div class="navbar-center hidden md:flex">
+      
+       <div class="ml-6 hidden md:flex">
         <ul class="menu menu-horizontal px-1 gap-1">
           <li>
             <button
@@ -57,22 +57,24 @@
           }
         </ul>
       </div>
+      </div>
+
+      
 
       <div class="navbar-end gap-2">
-        <app-themeselector />
 
         @if (!isAuthenticated()) {
           <button
             type="button"
             (click)="goToSignUp()"
-            class="btn btn-sm rounded-full btn-primary border-none text-white shadow-none font-bold"
+            class="btn btn-sm rounded-lg btn-primary border-none text-white shadow-none font-bold"
           >
             Cadastrar-se
           </button>
         } @else {
           <button
             type="button"
-            class="btn btn-sm rounded-full btn-outline text-white border-white/30 hover:bg-white/10"
+            class="btn btn-sm rounded-lg btn-outline text-white border-white/30 hover:bg-white/10"
             popovertarget="user-menu-popover"
             style="anchor-name: --user-menu-anchor"
             aria-haspopup="menu"
@@ -105,7 +107,8 @@
           </ul>
         }
 
-        <!-- Menu mobile: contém os links de navegação que somem em telas pequenas -->
+        <app-themeselector />
+
         <div class="md:hidden">
           <button
             type="button"
