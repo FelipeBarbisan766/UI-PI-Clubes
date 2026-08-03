@@ -11,7 +11,6 @@ import {
 } from '../models/model-reserve';
 import { environment } from '../../../../environments/environment.development';
 
-
 @Injectable({ providedIn: 'root' })
 export class ReserveService {
   private readonly http = inject(HttpClient);
@@ -19,25 +18,26 @@ export class ReserveService {
 
   // ── State ────────────────────────────────────────────────────────────────
   private readonly _reservations = signal<Reservation[]>([]);
-  private readonly _totalCount   = signal(0);
-  private readonly _totalPages   = signal(1);
-  private readonly _isLoading    = signal(false);
-  private readonly _error        = signal<string | null>(null);
+  private readonly _totalCount = signal(0);
+  private readonly _totalPages = signal(1);
+  private readonly _isLoading = signal(false);
+  private readonly _error = signal<string | null>(null);
 
   readonly reservations = this._reservations.asReadonly();
-  readonly totalCount   = this._totalCount.asReadonly();
-  readonly totalPages   = this._totalPages.asReadonly();
-  readonly isLoading    = this._isLoading.asReadonly();
-  readonly error        = this._error.asReadonly();
+  readonly totalCount = this._totalCount.asReadonly();
+  readonly totalPages = this._totalPages.asReadonly();
+  readonly isLoading = this._isLoading.asReadonly();
+  readonly error = this._error.asReadonly();
 
   // ── Load ─────────────────────────────────────────────────────────────────
-  loadByClubId(clubId: string, params: ReserveQueryParams): Observable<PagedResult<ResponseReserveDetailDTO>> {
+  loadByClubId(
+    clubId: string,
+    params: ReserveQueryParams,
+  ): Observable<PagedResult<ResponseReserveDetailDTO>> {
     this._isLoading.set(true);
     this._error.set(null);
 
-    let httpParams = new HttpParams()
-      .set('page', params.page)
-      .set('pageSize', params.pageSize);
+    let httpParams = new HttpParams().set('page', params.page).set('pageSize', params.pageSize);
 
     if (params.name) {
       httpParams = httpParams.set('name', params.name);
@@ -52,9 +52,9 @@ export class ReserveService {
         withCredentials: true,
       })
       .pipe(
-        catchError(err => this.handleError(err)),
-        tap(result => {
-          this._reservations.set(result.data.map(r => this.mapReservation(r)));
+        catchError((err) => this.handleError(err)),
+        tap((result) => {
+          this._reservations.set(result.data.map((r) => this.mapReservation(r)));
           this._totalCount.set(result.totalCount);
           this._totalPages.set(result.totalPages);
         }),
@@ -66,47 +66,53 @@ export class ReserveService {
     this._isLoading.set(true);
     this._error.set(null);
 
-    this.http.put(`${this.apiUrl}/reserve/status/${id}?status=Confirmada`, null, {
-      withCredentials: true,
-    }).pipe(
-      catchError(err => this.handleError(err)),
-      finalize(() => this._isLoading.set(false)),
-    )
-    .subscribe(() => {
-      const updatedReservations = this._reservations().map(r =>
-        r.id === id ? { ...r, status: StatusEnum.Confirmada } : r
-      );
-      this._reservations.set(updatedReservations);
-    });
+    this.http
+      .put(`${this.apiUrl}/reserve/status/${id}?status=Confirmada`, null, {
+        withCredentials: true,
+      })
+      .pipe(
+        catchError((err) => this.handleError(err)),
+        finalize(() => this._isLoading.set(false)),
+      )
+      .subscribe(() => {
+        const updatedReservations = this._reservations().map((r) =>
+          r.id === id ? { ...r, status: StatusEnum.Confirmada } : r,
+        );
+        this._reservations.set(updatedReservations);
+      });
   }
 
   cancel(id: string): void {
     this._isLoading.set(true);
     this._error.set(null);
 
-    this.http.put(`${this.apiUrl}/reserve/status/${id}?status=Recusada`, null, {
-      withCredentials: true,
-    }).pipe(
-      catchError(err => this.handleError(err)),
-      finalize(() => this._isLoading.set(false)),
-    )
-    .subscribe(() => {
-      const updatedReservations = this._reservations().map(r =>
-        r.id === id ? { ...r, status: StatusEnum.Recusada } : r
-      );
-      this._reservations.set(updatedReservations);
-    });
+    this.http
+      .put(`${this.apiUrl}/reserve/status/${id}?status=Recusada`, null, {
+        withCredentials: true,
+      })
+      .pipe(
+        catchError((err) => this.handleError(err)),
+        finalize(() => this._isLoading.set(false)),
+      )
+      .subscribe(() => {
+        const updatedReservations = this._reservations().map((r) =>
+          r.id === id ? { ...r, status: StatusEnum.Recusada } : r,
+        );
+        this._reservations.set(updatedReservations);
+      });
   }
 
   private mapReservation(r: ResponseReserveDetailDTO): Reservation {
     return {
-      id:     r.id,
-      player: r.player.name,
-      court:  r.schedule.court.name,
-      date:   r.date.slice(0, 10),
-      time:   `${r.schedule.startTime.slice(0, 5)} – ${r.schedule.endTime.slice(0, 5)}`,
+      id: r.id,
+      name: r.name,
+      email: r.email,
+      phoneNumber: r.phoneNumber,
+      court: r.schedule.court.name,
+      date: r.date.slice(0, 10),
+      time: `${r.schedule.startTime.slice(0, 5)} – ${r.schedule.endTime.slice(0, 5)}`,
       status: StatusEnum[r.status as keyof typeof StatusEnum] ?? StatusEnum.Pendente,
-      pricePerHour:  r.schedule.court.pricePerHour,
+      pricePerHour: r.schedule.court.pricePerHour,
     };
   }
 
