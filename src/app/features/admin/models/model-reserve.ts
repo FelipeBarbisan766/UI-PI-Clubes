@@ -2,9 +2,11 @@
 
 export interface ResponseReserveDetailDTO {
   id: string;
-  date: string;       // DateTime → "2026-03-03T00:00:00"
-  status: StatusEnum;     // StatusEnum como string: "Pending" | "Confirmed" | "Cancelled"
-  player: ApiPlayer;
+  date: string; // DateTime → "2026-03-03T00:00:00"
+  status: StatusEnum; // StatusEnum como string: "Pending" | "Confirmed" | "Cancelled"
+  name: string;
+  email: string;
+  phoneNumber: string;
   schedule: ApiSchedule;
 }
 
@@ -13,31 +15,33 @@ export interface ApiPlayer {
 }
 
 export interface ApiSchedule {
-  startTime: string;  // TimeOnly → "HH:mm:ss"
-  endTime:   string;
-  court:     ApiCourt;
+  startTime: string; // TimeOnly → "HH:mm:ss"
+  endTime: string;
+  court: ApiCourt;
 }
 
 export interface ApiCourt {
-  name:  string;
+  name: string;
   pricePerHour: number;
-  type:  string;
+  type: string;
 }
 
 export enum StatusEnum {
   Pendente = 'AguardandoConfirmacao',
   Confirmada = 'Confirmada',
-  Recusada = 'Recusada'
+  Recusada = 'Recusada',
 }
 
 export interface Reservation {
-  id:     string;
-  player: string;
-  court:  string;
-  date:   string; // "YYYY-MM-DD"
-  time:   string; // "HH:mm – HH:mm"
+  id: string;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  court: string;
+  date: string; // "YYYY-MM-DD"
+  time: string; // "HH:mm – HH:mm"
   status: StatusEnum;
-  pricePerHour:  number;
+  pricePerHour: number;
 }
 
 export interface ReserveQueryParams {
@@ -48,9 +52,9 @@ export interface ReserveQueryParams {
 }
 
 export interface PagedResult<T> {
-  data:       T[];
+  data: T[];
   totalCount: number;
-  page:       number;
-  pageSize:   number;
+  page: number;
+  pageSize: number;
   totalPages: number;
 }

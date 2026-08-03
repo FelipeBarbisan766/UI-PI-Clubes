@@ -112,7 +112,7 @@
             @for (r of reservations(); track trackById($index, r)) {
               <tr class="hover">
                 <!-- Player -->
-                <td class="font-medium">{{ r.player }}</td>
+                <td class="font-medium">{{ r.name }}</td>
 
                 <!-- Court -->
                 <td class="text-base-content/60">{{ r.court }}</td>
@@ -139,6 +139,23 @@
 
                 <!-- Actions -->
                 <td>
+                  <a
+              [href]="'https://wa.me/' + r.phoneNumber"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn btn-success btn-sm rounded-full text-success-content"
+              aria-label="Entrar em contato pelo WhatsApp"
+            >
+              WhatsApp
+            </a>
+
+            <a
+              [href]="'tel:' + r.phoneNumber"
+              class="btn btn-outline btn-sm rounded-full"
+              aria-label="Ligar para o clube"
+            >
+              Ligar
+            </a>
                   <div class="flex items-center justify-end gap-1">
                     @if (r.status === StatusEnum.Pendente) {
                       <!-- Confirm -->
@@ -146,7 +163,7 @@
                         type="button"
                         class="btn btn-ghost btn-sm btn-square text-success"
                         (click)="confirm(r.id)"
-                        [attr.aria-label]="'Confirmar reserva de ' + r.player"
+                        [attr.aria-label]="'Confirmar reserva de ' + r.name"
                         title="Confirmar"
                       >
                         <svg
@@ -169,7 +186,7 @@
                         type="button"
                         class="btn btn-ghost btn-sm btn-square text-error"
                         (click)="OpenModal(r.id)"
-                        [attr.aria-label]="'Cancelar reserva de ' + r.player"
+                        [attr.aria-label]="'Cancelar reserva de ' + r.name"
                         title="Cancelar"
                       >
                         <svg
