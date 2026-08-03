@@ -1,12 +1,9 @@
 <!-- reservations.component.html -->
 <section class="space-y-6" aria-labelledby="reservations-title">
-
   <!-- ── Header ── -->
   <header class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
     <div>
-      <h1 id="reservations-title" class="text-2xl font-bold tracking-tight">
-        Reservas
-      </h1>
+      <h1 id="reservations-title" class="text-2xl font-bold tracking-tight">Reservas</h1>
       <p class="text-sm text-base-content/60" aria-live="polite" aria-atomic="true">
         @if (pendingCount() > 0) {
           {{ pendingCount() }} reserva(s) pendente(s)
@@ -19,14 +16,21 @@
 
   <!-- ── Filters ── -->
   <div class="flex flex-col gap-3 sm:flex-row">
-
     <!-- Search -->
     <label class="input input-bordered flex flex-1 items-center gap-2">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 opacity-50"
-           viewBox="0 0 24 24" fill="none" stroke="currentColor"
-           stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-           aria-hidden="true">
-        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-4 w-4 shrink-0 opacity-50"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <circle cx="11" cy="11" r="8" />
+        <path d="m21 21-4.3-4.3" />
       </svg>
       <input
         type="search"
@@ -45,18 +49,20 @@
       [formControl]="filterControl"
       aria-label="Filtrar por status da reserva"
     >
-     <option value="all">Todos os status</option>
-<option [value]="StatusEnum.Pendente">Pendentes</option>
-<option [value]="StatusEnum.Confirmada">Confirmadas</option>
-<option [value]="StatusEnum.Recusada">Canceladas</option>
+      <option value="all">Todos os status</option>
+      <option [value]="StatusEnum.Pendente">Pendentes</option>
+      <option [value]="StatusEnum.Confirmada">Confirmadas</option>
+      <option [value]="StatusEnum.Recusada">Canceladas</option>
     </select>
-
   </div>
 
   <!-- ── Loading skeleton ── -->
   @if (isLoading()) {
-    <div class="card bg-base-100 shadow-sm border border-base-200 rounded-box p-6 space-y-3"
-         aria-busy="true" aria-label="Carregando reservas">
+    <div
+      class="card bg-base-100 shadow-sm border border-base-200 rounded-box p-6 space-y-3"
+      aria-busy="true"
+      aria-label="Carregando reservas"
+    >
       @for (_ of [1, 2, 3, 4]; track $index) {
         <div class="skeleton h-10 w-full"></div>
       }
@@ -66,13 +72,20 @@
   <!-- ── Error state ── -->
   @else if (error()) {
     <div role="alert" class="alert alert-error">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0"
-           viewBox="0 0 24 24" fill="none" stroke="currentColor"
-           stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-           aria-hidden="true">
-        <circle cx="12" cy="12" r="10"/>
-        <line x1="12" y1="8" x2="12" y2="12"/>
-        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-5 w-5 shrink-0"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <circle cx="12" cy="12" r="10" />
+        <line x1="12" y1="8" x2="12" y2="12" />
+        <line x1="12" y1="16" x2="12.01" y2="16" />
       </svg>
       <span>{{ error() }}</span>
     </div>
@@ -83,7 +96,6 @@
     <div class="card bg-base-100 shadow-sm border border-base-200 rounded-box">
       <div class="overflow-x-auto">
         <table class="table table-zebra w-full" aria-label="Lista de reservas">
-
           <thead>
             <tr>
               <th scope="col">Jogador</th>
@@ -99,7 +111,6 @@
           <tbody>
             @for (r of reservations(); track trackById($index, r)) {
               <tr class="hover">
-
                 <!-- Player -->
                 <td class="font-medium">{{ r.player }}</td>
 
@@ -129,9 +140,7 @@
                 <!-- Actions -->
                 <td>
                   <div class="flex items-center justify-end gap-1">
-
                     @if (r.status === StatusEnum.Pendente) {
-
                       <!-- Confirm -->
                       <button
                         type="button"
@@ -140,11 +149,18 @@
                         [attr.aria-label]="'Confirmar reserva de ' + r.player"
                         title="Confirmar"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
-                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
-                             aria-hidden="true">
-                          <path d="M20 6 9 17l-5-5"/>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="h-4 w-4"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          aria-hidden="true"
+                        >
+                          <path d="M20 6 9 17l-5-5" />
                         </svg>
                       </button>
 
@@ -152,37 +168,48 @@
                       <button
                         type="button"
                         class="btn btn-ghost btn-sm btn-square text-error"
-                        (click)="cancel(r.id)"
+                        (click)="OpenModal(r.id)"
                         [attr.aria-label]="'Cancelar reserva de ' + r.player"
                         title="Cancelar"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
-                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
-                             aria-hidden="true">
-                          <path d="M18 6 6 18M6 6l12 12"/>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="h-4 w-4"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          aria-hidden="true"
+                        >
+                          <path d="M18 6 6 18M6 6l12 12" />
                         </svg>
                       </button>
-
                     }
-
                   </div>
                 </td>
-
               </tr>
-            }
 
-            @empty {
+            } @empty {
               <tr>
                 <td colspan="7" class="py-12 text-center text-base-content/50">
                   <div class="flex flex-col items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 opacity-30"
-                         viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                         stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
-                         aria-hidden="true">
-                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                      <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
-                      <line x1="3" y1="10" x2="21" y2="10"/>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-8 w-8 opacity-30"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                      <line x1="16" y1="2" x2="16" y2="6" />
+                      <line x1="8" y1="2" x2="8" y2="6" />
+                      <line x1="3" y1="10" x2="21" y2="10" />
                     </svg>
                     <span>Nenhuma reserva encontrada.</span>
                   </div>
@@ -190,30 +217,82 @@
               </tr>
             }
           </tbody>
-<div class="flex items-center justify-between gap-3 p-4 border-t border-base-200">
-  <div class="flex items-center gap-2 text-sm text-base-content/60">
-    <span>Itens por página:</span>
-    <select
-      class="select select-bordered select-sm"
-      [value]="pageSize()"
-      (change)="onPageSizeChange(+$any($event.target).value)"
-      aria-label="Itens por página"
-    >
-      @for (size of pageSizeOptions; track size) {
-        <option [value]="size">{{ size }}</option>
-      }
-    </select>
-  </div>
+          <div class="flex items-center justify-between gap-3 p-4 border-t border-base-200">
+            <div class="flex items-center gap-2 text-sm text-base-content/60">
+              <span>Itens por página:</span>
+              <select
+                class="select select-bordered select-sm"
+                [value]="pageSize()"
+                (change)="onPageSizeChange(+$any($event.target).value)"
+                aria-label="Itens por página"
+              >
+                @for (size of pageSizeOptions; track size) {
+                  <option [value]="size">{{ size }}</option>
+                }
+              </select>
+            </div>
 
-  <div class="join">
-    <button type="button" class="join-item btn btn-sm" [disabled]="page() === 1" (click)="prevPage()" aria-label="Página anterior">«</button>
-    <button type="button" class="join-item btn btn-sm">Página {{ page() }} de {{ totalPages() }}</button>
-    <button type="button" class="join-item btn btn-sm" [disabled]="page() >= totalPages()" (click)="nextPage()" aria-label="Próxima página">»</button>
-  </div>
-</div>
+            <div class="join">
+              <button
+                type="button"
+                class="join-item btn btn-sm"
+                [disabled]="page() === 1"
+                (click)="prevPage()"
+                aria-label="Página anterior"
+              >
+                «
+              </button>
+              <button type="button" class="join-item btn btn-sm">
+                Página {{ page() }} de {{ totalPages() }}
+              </button>
+              <button
+                type="button"
+                class="join-item btn btn-sm"
+                [disabled]="page() >= totalPages()"
+                (click)="nextPage()"
+                aria-label="Próxima página"
+              >
+                »
+              </button>
+            </div>
+          </div>
         </table>
       </div>
     </div>
   }
+  <dialog
+    id="modal"
+    class="modal"
+    [class.modal-open]="ModalOpen()"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modal-title"
+  >
+    <div class="modal-box rounded-3xl max-w-md">
+      <h3 id="modal-title" class="font-bold text-xl text-base-content mb-4 text-center">
+        Cancelar reserva ?
+      </h3>
 
+      <p class="text-base-content/60 text-center">
+        Tem certeza que deseja cancelar a reserva? Esta ação não pode ser desfeita.
+      </p>
+
+      <div class="modal-action mt-6 flex gap-3">
+        <button
+          class="btn btn-primary shadow-lg rounded-lg flex-1"
+          (click)="cancel(selectedReservationId()!)"
+          aria-label="Confirmar reserva"
+        >
+          Sim, cancelar reserva
+        </button>
+        <button
+          class="btn btn-ghost shadow-lg rounded-lg flex-1"
+          (click)="closeModal()"
+          aria-label="Cancelar reserva"
+        >
+          Não, manter reserva
+        </button>
+      </div>
+    </div>
+  </dialog>
 </section>

@@ -145,7 +145,7 @@
                       <button
                         type="button"
                         class="btn btn-ghost btn-sm btn-square text-error"
-                        (click)="cancel(r.id)"
+                        (click)="OpenModal(r.id)"
                         [attr.aria-label]="'Cancelar reserva de ' + r.club"
                         title="Cancelar"
                       >
@@ -236,4 +236,39 @@
       </div>
     </div>
   }
+  <dialog
+    id="modal"
+    class="modal"
+    [class.modal-open]="ModalOpen()"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modal-title"
+  >
+    <div class="modal-box rounded-3xl max-w-md">
+      <h3 id="modal-title" class="font-bold text-xl text-base-content mb-4 text-center">
+        Cancelar reserva ?
+      </h3>
+
+      <p class="text-base-content/60 text-center">
+        Tem certeza que deseja cancelar a reserva? Esta ação não pode ser desfeita.
+      </p>
+
+      <div class="modal-action mt-6 flex gap-3">
+        <button
+          class="btn btn-primary shadow-lg rounded-lg flex-1"
+          (click)="cancel(selectedReservationId()!)"
+          aria-label="Confirmar reserva"
+        >
+          Sim, cancelar reserva
+        </button>
+        <button
+          class="btn btn-ghost shadow-lg rounded-lg flex-1"
+          (click)="closeModal()"
+          aria-label="Cancelar reserva"
+        >
+          Não, manter reserva
+        </button>
+      </div>
+    </div>
+  </dialog>
 </section>
