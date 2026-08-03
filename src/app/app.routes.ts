@@ -180,10 +180,10 @@ export const routes: Routes = [
         component: SignUp,
       },
       {
-        path: 'select',
+        path: 'register-club',
         canActivate: [selectRoleGuard],
         loadComponent: () =>
-          import('./features/auth/pages/select-role/select-role').then((m) => m.SelectRole),
+          import('./features/auth/pages/register-club/register-club').then((m) => m.RegisterClub),
       },
       // {
       //   path: '**',

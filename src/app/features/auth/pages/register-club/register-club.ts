@@ -1,21 +1,22 @@
-import { Component, computed, inject, output, signal } from '@angular/core';
+import { afterNextRender, Component, computed, inject, Injector, output, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth-service';
 import { finalize, switchMap, take } from 'rxjs';
-import { FormPlayerService } from '../../../../core/services/formPlayer-service';
 import { FormAdminService } from '../../../../core/services/formAdmin-service';
+import { ViewportScroller } from '@angular/common';
 
 @Component({
-  selector: 'app-select-role',
+  selector: 'app-register-club',
   imports: [],
-  templateUrl: './select-role.html',
-  styleUrl: './select-role.css',
+  templateUrl: './register-club.html',
+  styleUrl: './register-club.css',
 })
-export class SelectRole {
+export class RegisterClub {
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
-
+  private readonly viewportScroller = inject(ViewportScroller);
   private readonly adminService = inject(FormAdminService);
+  private readonly injector = inject(Injector);
 
   readonly isSubmitting = signal(false);
   readonly errorMessage = signal('');
@@ -32,7 +33,7 @@ export class SelectRole {
     {
       question: 'Preciso pagar para cadastrar meu clube?',
       answer:
-        'Não. O cadastro e a configuração inicial são gratuitos. Você só paga uma pequena taxa sobre as reservas realizadas pela plataforma.',
+        'Sim, Você só paga o plano de assinatura referente ao seu clube, tudo dependerá do tipo de clube que voce tem e pretende registrar.',
     },
     {
       question: 'Quanto tempo leva para meu clube estar ativo?',
@@ -47,9 +48,13 @@ export class SelectRole {
     {
       question: 'Como recebo o dinheiro das reservas?',
       answer:
-        'Os pagamentos são processados online e repassados diretamente para a sua conta bancária. Você acompanha tudo pelo painel financeiro em tempo real.',
+        'Os pagamentos são responsabilidade do dono de quadras, nos disponibilizamos meios de comunição para que o valor seja acertado do meio desejado por fora do site.',
     },
   ];
+
+  ngOnInit(): void {
+    this.scrollToTop();
+  }
 
   toggleFaq(index: number): void {
     this.openFaqIndex.update((current) => (current === index ? null : index));
@@ -88,5 +93,10 @@ export class SelectRole {
       });
 
     this.beAdminEvent.emit();
+  }
+  private scrollToTop(): void {
+    afterNextRender(() => this.viewportScroller.scrollToAnchor('top-section'), {
+      injector: this.injector,
+    });
   }
 }
