@@ -12,12 +12,11 @@ export const selectRoleGuard: CanActivateFn = () => {
 
   return auth.resolveSession().pipe(
     map((user) => {
-      if (!user) return router.parseUrl('/login');
-
-      const role = normalizeRole(user.role);
-
-      if (role === 'admin' ) return router.parseUrl('/admin/clubs');
-      // if (role === 'player') return router.parseUrl('/player');
+      if (user) {
+        const role = normalizeRole(user.role);
+        if (role === 'admin' ) return router.parseUrl('/admin/clubs');
+      }
+        // if (role === 'player') return router.parseUrl('/player');
 
       return true;
     })

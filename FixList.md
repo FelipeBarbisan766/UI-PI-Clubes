@@ -24,7 +24,7 @@ src/app/shared/components/search-home/search-home.html
 ```bash 
 src/app/features/auth/pages/select-role/select-role.html
 ```
-* Resolver o que vai fazer com o Visao Geral
+* ~~Resolver o que vai fazer com o Visao Geral~~
 
 * Arumar/Definir um visual para o a tela de horarios
 
@@ -38,10 +38,13 @@ src/app/features/auth/pages/select-role/select-role.html
 
     * Arrumar/Melhorar as informações da parte de açoes  
 
-* Ajeitar o visual da tela de configuraçoes do club (talvez deixar parecido com o visual do editar usuario)
+* Ajeitar o visual da tela de configuraçoes do clube (talvez deixar parecido com o visual do editar usuario)
 
-* Arrumar os link do bread-crumb
+* ~~Arrumar os link do bread-crumb~~
 ```bash
 src/app/shared/components/bread-crumb/bread-crumb.html
 ```
+
+* Adicionar um visual para poder editar as imagens do clube e quadra
+
 ---
