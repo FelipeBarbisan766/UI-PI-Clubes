@@ -52,6 +52,8 @@ export class UserReserve implements OnInit {
     nonNullable: true,
   });
 
+  readonly ModalOpen = signal(false);
+  readonly selectedReservationId = signal<string | null>(null); 
   private readonly playerId = signal<string | null>(null);
   protected readonly page = signal(1);
   protected readonly pageSize = signal<number>(PAGE_SIZE_OPTIONS[0]);
@@ -78,41 +80,53 @@ export class UserReserve implements OnInit {
     status: this.filterStatus$(),
   }));
 
-private readonly queryState$ = toObservable(this.queryState);
+  private readonly queryState$ = toObservable(this.queryState);
 
   // ── Lifecycle ─────────────────────────────────────────────────────────────
   ngOnInit(): void {
-    this.authService.getPlayerMe().pipe(
-      takeUntilDestroyed(this.destroyRef),
-    ).subscribe({
-      next: (player) => this.playerId.set(player.id),
-      error: (err: Error) => console.error('Erro ao carregar jogador:', err),
-    });
+    this.authService
+      .getPlayerMe()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (player) => this.playerId.set(player.id),
+        error: (err: Error) => console.error('Erro ao carregar jogador:', err),
+      });
 
     merge(
       this.searchControl.valueChanges.pipe(debounceTime(300), distinctUntilChanged()),
       this.filterControl.valueChanges,
-    ).pipe(
-      takeUntilDestroyed(this.destroyRef),
-    ).subscribe(() => this.page.set(1));
+    )
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.page.set(1));
 
-    this.queryState$.pipe(
-      filter((state): state is typeof state & { playerId: string } => state.playerId !== null),
-      switchMap(state =>
-        this.reserveService.loadByPlayerId(state.playerId, {
-          page:     state.page,
-          pageSize: state.pageSize,
-          name:     state.name || undefined,
-          status:   state.status === 'all' ? undefined : state.status,
-        })
-      ),
-      takeUntilDestroyed(this.destroyRef),
-    ).subscribe();
+    this.queryState$
+      .pipe(
+        filter((state): state is typeof state & { playerId: string } => state.playerId !== null),
+        switchMap((state) =>
+          this.reserveService.loadByPlayerId(state.playerId, {
+            page: state.page,
+            pageSize: state.pageSize,
+            name: state.name || undefined,
+            status: state.status === 'all' ? undefined : state.status,
+          }),
+        ),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe();
   }
 
   // ── Actions ───────────────────────────────────────────────────────────────
+  protected closeModal(): void {
+    this.ModalOpen.set(false);
+  }
+  protected OpenModal(id: string): void {
+    this.ModalOpen.set(true);
+    this.selectedReservationId.set(id);
+  }
+
   protected cancel(id: string): void {
     this.reserveService.cancel(id);
+    this.closeModal();
   }
 
   protected nextPage(): void {
