@@ -5,10 +5,10 @@
     >
       <div>
         <h1 class="text-xl sm:text-2xl font-bold text-base-content tracking-tight">
-          Todos os clubes: {{ clubsCount() }} propriedade{{
+          Todos os clubes: {{ clubsCount() }} clube{{
             clubsCount() !== 1 ? 's' : ''
           }}
-          encontrada{{ clubsCount() !== 1 ? 's' : '' }}
+          encontrado{{ clubsCount() !== 1 ? 's' : '' }}
         </h1>
       </div>
 
@@ -213,7 +213,7 @@
         <!-- Estado vazio -->
         @if (isEmpty() && !loading() && !error()) {
           <div class="rounded-lg border border-base-300 bg-base-100 p-12 text-center">
-            <p class="text-base-content/60">Nenhuma propriedade encontrada para esta busca.</p>
+            <p class="text-base-content/60">Nenhum clube encontrado para esta busca.</p>
           </div>
         }
 
