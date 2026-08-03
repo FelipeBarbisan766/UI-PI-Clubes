@@ -123,7 +123,7 @@ export class HomePage implements OnInit {
     return data.address?.city ?? data.address?.town ?? data.address?.municipality ?? data.address?.village ?? null;
   }
 
-  goTo(): void {
+  goToRegister(): void {
     this.router.navigate(['/register-club']);
   }
 }
