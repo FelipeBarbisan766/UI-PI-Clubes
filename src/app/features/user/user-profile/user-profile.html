@@ -68,12 +68,15 @@
           <div class="card bg-base-100 shadow-sm">
             <div class="card-body items-center gap-3 py-8">
               <div class="avatar avatar-placeholder">
-                <div
-                  class="w-24 h-24 rounded-full bg-neutral text-neutral-content relative overflow-hidden"
+                <button
+                  type="button"
+                  (click)="openModal()"
+                  aria-label="Editar avatar"
+                  class="group relative w-24 h-24 rounded-full bg-neutral text-neutral-content overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-base-100"
                 >
-                  @if (user()?.avatarUrl; as avatarUrl) {
+                  @if (displayAvatarUrl(); as avatarUrl) {
                     <img
-                      [ngSrc]="avatarUrl"
+                      [ngSrc]="avatarUrl" 
                       fill
                       [alt]="(user()?.name ?? '') + ' Avatar'"
                       class="object-cover"
@@ -85,7 +88,27 @@
                       {{ initials() }}
                     </span>
                   }
-                </div>
+
+                  <!-- Overlay de hover: escurece e mostra o ícone de câmera -->
+                  <span
+                    class="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/50 group-focus-visible:bg-black/50 transition-colors duration-200"
+                    aria-hidden="true"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-7 w-7 text-white opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity duration-200"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                      <circle cx="12" cy="13" r="4" />
+                      <line x1="19" y1="7" x2="19" y2="13" />
+                      <line x1="16" y1="10" x2="22" y2="10" />
+                    </svg>
+                  </span>
+                </button>
               </div>
 
               <!-- Name & email -->
@@ -368,4 +391,95 @@
       </div>
     }
   </div>
+  <dialog
+    id="modal"
+    class="modal"
+    [class.modal-open]="ModalOpen()"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modal-title"
+  >
+    <div class="modal-box rounded-3xl max-w-md">
+      <h3 id="modal-title" class="font-bold text-xl text-base-content mb-4 text-center">
+        Selecione uma nova imagem de avatar
+      </h3>
+
+      <!-- Pré-visualização -->
+      <div class="flex justify-center mb-5">
+        <div class="avatar avatar-placeholder">
+          <div class="w-28 h-28 rounded-full bg-neutral text-neutral-content ring ring-base-300 ring-offset-2 ring-offset-base-100 overflow-hidden relative">
+            @if (avatarPreviewUrl(); as preview) {
+              <img
+                [src]="preview"
+                alt="Pré-visualização do novo avatar"
+                class="object-cover w-full h-full"
+              />
+            } @else if (displayAvatarUrl(); as avatarUrl) {
+              <img
+                [ngSrc]="avatarUrl"
+                fill
+                [alt]="(user()?.name ?? '') + ' Avatar atual'"
+                class="object-cover"
+              />
+            } @else {
+              <span class="text-2xl font-semibold flex items-center justify-center w-full h-full">
+                {{ initials() }}
+              </span>
+            }
+          </div>
+        </div>
+      </div>
+
+      <input
+        id="avatarFile"
+        type="file"
+        accept="image/*"
+        class="file-input file-input-bordered file-input-primary file-input-sm w-full"
+        (change)="onFileSelected($event)"
+      />
+      <div class="label pt-1">
+        <span class="label-text-alt text-base-content/50">JPG, PNG ou WEBP, até 5MB</span>
+      </div>
+
+      @if (avatarError()) {
+        <p class="text-error text-sm mt-1" role="alert">{{ avatarError() }}</p>
+      }
+
+      <div class="modal-action mt-6 flex gap-3">
+        <button
+          type="button"
+          class="btn btn-ghost"
+          [disabled]="avatarUploading()"
+          (click)="closeModal()"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary min-w-36"
+          (click)="onEditAvatar()"
+          [disabled]="avatarUploading() || !selectedAvatarFile()"
+        >
+          @if (avatarUploading()) {
+            <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+          } @else {
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+            >
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+              <polyline points="17 21 17 13 7 13 7 21" />
+              <polyline points="7 3 7 8 15 8" />
+            </svg>
+          }
+          {{ avatarUploading() ? 'Enviando…' : 'Salvar foto' }}
+        </button>
+      </div>
+    </div>
+  </dialog>
 </div>
