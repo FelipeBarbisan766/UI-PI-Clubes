@@ -1,6 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, catchError, finalize, tap, throwError } from 'rxjs';
+import { Observable, catchError, finalize, switchMap, tap, throwError } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 
 export interface ResponseUserDTO {
@@ -53,6 +53,14 @@ export class UserProfileService {
         catchError(err => this.handleError('Não foi possível salvar as alterações.', err)),
         finalize(() => this._loading.set(false))
       );
+  }
+
+  updateAvatar(id: string, file: File): Observable<ResponseUserDTO> {
+    const formData = new FormData();
+    formData.append('AvatarImage', file);
+    return this.http
+      .put(`${this.baseUrl}/${id}/avatar`, formData, { withCredentials: true })
+      .pipe(switchMap(() => this.getById(id)));
   }
 
   private handleError(message: string, err: unknown): Observable<never> {
