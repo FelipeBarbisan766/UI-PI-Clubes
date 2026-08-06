@@ -15,10 +15,23 @@ export class AuthService {
   private readonly adminBaseUrl = `${environment.apiUrl}/Admin`;
   private readonly playerBaseUrl = `${environment.apiUrl}/Player`;
 
+  private readonly PHONE_WARNING_DISMISSED_KEY = 'phoneWarningDismissed';
+
   readonly me = signal<MeResponse | null>(null);
   readonly authStatus = signal<AuthStatus>('unknown');
+  private readonly phoneWarningDismissed = signal(
+     sessionStorage.getItem(this.PHONE_WARNING_DISMISSED_KEY) === 'true'
+   );
+
+   readonly needsPhoneNumber = computed(() => {
+    const user = this.me();
+    if (user === null) return false; // ainda não carregou ou não está logado
+    if (this.phoneWarningDismissed()) return false;
+    return !user.phoneNumber; // <- ajustar nome do campo conforme MeResponse
+  });
 
   readonly isAuthenticated = computed(() => this.authStatus() === 'authenticated');
+
 
   private meRequest$: Observable<MeResponse | null> | null = null;
 
@@ -121,11 +134,20 @@ export class AuthService {
     this.meRequest$ = null;
   }
 
+  dismissPhoneWarning(): void {
+    sessionStorage.setItem(this.PHONE_WARNING_DISMISSED_KEY, 'true');
+    this.phoneWarningDismissed.set(true);
+  }
+
+  
   clearSession(): void {
     this.me.set(null);
     this.authStatus.set('unauthenticated');
     this.meRequest$ = null;
+    sessionStorage.removeItem(this.PHONE_WARNING_DISMISSED_KEY);
+    this.phoneWarningDismissed.set(false);
   }
+
 
   refreshMe(): Observable<MeResponse> {
     this.meRequest$ = null;

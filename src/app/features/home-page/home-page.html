@@ -297,4 +297,19 @@
       </div>
     </div>
   </section>
+  @if (showPhoneModal()) {
+    <div class="modal modal-open" role="dialog" aria-modal="true">
+      <div class="modal-box">
+        <h3 class="font-bold text-lg">Complete seu cadastro</h3>
+        <p class="py-4">
+          Notamos que você ainda não cadastrou seu número de telefone. Isso é importante para
+          contato sobre suas reservas.
+        </p>
+        <div class="modal-action">
+          <button class="btn btn-ghost" (click)="dismiss()">Depois</button>
+          <button class="btn btn-primary" (click)="goToProfile()">Cadastrar agora</button>
+        </div>
+      </div>
+    </div>
+  }
 </main>
