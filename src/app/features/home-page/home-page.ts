@@ -5,7 +5,7 @@ import {
   inject,
   signal,
   computed,
-  OnInit
+  OnInit,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink, Router } from '@angular/router';
@@ -26,22 +26,25 @@ import { AuthService } from '../../core/services/auth-service'; // Ajuste o cami
 export class HomePage implements OnInit {
   private readonly clubService = inject(ServiceClub);
   private readonly authService = inject(AuthService);
-  private readonly router      = inject(Router);
-  private readonly destroyRef  = inject(DestroyRef);
+  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
 
-  readonly isLoggedIn = this.authService.isAuthenticated; 
-  
+  readonly isLoggedIn = this.authService.isAuthenticated;
+
   readonly userName = computed(() => {
     const user = this.authService.me();
-    return user ? (user as any).name : 'Jogador'; 
+    return user ? (user as any).name : 'Jogador';
   });
 
-  readonly detectedCity  = signal<string | null>(null);
-  readonly localClubs    = signal<ResponseClubDTO[]>([]);
+  readonly detectedCity = signal<string | null>(null);
+  readonly localClubs = signal<ResponseClubDTO[]>([]);
   readonly featuredClubs = signal<ResponseClubDTO[]>([]);
 
+  readonly showPhoneModal = this.authService.needsPhoneNumber;
+
   ngOnInit(): void {
-    this.authService.resolveSession()
+    this.authService
+      .resolveSession()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((user) => {
         if (user) {
@@ -53,7 +56,7 @@ export class HomePage implements OnInit {
   }
 
   private initAuthenticatedArea(): void {
-    this.resolveInitialCity().then(city => {
+    this.resolveInitialCity().then((city) => {
       if (city) {
         this.detectedCity.set(city);
         this.loadLocalClubs(city);
@@ -62,26 +65,28 @@ export class HomePage implements OnInit {
   }
 
   private loadFeaturedClubs(): void {
-    this.clubService.getAll({ pageSize: 3 })
+    this.clubService
+      .getAll({ pageSize: 3 })
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(response => {
-        this.featuredClubs.set(response.data || response as any); 
+      .subscribe((response) => {
+        this.featuredClubs.set(response.data || (response as any));
       });
   }
 
   private loadLocalClubs(city: string): void {
-    this.clubService.getAll({ city, pageSize: 4 })
+    this.clubService
+      .getAll({ city, pageSize: 4 })
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(response => {
-        this.localClubs.set(response.data || response as any);
+      .subscribe((response) => {
+        this.localClubs.set(response.data || (response as any));
       });
   }
 
   // --- Funções Auxiliares para o Template ---
-  
+
   getCoverImage(club: ResponseClubDTO): string {
-    return club.images && club.images.length > 0 
-      ? club.images[0].thumbUrl 
+    return club.images && club.images.length > 0
+      ? club.images[0].thumbUrl
       : 'assets/placeholder-club.jpg'; // Substitua pelo caminho do seu placeholder padrão
   }
 
@@ -92,7 +97,7 @@ export class HomePage implements OnInit {
   // --- Lógica de Geolocalização ---
 
   private resolveInitialCity(): Promise<string | null> {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       if (!navigator?.geolocation) return resolve(null);
 
       const timer = setTimeout(() => resolve(null), 4000);
@@ -107,7 +112,10 @@ export class HomePage implements OnInit {
             resolve(null);
           }
         },
-        () => { clearTimeout(timer); resolve(null); },
+        () => {
+          clearTimeout(timer);
+          resolve(null);
+        },
         { timeout: 4000, maximumAge: 5 * 60 * 1000 },
       );
     });
@@ -120,7 +128,20 @@ export class HomePage implements OnInit {
     });
     if (!res.ok) return null;
     const data = await res.json();
-    return data.address?.city ?? data.address?.town ?? data.address?.municipality ?? data.address?.village ?? null;
+    return (
+      data.address?.city ??
+      data.address?.town ??
+      data.address?.municipality ??
+      data.address?.village ??
+      null
+    );
+  }
+  dismiss(): void {
+    this.authService.dismissPhoneWarning();
+  }
+
+  goToProfile(): void {
+    this.router.navigate(['/user-profile']);
   }
 
   goToRegister(): void {

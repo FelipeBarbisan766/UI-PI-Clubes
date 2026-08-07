@@ -8,6 +8,7 @@ export interface MeResponse {
   name: string;
   email: string;
   role: string;
+  phoneNumber?: string;
   avatarUrl?: string;
 }
 
