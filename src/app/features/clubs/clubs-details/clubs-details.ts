@@ -22,6 +22,8 @@ import { ServiceReserve } from '../services/service-reserve';
 import { ScheduleAvailabilityDTO } from '../models/model-schedule';
 import { AuthService } from '../../../core/services/auth-service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { ServiceCourtAvailabilitySignalR } from '../services/service-court-availability-signalr';
+import { ReserveAvailabilityChangedDTO } from '../models/model-reserve';
 
 const TYPE_LABELS: Record<TypeEnum, string> = {
   [TypeEnum.None]: 'Outro',
@@ -72,6 +74,12 @@ const SURFACE_LABELS: Record<SurfaceEnum, string> = {
 };
 
 // ── Funções puras ────────────────────────────────────────────────────────────
+
+const UNAVAILABLE_STATUSES = new Set<string>(['AguardandoConfirmacao', 'Confirmada', 'Recusada']);
+
+function isSlotAvailableForStatus(status: string): boolean {
+  return !UNAVAILABLE_STATUSES.has(status);
+}
 
 function sanitizePhone(phone: string): string {
   return phone.replace(/\D/g, '');
@@ -148,6 +156,7 @@ export class ClubsDetail {
   private readonly sanitizer = inject(DomSanitizer);
   private readonly injector = inject(Injector);
   private readonly viewportScroller = inject(ViewportScroller);
+  private readonly courtAvailabilitySignalR = inject(ServiceCourtAvailabilitySignalR);
 
   private readonly routeClubId = toSignal(
     this.route.paramMap.pipe(
@@ -242,6 +251,28 @@ export class ClubsDetail {
         this.selectedDate.set(dates[0] ?? '');
       }
     });
+
+    effect((onCleanup) => {
+      const clubId = this.routeClubId();
+      if (!clubId) return;
+
+      this.courtAvailabilitySignalR
+        .joinClub(clubId)
+        .catch((err) => console.error('[SignalR] Falha ao entrar no grupo do clube:', err));
+
+      onCleanup(() => {
+        this.courtAvailabilitySignalR
+          .leaveClub(clubId)
+          .catch((err) => console.error('[SignalR] Falha ao sair do grupo do clube:', err));
+      });
+    });
+
+    this.courtAvailabilitySignalR.reserveStatusChanged$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((dto) => {
+        // console.log('SignalR event recebido:', dto); // TEMPORÁRIO
+        this.applyReserveStatusChanged(dto);
+      });
 
     toObservable(this.courtAndDate)
       .pipe(
@@ -338,12 +369,19 @@ export class ClubsDetail {
         next: () => {
           this.isConfirming.set(false);
           this.bookingSuccess.set(true);
+          this.markSlotUnavailable(slot.id); // ← atualização local imediata
         },
         error: (err: Error) => {
           this.isConfirming.set(false);
           this.bookingError.set(err.message);
         },
       });
+  }
+
+  private markSlotUnavailable(scheduleId: string): void {
+    this.slotsForDate.update((slots) =>
+      slots.map((s) => (s.id === scheduleId ? { ...s, available: false } : s)),
+    );
   }
 
   // ── Helpers expostos ao template ─────────────────────────────────────────
@@ -356,6 +394,19 @@ export class ClubsDetail {
   readonly getSurfaceName = getSurfaceName;
 
   // ── Helpers privados ─────────────────────────────────────────────────────
+
+  private applyReserveStatusChanged(dto: ReserveAvailabilityChangedDTO): void {
+    const eventDate = dto.date.slice(0, 10);
+    if (eventDate !== this.selectedDate()) return;
+
+    this.slotsForDate.update((slots) =>
+      slots.map((slot) =>
+        slot.id === dto.scheduleId
+          ? { ...slot, available: isSlotAvailableForStatus(dto.status) }
+          : slot,
+      ),
+    );
+  }
 
   private resetBookingUiState(): void {
     this.selectedDate.set('');
