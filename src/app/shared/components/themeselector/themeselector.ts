@@ -16,8 +16,8 @@ export class Themeselector {
 
   readonly colors: ThemeColor[] = [
     { name: 'Vermelho', value: 'oklch(72.3% 0.370 16.823)' },
-    { name: 'Laranja', value: 'oklch(65.93% 0.230 35.22)' },
-    { name: 'Azul', value: 'oklch(52.15% 0.123 250)' },
+    { name: 'Laranja', value: 'oklch(53% 0.157 131.589)' },
+    { name: 'Azul', value: 'oklch(51% 0.262 276.966)' },
     { name: 'Laranja 2', value: 'oklch(72.19% 0.215 50)' },
     { name: 'Verde', value: 'oklch(52% 0.154 150.069)' },
   ];
