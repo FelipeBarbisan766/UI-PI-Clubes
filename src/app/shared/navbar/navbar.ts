@@ -4,10 +4,11 @@ import { Router, RouterModule } from '@angular/router';
 import { Themeselector } from '../components/themeselector/themeselector';
 import { AuthService } from '../../core/services/auth-service';
 import { take } from 'rxjs';
+import { NotificationIcon } from "../components/notification-icon/notification-icon";
 
 @Component({
   selector: 'app-navbar',
-  imports: [CommonModule, RouterModule, Themeselector],
+  imports: [CommonModule, RouterModule, Themeselector, NotificationIcon],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
 })
