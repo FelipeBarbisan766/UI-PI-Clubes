@@ -18,7 +18,7 @@ import { AuthService } from '../../core/services/auth-service'; // Ajuste o cami
 
 @Component({
   selector: 'app-home-page',
-  imports: [NgOptimizedImage, RouterLink, SearchHome],
+  imports: [NgOptimizedImage, RouterLink],
   templateUrl: './home-page.html',
   // NOTA: standalone: true é o padrão no Angular v20+, então não o declaramos.
   changeDetection: ChangeDetectionStrategy.OnPush,

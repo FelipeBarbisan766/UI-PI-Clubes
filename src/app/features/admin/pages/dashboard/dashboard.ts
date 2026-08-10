@@ -69,8 +69,6 @@ export class Dashboard implements OnInit {
     switch (status) {
       case 'Confirmada':
         return 'text-green-600 bg-green-50 border-green-100';
-      case 'AguardandoConfirmacao':
-        return 'text-orange-400 bg-orange-50 border-orange-100';
       case 'Recusada':
         return 'text-red-500 bg-red-50 border-red-100';
       default:

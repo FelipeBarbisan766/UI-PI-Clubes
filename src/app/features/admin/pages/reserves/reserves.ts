@@ -21,7 +21,6 @@ interface StatusConfig {
 }
 
 const STATUS_CONFIG: Record<StatusEnum, StatusConfig> = {
-  [StatusEnum.Pendente]: { label: 'Pendente', badgeClass: 'badge-warning' },
   [StatusEnum.Confirmada]: { label: 'Confirmada', badgeClass: 'badge-success' },
   [StatusEnum.Recusada]: { label: 'Cancelada', badgeClass: 'badge-error' },
 };
@@ -78,10 +77,7 @@ export class Reserve implements OnInit {
 
   private readonly queryState$ = toObservable(this.queryState);
 
-  protected readonly pendingCount = computed(
-    () => this.reservations().filter((r) => r.status === StatusEnum.Pendente).length,
-  );
-
+ 
   // ── Lifecycle ─────────────────────────────────────────────────────────────
   ngOnInit(): void {
     const clubId =
