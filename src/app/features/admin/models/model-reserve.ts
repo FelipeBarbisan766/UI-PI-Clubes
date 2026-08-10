@@ -27,7 +27,6 @@ export interface ApiCourt {
 }
 
 export enum StatusEnum {
-  Pendente = 'AguardandoConfirmacao',
   Confirmada = 'Confirmada',
   Recusada = 'Recusada',
 }

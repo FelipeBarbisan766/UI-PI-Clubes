@@ -203,7 +203,11 @@
                 aria-label="Itens por página"
               >
                 @for (size of pageSizeOptions; track size) {
-                  <option [value]="size">{{ size }}</option>
+                  @if (size === pageSize()) {
+                    <option [value]="size" selected>{{ size }}</option>
+                  } @else {
+                    <option [value]="size">{{ size }}</option>
+                  }
                 }
               </select>
             </div>
