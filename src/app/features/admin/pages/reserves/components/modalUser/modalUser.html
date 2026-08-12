@@ -1,0 +1,44 @@
+<h3 id="modal-title" class="font-bold text-xl text-base-content mb-4 text-center">
+          Informações do jogador
+        </h3>
+
+        <div class="flex justify-center mb-5">
+        <div class="avatar avatar-placeholder">
+          <div class="w-28 h-28 rounded-full bg-neutral text-neutral-content ring ring-base-300 ring-offset-2 ring-offset-base-100 overflow-hidden relative">
+            
+             @if (displayAvatarUrl(); as avatarUrl) {
+              <img
+                [ngSrc]="avatarUrl"
+                fill
+                [alt]="(user()?.name ?? '') + ' Avatar atual'"
+                class="object-cover"
+              />
+            } @else {
+              <span class="text-2xl font-semibold flex items-center justify-center w-full h-full">
+                {{ initials() }}
+              </span>
+            }
+          </div>
+        </div>
+      </div>
+        <div class="flex flex-col gap-2">
+          <p class="text-base-content/60 text-center">
+            Nome: {{ user()?.name }}
+          </p>
+          <p class="text-base-content/60 text-center">
+            Email: {{ user()?.email }}
+          </p>
+          <p class="text-base-content/60 text-center">
+            Telefone: {{ user()?.phoneNumber ?? 'Não informado' }}
+          </p>
+
+        <div class="modal-action mt-6 flex gap-3">
+         
+          <button
+            class="btn btn-ghost shadow-lg rounded-lg flex-1"
+            (click)="close.emit()"
+            aria-label="Cancelar reserva"
+          >
+            Fechar
+          </button>
+        </div>
