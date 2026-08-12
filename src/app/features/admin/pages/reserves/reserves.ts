@@ -14,6 +14,8 @@ import { debounceTime, distinctUntilChanged, filter, merge, switchMap } from 'rx
 
 import { ReserveService } from '../../services/service-reserve';
 import { Reservation, StatusEnum } from '../../models/model-reserve';
+import { ModalUserComponent } from "./components/modalUser/modalUser";
+import { ModalAlertComponent } from "./components/modalAlert/modalAlert";
 
 interface StatusConfig {
   label: string;
@@ -31,7 +33,7 @@ const PAGE_SIZE_OPTIONS = [5, 10, 20, 50] as const;
   selector: 'app-reserve',
   templateUrl: './reserves.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, ModalUserComponent, ModalAlertComponent],
 })
 export class Reserve implements OnInit {
   private readonly route = inject(ActivatedRoute);
@@ -55,6 +57,7 @@ export class Reserve implements OnInit {
 
   readonly ModalOpen = signal(false);
   readonly selectedReservationId = signal<string | null>(null);
+  readonly selectedUserId = signal<string | null>(null);
   private readonly clubId = signal<string | null>(null);
   protected readonly page = signal(1);
   protected readonly pageSize = signal<number>(PAGE_SIZE_OPTIONS[0]);
@@ -77,7 +80,6 @@ export class Reserve implements OnInit {
 
   private readonly queryState$ = toObservable(this.queryState);
 
- 
   // ── Lifecycle ─────────────────────────────────────────────────────────────
   ngOnInit(): void {
     const clubId =
@@ -113,19 +115,26 @@ export class Reserve implements OnInit {
   }
 
   // ── Actions ───────────────────────────────────────────────────────────────
-  protected closeModal(): void {
+  closeModal(): void {
     this.ModalOpen.set(false);
   }
-  protected OpenModal(id: string): void {
+  openAlertModal(reservationId: string): void {
+    this.selectedReservationId.set(reservationId);
+    this.selectedUserId.set(null);
     this.ModalOpen.set(true);
-    this.selectedReservationId.set(id);
   }
-
-  protected cancel(id: string): void {
-    this.reserveService.cancel(id);
-    this.closeModal();
+  openUserModal(userId: string): void {
+    this.selectedUserId.set(userId);
+    this.selectedReservationId.set(null);
+    this.ModalOpen.set(true);
   }
-
+onModalTransitionEnd(): void {
+  if (!this.ModalOpen()) {
+    this.selectedUserId.set(null);
+    this.selectedReservationId.set(null);
+  }
+}
+  
   protected confirm(id: string): void {
     this.reserveService.confirm(id);
   }

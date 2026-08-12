@@ -1,5 +1,5 @@
 # Lista de Bugs ou Fix Necessarios
-( Essa lista nao tem uma ordem correta )
+> ( Essa lista nao tem uma ordem correta )
 
 ## Geral
 
@@ -30,13 +30,15 @@ src/app/features/auth/pages/select-role/select-role.html
 
 * Tela de Reserva (Visualizar as reservas)
 
-    * Adicionar a API do Whatsapp na tela de reserva junto com talvez um botao para copiar o numero telefonico
+    * ~~Adicionar a API do Whatsapp na tela de reserva junto com talvez um botao para copiar o numero telefonico ~~
 
-    * Adicionar talvez um botao para se comunicar via Email
+    * ~~Adicionar talvez um botao para se comunicar via Email ~~
     
-    * Talvez adicionar a data na qual foi reservada (Create-date)
+    * ~~Arrumar/Melhorar as informações da parte de açoes ~~ 
+    
+    * Talvez adicionar a data na qual foi reservada (Create-date) 
+        > Obs: ja foi adicionado no backend so ficou para confirmar no front
 
-    * Arrumar/Melhorar as informações da parte de açoes  
 
 * Ajeitar o visual da tela de configuraçoes do clube (talvez deixar parecido com o visual do editar usuario)
 

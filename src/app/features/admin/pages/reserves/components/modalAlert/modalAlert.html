@@ -1,0 +1,24 @@
+<h3 id="modal-title" class="font-bold text-xl text-base-content mb-4 text-center">
+          Cancelar reserva ?
+        </h3>
+
+        <p class="text-base-content/60 text-center">
+          Tem certeza que deseja cancelar a reserva? Esta ação não pode ser desfeita.
+        </p>
+
+        <div class="modal-action mt-6 flex gap-3">
+          <button
+            class="btn btn-primary shadow-lg rounded-lg flex-1"
+            (click)="cancel(this.reservationId()!)"
+            aria-label="Confirmar reserva"
+          >
+            Sim, cancelar reserva
+          </button>
+          <button
+            class="btn btn-ghost shadow-lg rounded-lg flex-1"
+            (click)="close.emit()"
+            aria-label="Cancelar reserva"
+          >
+            Não, manter reserva
+          </button>
+        </div>

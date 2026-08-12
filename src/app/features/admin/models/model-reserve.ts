@@ -2,11 +2,12 @@
 
 export interface ResponseReserveDetailDTO {
   id: string;
-  date: string; // DateTime → "2026-03-03T00:00:00"
-  status: StatusEnum; // StatusEnum como string: "Pending" | "Confirmed" | "Cancelled"
+  date: string; 
+  status: StatusEnum; 
   name: string;
-  email: string;
   phoneNumber: string;
+  userId: string;
+  dateOfReservation: string;
   schedule: ApiSchedule;
 }
 
@@ -34,8 +35,9 @@ export enum StatusEnum {
 export interface Reservation {
   id: string;
   name: string;
-  email: string;
   phoneNumber: string;
+  userId: string;
+  dateOfReservation: string;
   court: string;
   date: string; // "YYYY-MM-DD"
   time: string; // "HH:mm – HH:mm"

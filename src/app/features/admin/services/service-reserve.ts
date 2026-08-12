@@ -106,8 +106,9 @@ export class ReserveService {
     return {
       id: r.id,
       name: r.name,
-      email: r.email,
       phoneNumber: r.phoneNumber,
+      userId: r.userId,
+      dateOfReservation: r.dateOfReservation,
       court: r.schedule.court.name,
       date: r.date.slice(0, 10),
       time: `${r.schedule.startTime.slice(0, 5)} – ${r.schedule.endTime.slice(0, 5)}`,
