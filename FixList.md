@@ -11,7 +11,7 @@
 
 ## HomePage
 
-* O search da HomePage 
+* ~~O search da HomePage~~ 
 ```bash 
 src/app/shared/components/search-home/search-home.html
 ```
@@ -30,11 +30,11 @@ src/app/features/auth/pages/select-role/select-role.html
 
 * Tela de Reserva (Visualizar as reservas)
 
-    * ~~Adicionar a API do Whatsapp na tela de reserva junto com talvez um botao para copiar o numero telefonico ~~
+    * ~~Adicionar a API do Whatsapp na tela de reserva junto com talvez um botao para copiar o numero telefonico~~
 
-    * ~~Adicionar talvez um botao para se comunicar via Email ~~
+    * ~~Adicionar talvez um botao para se comunicar via Email~~
     
-    * ~~Arrumar/Melhorar as informações da parte de açoes ~~ 
+    * ~~Arrumar/Melhorar as informações da parte de açoes~~ 
     
     * Talvez adicionar a data na qual foi reservada (Create-date) 
         > Obs: ja foi adicionado no backend so ficou para confirmar no front
