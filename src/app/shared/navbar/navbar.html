@@ -79,7 +79,7 @@
                 [routerLink]="['/login']"
                 class="text-gray-300 hover:text-white rounded-lg font-medium text-sm transition-colors"
               >
-                Entrar
+              Entrar
               </a>
           </li>
 
@@ -93,39 +93,7 @@
         } @else {
           <app-notification-icon></app-notification-icon>
 
-          <button
-            type="button"
-            class="btn btn-sm rounded-lg btn-outline text-white border-white/30 hover:bg-white/10"
-            popovertarget="user-menu-popover"
-            style="anchor-name: --user-menu-anchor"
-            aria-haspopup="menu"
-            aria-controls="user-menu-popover"
-          >
-            {{ displayName() }}
-          </button>
-
-          <ul
-            id="user-menu-popover"
-            popover
-            class="dropdown dropdown-end menu w-56 rounded-box bg-base-100 shadow-sm"
-            style="position-anchor: --user-menu-anchor"
-            role="menu"
-          >
-            <li role="none">
-              <button type="button" role="menuitem" (click)="goToAccount()">Minha Conta</button>
-            </li>
-            <li role="none">
-              <button type="button" role="menuitem" (click)="goToReserves()">Minhas Reservas</button>
-            </li>
-            @if (isAdmin()) {
-              <li role="none">
-                <button type="button" role="menuitem" (click)="goToAdmin()">Administração</button>
-              </li>
-            }
-            <li role="none">
-              <button type="button" role="menuitem" (click)="onLogout()">Sair</button>
-            </li>
-          </ul>
+          <app-user-menu></app-user-menu>
         }
 
         <div class="md:hidden">

@@ -5,10 +5,11 @@ import { Themeselector } from '../components/themeselector/themeselector';
 import { AuthService } from '../../core/services/auth-service';
 import { take } from 'rxjs';
 import { NotificationIcon } from "../components/notification-icon/notification-icon";
+import { UserMenu } from "../components/user-menu/user-menu";
 
 @Component({
   selector: 'app-navbar',
-  imports: [CommonModule, RouterModule, Themeselector, NotificationIcon],
+  imports: [CommonModule, RouterModule, Themeselector, NotificationIcon, UserMenu],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
 })
@@ -36,24 +37,4 @@ export class Navbar {
     void this.router.navigate(['/sign-up']);
   }
 
-  onLogout(): void {
-    this.authService.logout().pipe(take(1)).subscribe({
-      next: () => void this.router.navigateByUrl('/login'),
-      error: () => void this.router.navigateByUrl('/login'),
-    });
-  }
-  isAdmin = computed(() => {
-    const role = this.me()?.role?.trim().toLowerCase();
-    return role === 'admin';
-  });
-
-  goToAccount(): void {
-    void this.router.navigate(['/user-profile']);
-  }
-  goToReserves(): void {
-    void this.router.navigate(['/user-reserves']);
-  }
-  goToAdmin(): void {
-    void this.router.navigate(['/admin/clubs']);
-  }
 }

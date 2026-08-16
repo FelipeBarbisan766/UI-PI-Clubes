@@ -1,35 +1,35 @@
-// theme.service.ts
 import { Injectable, inject, signal } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 
-const THEME_STORAGE_KEY = 'theme-color';
-const DEFAULT_COLOR = 'oklch(72.3% 0.370 16.823)'; // Vermelho
+const THEME_STORAGE_KEY = 'dashboard-theme';
+const DEFAULT_THEME = 'light';
 
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
   private readonly document = inject(DOCUMENT);
 
-  private readonly _selectedColor = signal<string>(DEFAULT_COLOR);
-  readonly selectedColor = this._selectedColor.asReadonly();
+  private readonly _selectedTheme = signal<string>(DEFAULT_THEME);
+  readonly selectedTheme = this._selectedTheme.asReadonly();
 
   constructor() {
     this.applyStoredTheme();
   }
 
-  setColor(newColorValue: string): void {
-    this._selectedColor.set(newColorValue);
-    localStorage.setItem(THEME_STORAGE_KEY, newColorValue);
-    this.applyColor(newColorValue);
+  setTheme(newTheme: string): void {
+    this._selectedTheme.set(newTheme);
+    localStorage.setItem(THEME_STORAGE_KEY, newTheme);
+    this.applyTheme(newTheme);
   }
 
   private applyStoredTheme(): void {
     const stored = localStorage.getItem(THEME_STORAGE_KEY);
-    const colorToApply = stored ?? DEFAULT_COLOR;
-    this._selectedColor.set(colorToApply);
-    this.applyColor(colorToApply);
+    const themeToApply = stored ?? DEFAULT_THEME;
+    this._selectedTheme.set(themeToApply);
+    this.applyTheme(themeToApply);
   }
 
-  private applyColor(color: string): void {
-    this.document.documentElement.style.setProperty('--color-primary', color);
+  private applyTheme(theme: string): void {
+    // É assim que o DaisyUI v4 sabe qual tema aplicar
+    this.document.documentElement.setAttribute('data-theme', theme);
   }
 }

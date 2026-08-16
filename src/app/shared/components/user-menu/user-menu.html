@@ -1,0 +1,136 @@
+<button
+  type="button"
+  class="btn btn-md btn-ghost text-white border-none hover:bg-white/10 shadow-none"
+  popovertarget="user-menu-popover"
+  style="anchor-name: --user-menu-anchor"
+  aria-haspopup="menu"
+  aria-controls="user-menu-popover"
+>
+  <span class="avatar avatar-placeholder">
+    <span class="bg-neutral text-neutral-content w-8 h-8 rounded-full flex items-center justify-center">
+        <span class="text-xs">
+          {{ initials() }}
+        </span>
+    </span>
+  </span>
+  {{ displayName() }}
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down-icon lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg>
+</button>
+
+<ul
+  id="user-menu-popover"
+  popover
+  class="dropdown dropdown-end menu w-64 rounded-none bg-base-100 shadow-sm p-2"
+  style="position-anchor: --user-menu-anchor"
+  role="menu"
+>
+
+  <li role="none">
+    <button type="button" role="menuitem" (click)="goToAccount()">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="3" />
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z" />
+      </svg>
+      Minha Conta
+    </button>
+  </li>
+  <li role="none">
+    <button type="button" role="menuitem" (click)="goToReserves()">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="3" y="4" width="18" height="18" rx="2" />
+        <path d="M16 2v4M8 2v4M3 10h18" />
+      </svg>
+      Minhas Reservas
+    </button>
+  </li>
+  @if (isAdmin()) {
+    <li role="none">
+      <button type="button" role="menuitem" (click)="goToAdmin()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
+        </svg>
+        Administração
+      </button>
+    </li>
+  }
+
+  <div class="divider my-0"></div>
+
+  <li role="none">
+    <button
+      type="button"
+      role="menuitem"
+      popovertarget="theme-submenu-popover"
+      style="anchor-name: --theme-menu-anchor"
+      aria-haspopup="menu"
+      aria-controls="theme-submenu-popover"
+      class="flex items-center justify-between"
+    >
+      <span class="flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="5" />
+          <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+        </svg>
+        Tema do painel
+      </span>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 opacity-60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="m9 18 6-6-6-6" />
+      </svg>
+    </button>
+  </li>
+
+  <div class="divider my-0"></div>
+
+  <li role="none">
+    <button type="button" role="menuitem" class="text-error" (click)="onLogout()">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+        <path d="m16 17 5-5-5-5" />
+        <path d="M21 12H9" />
+      </svg>
+      Sair
+    </button>
+  </li>
+</ul>
+
+<ul
+  id="theme-submenu-popover"
+  popover
+  class="dropdown dropdown-right menu w-40 rounded-box bg-base-100 shadow-sm p-2"
+  style="position-anchor: --theme-menu-anchor"
+  role="menu"
+>
+  <li role="none">
+    <label class="flex items-center justify-between gap-2 cursor-pointer">
+      <span class="flex items-center gap-2">Claro</span>
+      <input 
+        type="radio" 
+        name="dashboard-theme" 
+        class="theme-controller peer hidden" 
+        value="light" 
+        [checked]="themeService.selectedTheme() === 'light'"
+        (change)="themeService.setTheme('light')"
+      />
+      <svg xmlns="http://www.w3.org/2000/svg" class="hidden peer-checked:block h-4 w-4 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M20 6 9 17l-5-5" />
+      </svg>
+    </label>
+  </li>
+  
+  <li role="none">
+    <label class="flex items-center justify-between gap-2 cursor-pointer">
+      <span class="flex items-center gap-2">Escuro</span>
+      <input 
+        type="radio" 
+        name="dashboard-theme" 
+        class="theme-controller peer hidden" 
+        value="dark" 
+        [checked]="themeService.selectedTheme() === 'dark'"
+        (change)="themeService.setTheme('dark')"
+      />
+      <svg xmlns="http://www.w3.org/2000/svg" class="hidden peer-checked:block h-4 w-4 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M20 6 9 17l-5-5" />
+      </svg>
+    </label>
+  </li>
+</ul>
