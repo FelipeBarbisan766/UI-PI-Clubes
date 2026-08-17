@@ -57,12 +57,13 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 ### Homepage
 
 * erro de nao autorizado, na home page 
-* logo 
-* o botao de entrar esta no como lista 
+* ~~logo~~ 
+* ~~o botao de entrar esta no como lista~~ 
 * baner precisa de atenção pois nao envia voce para lugar nenhum (colocar o cadrastrar talvez)
 * problemas de resposividade
 * informaçoes sobre nao ter clube ( esconder/tirar )
-* tornar a logo ficar com o cursor do tipo poiter
+* ~~tornar a logo ficar com o cursor do tipo poiter~~
+* ~~primeiro nome~~
 
 ### Login 
 
@@ -71,18 +72,18 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 ### Clubs/Court-list
 
 - responsividade no botao de filtrar
-- sem roda-pé
+- ~~sem roda-pé~~
 
 ### Cadastrar
 
-- tem que ter atençao nas proibições de caracteres especiais 
-- revelar as condiçoes sobre a senha antes de ela tentar criar a senha 
+- ~~tem que ter atençao nas proibições de caracteres especiais~~ 
+- ~~revelar as condiçoes sobre a senha antes de ela tentar criar a senha~~ 
 - cpf e data de nascimento (eu n quero fazer isso )
 
 ### Email
 
 - deixar bonito
-- nao redirecionar 
+- ~~nao redirecionar~~ 
 
 ### User 
 
@@ -90,7 +91,7 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 
 ##### Barra de pesquisa 
 
-- ~~sla o que nois vai fazer com isso aqui ~~
+- ~~sla o que nois vai fazer com isso aqui~~
 
 ### Clube details
 

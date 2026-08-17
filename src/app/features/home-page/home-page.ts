@@ -33,7 +33,9 @@ export class HomePage implements OnInit {
 
   readonly userName = computed(() => {
     const user = this.authService.me();
-    return user ? (user as any).name : 'Jogador';
+    const fullName = user ? (user as any).name?.trim() : '';
+
+    return fullName ? fullName.split(' ')[0] : 'Jogador';
   });
 
   readonly detectedCity = signal<string | null>(null);

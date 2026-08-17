@@ -37,7 +37,7 @@ export class VerifyMail {
     next: (result) => {
       this.status.set('success');
       this.successMessage.set(result.message);
-      this.router.navigate(['/login']);
+      
     },
     error: (error: unknown) => {
       this.status.set('error');
