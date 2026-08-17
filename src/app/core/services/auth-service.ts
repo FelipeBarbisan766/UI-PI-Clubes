@@ -80,16 +80,24 @@ export class AuthService {
       );
   }
 
-  getMe(): Observable<MeResponse> {
-    return this.http
-      .get<MeResponse>(`${this.baseUrl}/me`, { withCredentials: true })
-      .pipe(
-        tap((user) => {
-          this.me.set(user);
-          this.authStatus.set('authenticated');
-        })
-      );
-  }
+ getMe(): Observable<MeResponse | null> {
+  return this.http
+    .get<MeResponse>(`${this.baseUrl}/me`, { withCredentials: true })
+    .pipe(
+      tap((user) => {
+        this.me.set(user);
+        this.authStatus.set('authenticated');
+      }),
+      catchError((err: HttpErrorResponse) => {
+        if (err.status === 401) {
+          this.me.set(null);
+          this.authStatus.set('unauthenticated');
+          return of(null); 
+        }
+        return throwError(() => err); 
+      })
+    );
+}
 
   logout(): Observable<string> {
     return this.http
