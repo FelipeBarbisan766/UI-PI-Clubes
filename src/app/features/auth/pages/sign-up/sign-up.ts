@@ -56,7 +56,8 @@ export class SignUp implements AfterViewInit {
         [
           Validators.required,
           Validators.minLength(3),
-          Validators.pattern(/^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/),
+          Validators.maxLength(100),
+          Validators.pattern(/^[A-Za-zÀ-ÖØ-öø-ÿ\s\-'().]+$/)
         ],
       ],
       email: ['', [Validators.required, Validators.email]],

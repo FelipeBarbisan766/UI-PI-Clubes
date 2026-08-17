@@ -42,8 +42,10 @@
                   O nome é obrigatório.
                 } @else if (form.controls.name.hasError('minlength')) {
                   O nome deve ter pelo menos 3 caracteres.
+                  } @else if (form.controls.name.hasError('maxlength')) {
+                  O nome deve ter no máximo 100 caracteres.
                 } @else if (form.controls.name.hasError('pattern')) {
-                  O nome deve conter apenas letras.
+                  O nome deve conter apenas letras. Não é permitido o uso de números ou caracteres especiais.
                 }
               </p>
             }
@@ -102,10 +104,10 @@
                   ? 'password-error'
                   : null
               "
-              placeholder="●●●●●●"
+              placeholder="*********"
             />
           </div>
-          <div class="h-5 mt-1 px-3">
+          <div class="h-5 mt-1 px-3 mb-5">
             @if (form.controls.password.invalid && form.controls.password.touched) {
               <p id="password-error" class="text-error text-xs" role="alert">
                 @if (form.controls.password.hasError('required')) {
@@ -114,6 +116,12 @@
                   A senha deve ter no mínimo 8 caracteres, incluindo letra maiúscula, letra
                   minúscula, número e caractere especial.
                 }
+              </p>
+            }
+            @else {
+              <p id="password-info" class="text-gray-400 text-xs">
+                A senha deve ter no mínimo 8 caracteres, incluindo letra maiúscula, letra
+                minúscula, número e caractere especial.
               </p>
             }
           </div>
@@ -145,7 +153,7 @@
                   ? 'confirmPassword-error'
                   : null
               "
-              placeholder="●●●●●●"
+              placeholder="*********"
             />
           </div>
           <div class="h-5 mt-1 px-3">
