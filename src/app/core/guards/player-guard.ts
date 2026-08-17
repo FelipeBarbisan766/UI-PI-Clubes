@@ -18,7 +18,7 @@ export const playerGuard: CanActivateFn = () => {
 
       const role = normalizeRole(user.role);
 
-      return role === 'player' || role === 'both'
+      return role === 'player' 
         ? true
         : router.parseUrl('/select');
     })

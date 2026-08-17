@@ -175,11 +175,7 @@ export class Payment implements OnInit, OnDestroy {
     });
   }
 
-  /**
-   * Polls `check-access` every 3 s after a successful MP redirect.
-   * The webhook is handled by the backend; here we just wait for confirmation.
-   * Stops after MAX_POLL_ATTEMPTS × 3 s or when access is confirmed.
-   */
+
   private startPolling(): void {
     const adminId = this.adminId;
     if (!adminId) return;
@@ -205,7 +201,6 @@ export class Payment implements OnInit, OnDestroy {
           this.isPolling.set(false);
         },
         complete: () => {
-          // Exhausted all attempts without confirmation
           if (!this.accessConfirmed()) {
             this.isPolling.set(false);
             this.pollTimedOut.set(true);
@@ -216,5 +211,39 @@ export class Payment implements OnInit, OnDestroy {
 
   formatPrice(price: number): string {
     return price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  }
+  beAdmin() {
+    // const userId = this.currentUserId();
+    // if (!userId) {
+    //   this.errorMessage.set('Sessão inválida. Faça login novamente.');
+    //   return;
+    // }
+
+    // this.isSubmitting.set(true);
+    // this.errorMessage.set('');
+    // this.successMessage.set('');
+
+    // this.adminService
+    //   .createAdmin(userId)
+    //   .pipe(
+    //     take(1),
+    //     switchMap(() => this.authService.refreshMe()),
+    //     finalize(() => this.isSubmitting.set(false)),
+    //   )
+    //   .subscribe({
+    //     next: () => {
+    //       console.log('Admin role assigned and session refreshed successfully');
+    //       this.successMessage.set('Perfil de administrador salvo com sucesso.');
+
+    //       void this.router.navigateByUrl('/admin/clubs');
+    //     },
+    //     error: (error: unknown) => {
+    //       this.errorMessage.set(
+    //         error instanceof Error ? error.message : 'Erro ao salvar perfil de administrador.',
+    //       );
+    //     },
+    //   });
+
+    // this.beAdminEvent.emit();
   }
 }

@@ -9,6 +9,7 @@ import {
 import { Router } from '@angular/router';
 import { take } from 'rxjs';
 import { Plan, ServiceSubscription } from '../../services/service-subscription';
+import { AuthService } from '../../../../core/services/auth-service';
 
 @Component({
   selector: 'app-plans',
@@ -17,11 +18,16 @@ import { Plan, ServiceSubscription } from '../../services/service-subscription';
 })
 export class Plans implements OnInit {
   private readonly router = inject(Router);
+  readonly authService = inject(AuthService);
   private readonly subscriptionService = inject(ServiceSubscription);
 
   readonly plans = signal<Plan[]>([]);
   readonly isLoading = signal(true);
   readonly errorMessage = signal('');
+
+
+  readonly me = this.authService.me;
+  readonly currentUserId = computed(() => this.me()?.id ?? '');
 
   /** Marks the plan at index 1 as "popular" when there are ≥ 2 plans. */
   readonly popularPlanId = computed<string | null>(() => {
@@ -49,6 +55,11 @@ export class Plans implements OnInit {
   }
 
   selectPlan(planId: string): void {
+    const userId = this.currentUserId();
+    if (!userId) {
+      this.errorMessage.set('Sessão inválida. Faça login novamente.');
+      return;
+    }
     this.router.navigate(['/payment'], { queryParams: { planId } });
   }
 
