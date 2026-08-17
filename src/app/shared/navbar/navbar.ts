@@ -1,15 +1,13 @@
 import { Component, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { Themeselector } from '../components/themeselector/themeselector';
 import { AuthService } from '../../core/services/auth-service';
-import { take } from 'rxjs';
 import { NotificationIcon } from "../components/notification-icon/notification-icon";
 import { UserMenu } from "../components/user-menu/user-menu";
 
 @Component({
   selector: 'app-navbar',
-  imports: [CommonModule, RouterModule, Themeselector, NotificationIcon, UserMenu],
+  imports: [CommonModule, RouterModule, NotificationIcon, UserMenu],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
 })
