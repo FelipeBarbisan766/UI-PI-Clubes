@@ -347,6 +347,12 @@ export class ClubsDetail {
       return;
     }
 
+    if (this.authService.needsCompleteProfile()) {
+      this.closeBookingModal();
+      this.router.navigate(['/complete-profile']);
+      return;
+    }
+
     const slot = this.bookingSlot();
     if (!slot) return;
 

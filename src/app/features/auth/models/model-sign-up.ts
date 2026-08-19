@@ -3,3 +3,8 @@ export interface SignUpPayload {
   email: string;
   password: string;
 }
+export interface CompleteProfilePayload {
+  phoneNumber: string;
+  cpf: string;
+  birthDate: string; 
+}
