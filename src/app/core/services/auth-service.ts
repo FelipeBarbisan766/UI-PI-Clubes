@@ -15,23 +15,24 @@ export class AuthService {
   private readonly adminBaseUrl = `${environment.apiUrl}/Admin`;
   private readonly playerBaseUrl = `${environment.apiUrl}/Player`;
 
-  private readonly PHONE_WARNING_DISMISSED_KEY = 'phoneWarningDismissed';
+  private readonly PROFILE_WARNING_DISMISSED_KEY = 'profileWarningDismissed';
 
   readonly me = signal<MeResponse | null>(null);
   readonly authStatus = signal<AuthStatus>('unknown');
-  private readonly phoneWarningDismissed = signal(
-     sessionStorage.getItem(this.PHONE_WARNING_DISMISSED_KEY) === 'true'
-   );
+  private readonly profileWarningDismissed = signal(
+    sessionStorage.getItem(this.PROFILE_WARNING_DISMISSED_KEY) === 'true',
+  );
 
-   readonly needsPhoneNumber = computed(() => {
+  readonly needsCompleteProfile = computed(() => {
     const user = this.me();
-    if (user === null) return false; // ainda não carregou ou não está logado
-    if (this.phoneWarningDismissed()) return false;
-    return !user.phoneNumber; // <- ajustar nome do campo conforme MeResponse
+    if (user === null) return false;
+    return user.role === 'None';
   });
+  readonly showCompleteProfileModal = computed(
+    () => this.needsCompleteProfile() && !this.profileWarningDismissed(),
+  );
 
   readonly isAuthenticated = computed(() => this.authStatus() === 'authenticated');
-
 
   private meRequest$: Observable<MeResponse | null> | null = null;
 
@@ -46,44 +47,50 @@ export class AuthService {
           this.authStatus.set('authenticated');
           this.meRequest$ = null;
         }),
-        catchError(this.handleHttpError('Erro ao realizar login.'))
+        catchError(this.handleHttpError('Erro ao realizar login.')),
       );
   }
 
   googleLogin(idToken: string): Observable<string> {
     return this.http
-      .post(`${this.baseUrl}/google/login`, { idToken }, {
-        responseType: 'text',
-        withCredentials: true,
-      })
+      .post(
+        `${this.baseUrl}/google/login`,
+        { idToken },
+        {
+          responseType: 'text',
+          withCredentials: true,
+        },
+      )
       .pipe(
         tap(() => {
           this.authStatus.set('authenticated');
           this.meRequest$ = null;
         }),
-        catchError(this.handleHttpError('Erro ao realizar login com Google.'))
+        catchError(this.handleHttpError('Erro ao realizar login com Google.')),
       );
   }
 
   googleSignUp(idToken: string): Observable<string> {
     return this.http
-      .post(`${this.baseUrl}/google/signup`, { idToken }, {
-        responseType: 'text',
-        withCredentials: true,
-      })
+      .post(
+        `${this.baseUrl}/google/signup`,
+        { idToken },
+        {
+          responseType: 'text',
+          withCredentials: true,
+        },
+      )
       .pipe(
         tap(() => {
           this.authStatus.set('authenticated');
           this.meRequest$ = null;
         }),
-        catchError(this.handleHttpError('Erro ao criar conta com Google.'))
+        catchError(this.handleHttpError('Erro ao criar conta com Google.')),
       );
   }
 
- getMe(): Observable<MeResponse | null> {
-  return this.http
-    .get<MeResponse>(`${this.baseUrl}/me`, { withCredentials: true })
-    .pipe(
+  getMe(): Observable<MeResponse | null> {
+    return this.http.get<MeResponse>(`${this.baseUrl}/me`, { withCredentials: true }).pipe(
       tap((user) => {
         this.me.set(user);
         this.authStatus.set('authenticated');
@@ -92,12 +99,12 @@ export class AuthService {
         if (err.status === 401) {
           this.me.set(null);
           this.authStatus.set('unauthenticated');
-          return of(null); 
+          return of(null);
         }
-        return throwError(() => err); 
-      })
+        return throwError(() => err);
+      }),
     );
-}
+  }
 
   logout(): Observable<string> {
     return this.http
@@ -108,8 +115,12 @@ export class AuthService {
         catchError((error: unknown) => {
           this.clearSession();
           return this.handleHttpError('Erro ao realizar logout.')(error);
-        })
+        }),
       );
+  }
+  getPostLoginRoute(): string {
+    const role = this.me()?.role;
+    return role === 'None' ? '/complete-profile' : '/clubs';
   }
 
   resolveSession(): Observable<MeResponse | null> {
@@ -129,7 +140,7 @@ export class AuthService {
             this.clearSession();
             return of(null);
           }),
-          shareReplay(1)
+          shareReplay(1),
         );
     }
 
@@ -142,53 +153,54 @@ export class AuthService {
     this.meRequest$ = null;
   }
 
-  dismissPhoneWarning(): void {
-    sessionStorage.setItem(this.PHONE_WARNING_DISMISSED_KEY, 'true');
-    this.phoneWarningDismissed.set(true);
+  dismissProfileWarning(): void {
+    sessionStorage.setItem(this.PROFILE_WARNING_DISMISSED_KEY, 'true');
+    this.profileWarningDismissed.set(true);
   }
 
-  
+  requireCompleteProfile(): boolean {
+    if (!this.needsCompleteProfile()) return false;
+
+    sessionStorage.removeItem(this.PROFILE_WARNING_DISMISSED_KEY);
+    this.profileWarningDismissed.set(false);
+    return true;
+  }
+
   clearSession(): void {
     this.me.set(null);
     this.authStatus.set('unauthenticated');
     this.meRequest$ = null;
-    sessionStorage.removeItem(this.PHONE_WARNING_DISMISSED_KEY);
-    this.phoneWarningDismissed.set(false);
+    sessionStorage.removeItem(this.PROFILE_WARNING_DISMISSED_KEY);
+    this.profileWarningDismissed.set(false);
   }
-
 
   refreshMe(): Observable<MeResponse> {
     this.meRequest$ = null;
-    return this.http
-      .get<MeResponse>(`${this.baseUrl}/me`, { withCredentials: true })
-      .pipe(
-        tap((user) => this.markAuthenticated(user)),
-        catchError(this.handleHttpError('Não foi possível carregar usuário.'))
-      );
+    return this.http.get<MeResponse>(`${this.baseUrl}/me`, { withCredentials: true }).pipe(
+      tap((user) => this.markAuthenticated(user)),
+      catchError(this.handleHttpError('Não foi possível carregar usuário.')),
+    );
   }
 
   getAdminMe(): Observable<AdminMeResponse> {
     return this.http
       .get<AdminMeResponse>(`${this.adminBaseUrl}/me`, { withCredentials: true })
       .pipe(
-        catchError(this.handleHttpError('Não foi possível carregar o perfil do administrador.'))
+        catchError(this.handleHttpError('Não foi possível carregar o perfil do administrador.')),
       );
   }
 
   getPlayerMe(): Observable<PlayerMeResponse> {
     return this.http
       .get<PlayerMeResponse>(`${this.playerBaseUrl}/me`, { withCredentials: true })
-      .pipe(
-        catchError(this.handleHttpError('Não foi possível carregar o perfil do jogador.'))
-      );
+      .pipe(catchError(this.handleHttpError('Não foi possível carregar o perfil do jogador.')));
   }
 
   // Centraliza o tratamento de erro HTTP — evita repetição nos métodos acima
   private handleHttpError(fallback: string) {
     return (error: unknown): Observable<never> => {
       if (error instanceof HttpErrorResponse) {
-        if (error.status === 401)
-          return throwError(() => new Error('Credenciais inválidas.'));
+        if (error.status === 401) return throwError(() => new Error('Credenciais inválidas.'));
 
         if (typeof error.error === 'string' && error.error.trim())
           return throwError(() => new Error(error.error));

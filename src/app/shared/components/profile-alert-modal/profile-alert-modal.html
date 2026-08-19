@@ -1,0 +1,22 @@
+@if (variant(); as v) {
+      <div class="modal modal-open" role="dialog" aria-modal="true">
+        <div class="modal-box">
+          <h3 class="font-bold text-lg">
+            {{ v === 'completeProfile' ? 'Finalize seu cadastro' : 'Complete seu cadastro' }}
+          </h3>
+          <p class="py-4">
+            @if (v === 'completeProfile') {
+              Notamos que seu cadastro ainda não foi concluído. Você já pode navegar pelo site,
+              mas para reservar uma quadra é preciso completar seu perfil com telefone, CPF e
+              data de nascimento.
+            } 
+          </p>
+          <div class="modal-action">
+            <button class="btn btn-ghost" (click)="dismiss(v)">Depois</button>
+            <button class="btn btn-primary" (click)="goToProfile(v)">
+              {{ v === 'completeProfile' ? 'Completar cadastro' : 'Cadastrar agora' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    }

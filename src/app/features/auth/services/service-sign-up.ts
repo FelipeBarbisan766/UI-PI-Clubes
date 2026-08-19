@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable, catchError, throwError } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { SignUpPayload } from '../models/model-sign-up';
+import { CompleteProfilePayload, SignUpPayload } from '../models/model-sign-up';
 
 @Injectable({
   providedIn: 'root',
@@ -28,6 +28,15 @@ export class ServiceSignUp {
       })
       .pipe(catchError((err) => this.handleError(err)));
   }
+  
+  completeProfile(data: CompleteProfilePayload): Observable<string> {
+  return this.http
+    .patch(`${this.apiUrl}/complete-profile`, data, {
+      responseType: 'text',
+      withCredentials: true, // ← endpoint autenticado, diferente de register/signup
+    })
+    .pipe(catchError((err) => this.handleError(err)));
+}
 
   private handleError(err: unknown): Observable<never> {
     if (err instanceof HttpErrorResponse) {
@@ -41,4 +50,5 @@ export class ServiceSignUp {
     const message = err instanceof Error ? err.message : 'Ocorreu um erro inesperado.';
     return throwError(() => new Error(message));
   }
+
 }

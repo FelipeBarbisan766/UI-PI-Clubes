@@ -10,6 +10,7 @@ import { Clubs } from './features/admin/pages/clubs/clubs';
 import { clubNameResolver } from './shared/components/resolvers/club-name.resolver';
 import { courtNameResolver } from './shared/components/resolvers/court-name.resolver';
 import { clubCityResolver } from './shared/components/resolvers/club-city.resolver';
+import { completeProfileGuard } from './core/guards/complete-profile-guard';
 
 export const routes: Routes = [
   {
@@ -184,6 +185,14 @@ export const routes: Routes = [
         canActivate: [selectRoleGuard],
         loadComponent: () =>
           import('./features/auth/pages/register-club/register-club').then((m) => m.RegisterClub),
+      },
+      {
+        path: 'complete-profile',
+        loadComponent: () =>
+          import('./features/auth/pages/complete-profile/complete-profile').then(
+            (m) => m.CompleteProfile,
+          ),
+        canActivate: [completeProfileGuard],
       },
       // {
       //   path: '**',

@@ -1,0 +1,143 @@
+@if (errorMessage(); as msg) {
+  <app-toast-alert [message]="msg" type="error" (dismiss)="errorMessage.set(null)" />
+}
+
+<div
+  class="w-full min-h-[calc(100vh-var(--nav-h))] pattern-background flex items-center justify-center px-4 py-12"
+>
+  <div
+    class="card w-full max-w-lg bg-base-100 shadow-xl rounded-3xl overflow-hidden border border-base-300"
+  >
+    <div class="card-body p-6 md:p-8">
+      <div class="text-center mb-6">
+        <h1 class="text-2xl md:text-3xl font-bold text-base-content mb-2">Complete seu perfil</h1>
+        <p class="text-base-content/60 text-sm">
+          Falta pouco! Precisamos de mais alguns dados para liberar suas reservas.
+        </p>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate class="flex flex-col gap-4">
+        <div class="form-group">
+          <label for="phoneNumber" class="text-sm font-medium text-base-content block pb-2">
+            Telefone
+          </label>
+          <div
+            class="input w-full"
+            [class.input-error]="
+              form.controls.phoneNumber.invalid && form.controls.phoneNumber.touched
+            "
+          >
+            <input
+              id="phoneNumber"
+              type="tel"
+              formControlName="phoneNumber"
+              mask="(00) 00000-0000"
+              class="grow text-sm"
+              [attr.aria-invalid]="
+                form.controls.phoneNumber.invalid && form.controls.phoneNumber.touched
+              "
+              [attr.aria-describedby]="
+                form.controls.phoneNumber.invalid && form.controls.phoneNumber.touched
+                  ? 'phoneNumber-error'
+                  : null
+              "
+              placeholder="(00) 00000-0000"
+            />
+          </div>
+          <div class="h-5 mt-1 px-3">
+            @if (form.controls.phoneNumber.invalid && form.controls.phoneNumber.touched) {
+              <p id="phoneNumber-error" class="text-error text-xs" role="alert">
+                O telefone é obrigatório.
+              </p>
+            }
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="cpf" class="text-sm font-medium text-base-content block pb-2"> CPF </label>
+          <div
+            class="input w-full"
+            [class.input-error]="form.controls.cpf.invalid && form.controls.cpf.touched"
+          >
+            <input
+              id="cpf"
+              type="text"
+              formControlName="cpf"
+              mask="000.000.000-00"
+              class="grow text-sm"
+              [attr.aria-invalid]="form.controls.cpf.invalid && form.controls.cpf.touched"
+              [attr.aria-describedby]="
+                form.controls.cpf.invalid && form.controls.cpf.touched ? 'cpf-error' : null
+              "
+              placeholder="000.000.000-00"
+            />
+          </div>
+          <div class="h-5 mt-1 px-3">
+            @if (form.controls.cpf.invalid && form.controls.cpf.touched) {
+              <p id="cpf-error" class="text-error text-xs" role="alert">
+                @if (form.controls.cpf.hasError('required')) {
+                  O CPF é obrigatório.
+                } @else if (form.controls.cpf.hasError('cpfInvalid')) {
+                  Informe um CPF válido.
+                }
+              </p>
+            }
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="birthDate" class="text-sm font-medium text-base-content block pb-2">
+            Data de nascimento
+          </label>
+          <div
+            class="input w-full"
+            [class.input-error]="form.controls.birthDate.invalid && form.controls.birthDate.touched"
+          >
+            <input
+              id="birthDate"
+              type="date"
+              formControlName="birthDate"
+              class="grow text-sm"
+              [attr.aria-invalid]="
+                form.controls.birthDate.invalid && form.controls.birthDate.touched
+              "
+              [attr.aria-describedby]="
+                form.controls.birthDate.invalid && form.controls.birthDate.touched
+                  ? 'birthDate-error'
+                  : null
+              "
+            />
+          </div>
+          <div class="h-5 mt-1 px-3">
+            @if (form.controls.birthDate.invalid && form.controls.birthDate.touched) {
+              <p id="birthDate-error" class="text-error text-xs" role="alert">
+                @if (form.controls.birthDate.hasError('required')) {
+                  A data de nascimento é obrigatória.
+                } @else if (form.controls.birthDate.hasError('futureDate')) {
+                  A data não pode ser no futuro.
+                }
+              </p>
+            }
+          </div>
+        </div>
+
+        <div class="mt-2 pt-2 flex justify-between">
+            <button class="btn btn-ghost" (click)="dismiss()">Depois</button>
+            <button
+            type="submit"
+            class="btn btn-primary rounded-lg font-semibold text-white shadow-lg hover:shadow-primary/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            [disabled]="form.invalid || isSubmitting()"
+            [attr.aria-busy]="isSubmitting()"
+          >
+            @if (isSubmitting()) {
+                <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+                <span class="sr-only">Carregando...</span>
+            } @else {
+                Concluir cadastro
+            }
+        </button>
+    </div>
+</form>
+</div>
+  </div>
+</div>

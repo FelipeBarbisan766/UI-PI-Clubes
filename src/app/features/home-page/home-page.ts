@@ -14,11 +14,12 @@ import { NgOptimizedImage } from '@angular/common';
 import { ServiceClub } from '../clubs/services/service-club';
 import { ResponseClubDTO } from '../clubs/models/model-club';
 import { SearchHome } from '../../shared/components/search-home/search-home';
-import { AuthService } from '../../core/services/auth-service'; // Ajuste o caminho conforme seu projeto
+import { AuthService } from '../../core/services/auth-service';
+import { ProfileAlertModal } from "../../shared/components/profile-alert-modal/profile-alert-modal"; // Ajuste o caminho conforme seu projeto
 
 @Component({
   selector: 'app-home-page',
-  imports: [NgOptimizedImage, RouterLink],
+  imports: [NgOptimizedImage, RouterLink, ProfileAlertModal],
   templateUrl: './home-page.html',
   // NOTA: standalone: true é o padrão no Angular v20+, então não o declaramos.
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -41,8 +42,6 @@ export class HomePage implements OnInit {
   readonly detectedCity = signal<string | null>(null);
   readonly localClubs = signal<ResponseClubDTO[]>([]);
   readonly featuredClubs = signal<ResponseClubDTO[]>([]);
-
-  readonly showPhoneModal = this.authService.needsPhoneNumber;
 
   ngOnInit(): void {
     this.authService
@@ -137,13 +136,6 @@ export class HomePage implements OnInit {
       data.address?.village ??
       null
     );
-  }
-  dismiss(): void {
-    this.authService.dismissPhoneWarning();
-  }
-
-  goToProfile(): void {
-    this.router.navigate(['/user-profile']);
   }
 
   goToRegister(): void {
