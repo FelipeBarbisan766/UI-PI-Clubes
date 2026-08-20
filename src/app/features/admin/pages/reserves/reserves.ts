@@ -24,7 +24,7 @@ interface StatusConfig {
 
 const STATUS_CONFIG: Record<StatusEnum, StatusConfig> = {
   [StatusEnum.Confirmada]: { label: 'Confirmada', badgeClass: 'badge-success' },
-  [StatusEnum.Recusada]: { label: 'Cancelada', badgeClass: 'badge-error' },
+  [StatusEnum.Cancelada]: { label: 'Cancelada', badgeClass: 'badge-error' },
 };
 
 const PAGE_SIZE_OPTIONS = [5, 10, 20, 50] as const;

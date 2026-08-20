@@ -29,7 +29,7 @@ export interface ApiCourt {
 
 export enum StatusEnum {
   Confirmada = 'Confirmada',
-  Recusada = 'Recusada',
+  Cancelada = 'Cancelada',
 }
 
 export interface Reservation {
