@@ -64,6 +64,7 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 * informaçoes sobre nao ter clube ( esconder/tirar )
 * ~~tornar a logo ficar com o cursor do tipo poiter~~
 * ~~primeiro nome~~
+* ~~links footer~~
 
 ### Login 
 

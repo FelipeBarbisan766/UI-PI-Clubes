@@ -21,11 +21,12 @@
     <h6 class="footer-title">Navegação</h6>
     <a [routerLink]="['/']" class="link link-hover">Início</a>
     <a [routerLink]="['/clubs']" class="link link-hover">Clubes</a>
+    <a [routerLink]="['/courts']" class="link link-hover">Quadras</a>
    
   </nav>
   <nav>
     <h6 class="footer-title">Para clubes</h6>
-    <a class="link link-hover">Cadastre seu clube</a>
-    <a class="link link-hover">Gerencie suas quadras</a>
+    <a [routerLink]="['/register-club']" class="link link-hover">Cadastre seu clube</a>
+    <a [routerLink]="['/register-club']" class="link link-hover">Gerencie suas quadras</a>
   </nav>
 </footer>
