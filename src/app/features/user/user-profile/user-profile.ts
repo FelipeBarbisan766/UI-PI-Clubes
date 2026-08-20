@@ -105,7 +105,7 @@ export class UserProfile implements OnInit, OnDestroy {
     this.submitError.set(null);
 
     this.profileService
-      .update(userId, dto)
+      .update(dto)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isSubmitting.set(false))

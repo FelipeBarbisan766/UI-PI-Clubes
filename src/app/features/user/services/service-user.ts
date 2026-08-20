@@ -42,12 +42,12 @@ export class UserProfileService {
       );
   }
 
-  update(id: string, dto: UpdateProfileDTO): Observable<ResponseUserDTO> {
+  update(dto: UpdateProfileDTO): Observable<ResponseUserDTO> {
     this._loading.set(true);
     this._error.set(null);
 
     return this.http
-      .put<ResponseUserDTO>(`${this.baseUrl}/${id}`, dto, { withCredentials: true })
+      .put<ResponseUserDTO>(`${this.baseUrl}/`, dto, { withCredentials: true })
       .pipe(
         tap(user => this._user.set(user)),
         catchError(err => this.handleError('Não foi possível salvar as alterações.', err)),
@@ -59,7 +59,7 @@ export class UserProfileService {
     const formData = new FormData();
     formData.append('AvatarImage', file);
     return this.http
-      .put(`${this.baseUrl}/${id}/avatar`, formData, { withCredentials: true })
+      .put(`${this.baseUrl}/avatar`, formData, { withCredentials: true })
       .pipe(switchMap(() => this.getById(id)));
   }
 

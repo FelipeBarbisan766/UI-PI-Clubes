@@ -20,9 +20,8 @@ interface StatusConfig {
 }
 
 const STATUS_CONFIG: Record<StatusEnum, StatusConfig> = {
-  [StatusEnum.Pendente]: { label: 'Pendente', badgeClass: 'badge-warning' },
   [StatusEnum.Confirmada]: { label: 'Confirmada', badgeClass: 'badge-success' },
-  [StatusEnum.Recusada]: { label: 'Cancelada', badgeClass: 'badge-error' },
+  [StatusEnum.Cancelada]: { label: 'Cancelada', badgeClass: 'badge-error' },
 };
 
 const PAGE_SIZE_OPTIONS = [5, 10, 20, 50] as const;
@@ -68,9 +67,6 @@ export class UserReserve implements OnInit {
 
   protected readonly reservations = this.reserveService.reservations;
 
-  protected readonly pendingCount = computed(
-    () => this.reservations().filter((r) => r.status === StatusEnum.Pendente).length,
-  );
 
   private readonly queryState = computed(() => ({
     playerId: this.playerId(),

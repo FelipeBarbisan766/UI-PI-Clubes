@@ -39,6 +39,8 @@ src/app/features/auth/pages/select-role/select-role.html
     * Talvez adicionar a data na qual foi reservada (Create-date) 
         > Obs: ja foi adicionado no backend so ficou para confirmar no front
 
+    * Arrumar os filtros
+
 
 * Ajeitar o visual da tela de configuraçoes do clube (talvez deixar parecido com o visual do editar usuario)
 
@@ -78,7 +80,7 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 
 - ~~tem que ter atençao nas proibições de caracteres especiais~~ 
 - ~~revelar as condiçoes sobre a senha antes de ela tentar criar a senha~~ 
-- cpf e data de nascimento (eu n quero fazer isso )
+- ~~cpf e data de nascimento (eu n quero fazer isso )~~
 
 ### Email
 

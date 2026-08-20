@@ -67,7 +67,7 @@ export class UserReserveService {
     this._error.set(null);
 
     this.http
-      .put(`${this.apiUrl}/reserve/status/${id}?status=Recusada`, null, {
+      .put(`${this.apiUrl}/reserve/status/${id}?status=Cancelada`, null, {
         withCredentials: true,
       })
       .pipe(
@@ -76,7 +76,7 @@ export class UserReserveService {
       )
       .subscribe(() => {
         const updatedReservations = this._reservations().map((r) =>
-          r.id === id ? { ...r, status: StatusEnum.Recusada } : r,
+          r.id === id ? { ...r, status: StatusEnum.Cancelada } : r,
         );
         this._reservations.set(updatedReservations);
       });
@@ -90,7 +90,7 @@ export class UserReserveService {
       court: r.schedule.court.name,
       date: r.date.slice(0, 10),
       time: `${r.schedule.startTime.slice(0, 5)} – ${r.schedule.endTime.slice(0, 5)}`,
-      status: StatusEnum[r.status as keyof typeof StatusEnum] ?? StatusEnum.Pendente,
+      status: StatusEnum[r.status as keyof typeof StatusEnum],
       pricePerHour: r.schedule.court.pricePerHour,
     };
   }

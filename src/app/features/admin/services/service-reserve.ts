@@ -87,7 +87,7 @@ export class ReserveService {
     this._error.set(null);
 
     this.http
-      .put(`${this.apiUrl}/reserve/status/${id}?status=Recusada`, null, {
+      .put(`${this.apiUrl}/reserve/status/${id}?status=Cancelada`, null, {
         withCredentials: true,
       })
       .pipe(
@@ -96,7 +96,7 @@ export class ReserveService {
       )
       .subscribe(() => {
         const updatedReservations = this._reservations().map((r) =>
-          r.id === id ? { ...r, status: StatusEnum.Recusada } : r,
+          r.id === id ? { ...r, status: StatusEnum.Cancelada } : r,
         );
         this._reservations.set(updatedReservations);
       });

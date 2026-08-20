@@ -26,9 +26,8 @@ export interface Court {
 }
 
 export enum StatusEnum {
-  Pendente = 'AguardandoConfirmacao',
+  Cancelada = 'Cancelada',
   Confirmada = 'Confirmada',
-  Recusada = 'Recusada',
 }
 
 export interface Reservation {
