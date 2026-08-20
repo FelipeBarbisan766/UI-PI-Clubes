@@ -2,7 +2,7 @@ import { Injectable, signal } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { Subject, Observable } from 'rxjs';
 import { ReserveAvailabilityChangedDTO } from '../models/model-reserve';
-import { environment } from '../../../../environments/environment.development';
+import { environment } from '../../../../environments/environment';
 
 
 
