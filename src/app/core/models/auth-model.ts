@@ -3,6 +3,11 @@ export interface LoginPayload {
   password: string;
 }
 
+export interface MeEnvelope {
+  isAuthenticated: boolean;
+  user: MeResponse | null;
+}
+
 export interface MeResponse {
   id: string;
   name: string;
