@@ -68,11 +68,11 @@ export class Dashboard implements OnInit {
   statusBadgeClasses(status: StatusEnum): string {
     switch (status) {
       case 'Confirmada':
-        return 'text-green-600 bg-green-50 border-green-100';
+        return 'text-green-600 bg-base-50 border-green-100';
       case 'Cancelada':
-        return 'text-red-500 bg-red-50 border-red-100';
+        return 'text-red-500 bg-base-50 border-red-100';
       default:
-        return 'text-gray-600 bg-gray-50 border-gray-100';
+        return 'text-gray-600 bg-base-50 border-gray-100';
     }
   }
 
