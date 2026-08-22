@@ -1,10 +1,10 @@
 <main class="flex-1 p-8">
   <header class="mb-8">
-    <div class="flex items-center text-sm text-gray-600 mb-4">
+    <div class="flex items-center text-sm text-base-600 mb-4">
       <i class="fa-solid fa-layer-group mr-2"></i> Clubera
     </div>
-    <h1 class="text-3xl font-bold text-gray-900">Visão Geral</h1>
-    <p class="text-gray-500">Acompanhe o desempenho do seu clube.</p>
+    <h1 class="text-3xl font-bold text-base-900">Visão Geral</h1>
+    <p class="text-base-500">Acompanhe o desempenho do seu clube.</p>
   </header>
 
   @if (loading()) {
@@ -17,37 +17,37 @@
     </div>
   } @else if (dashboard(); as data) {
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-      <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm relative">
-        <p class="text-sm font-medium text-gray-500 mb-2">Quadras</p>
+      <div class="bg-base p-6 rounded-xl border border-base-100 shadow-sm relative">
+        <p class="text-sm font-medium text-base-500 mb-2">Quadras</p>
         <p class="text-3xl font-bold">{{ data.quantCourt }}</p>
         <i class="fa-solid fa-location-dot absolute top-6 right-6 text-orange-500 opacity-80"></i>
       </div>
-      <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm relative">
-        <p class="text-sm font-medium text-gray-500 mb-2">Reservas para Hoje</p>
+      <div class="bg-base p-6 rounded-xl border border-base-100 shadow-sm relative">
+        <p class="text-sm font-medium text-base-500 mb-2">Reservas para Hoje</p>
         <p class="text-3xl font-bold">{{ data.quantReserveToday }}</p>
         <i class="fa-regular fa-calendar absolute top-6 right-6 text-orange-500 opacity-80"></i>
       </div>
-      <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm relative">
-        <p class="text-sm font-medium text-gray-500 mb-2">Jogadores</p>
+      <div class="bg-base p-6 rounded-xl border border-base-100 shadow-sm relative">
+        <p class="text-sm font-medium text-base-500 mb-2">Jogadores</p>
         <p class="text-3xl font-bold">{{ data.countPlayers }}</p>
         <i class="fa-solid fa-users absolute top-6 right-6 text-green-500 opacity-80"></i>
       </div>
     </div>
 
-    <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-      <div class="p-6 border-b border-gray-50">
-        <h2 class="text-lg font-bold text-gray-900">Reservas Recentes</h2>
+    <div class="bg-base rounded-xl border border-base-200 shadow-sm overflow-hidden">
+      <div class="p-6 border-b border-base-50">
+        <h2 class="text-lg font-bold text-base-900">Reservas Recentes</h2>
       </div>
 
-      <div class="divide-y divide-gray-50">
+      <div class="divide-y bg-base-100">
         @for (reserve of data.clubReserve; track reserve.id) {
-          <div class="p-5 flex justify-between items-center hover:bg-gray-50 transition">
+          <div class="p-5 flex justify-between items-center hover:bg-base-50 transition">
             <div>
-              <p class="font-semibold text-gray-800">{{ reserve.name }}</p>
-              <p class="text-xs text-gray-400 font-medium">{{ courtLabel(reserve) }}</p>
+              <p class="font-semibold">{{ reserve.name }}</p>
+              <p class="text-xs font-medium">{{ courtLabel(reserve) }}</p>
             </div>
             <div class="text-right">
-              <p class="text-sm text-gray-400 mb-1">
+              <p class="text-sm mb-1">
                 {{ formatReserveDate(reserve.date) }} • {{ timeRange(reserve) }}
               </p>
               <span
@@ -59,7 +59,7 @@
             </div>
           </div>
         } @empty {
-          <div class="p-8 text-center text-gray-400 text-sm">
+          <div class="p-8 text-center text-sm">
             Nenhuma reserva recente encontrada.
           </div>
         }

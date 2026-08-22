@@ -24,10 +24,10 @@
         <p class="text-lg md:text-xl">Clubes, quadras e horários perto de você.</p>
       </div>
     </section>
-    <section class="py-24 px-4 bg-white">
+    <section class="py-24 px-4 bg-base">
       <div class="container mx-auto max-w-6xl text-center">
-        <h2 class="font-destaque text-3xl font-bold mb-3 text-gray-900">Como funciona</h2>
-        <p class="text-gray-500 mb-16 font-light">Simples, rápido e prático.</p>
+        <h2 class="font-destaque text-3xl font-bold mb-3 text-base-900">Como funciona</h2>
+        <p class="text-base-500 mb-16 font-light">Simples, rápido e prático.</p>
 
         <div class="relative grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
           <div class="hidden md:block absolute top-12 left-[28%] w-24 text-zinc-300 z-0">
@@ -84,8 +84,8 @@
                 <circle cx="11" cy="11" r="8" />
               </svg>
             </div>
-            <h3 class="font-destaque text-xl font-bold mb-3 text-gray-900">Encontre</h3>
-            <p class="text-gray-500 text-base leading-relaxed max-w-[250px]">
+            <h3 class="font-destaque text-xl font-bold mb-3 text-base-900">Encontre</h3>
+            <p class="text-base-500 text-base leading-relaxed max-w-[250px]">
               Busque clubes e quadras esportivas na sua região.
             </p>
           </div>
@@ -110,8 +110,8 @@
                 <path d="M3 10h18" />
               </svg>
             </div>
-            <h3 class="font-destaque text-xl font-bold mb-3 text-gray-900">Reserve</h3>
-            <p class="text-gray-500 text-base leading-relaxed max-w-[250px]">
+            <h3 class="font-destaque text-xl font-bold mb-3 text-base-900">Reserve</h3>
+            <p class="text-base-500 text-base leading-relaxed max-w-[250px]">
               Escolha o horário disponível e faça sua reserva online.
             </p>
           </div>
@@ -136,8 +136,8 @@
                 <line x1="15" x2="15.01" y1="9" y2="9" />
               </svg>
             </div>
-            <h3 class="font-destaque text-xl font-bold mb-3 text-gray-900">Jogue</h3>
-            <p class="text-gray-500 text-base leading-relaxed max-w-[250px]">
+            <h3 class="font-destaque text-xl font-bold mb-3 text-base-900">Jogue</h3>
+            <p class="text-base-500 text-base leading-relaxed max-w-[250px]">
               Confirme sua reserva e aproveite o jogo com tranquilidade.
             </p>
           </div>
@@ -146,22 +146,22 @@
     </section>
   }
   @if (localClubs().length > 0) {
-    <section class="pt-24 pb-12 px-4 bg-gray-50">
+    <section class="pt-24 pb-12 px-4 bg-base-50">
       <div class="container mx-auto max-w-6xl">
         <div class="mb-8">
-          <h2 class="font-destaque text-2xl font-bold text-gray-900">
+          <h2 class="font-destaque text-2xl font-bold text-base-900">
             Perto de você em {{ detectedCity() }}
           </h2>
-          <p class="text-gray-500 text-sm">Quadras disponíveis para jogar na sua região.</p>
+          <p class="text-base-500 text-sm">Quadras disponíveis para jogar na sua região.</p>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           @for (club of localClubs(); track club.id) {
             <div
               [routerLink]="['/clubs', club.id]"
-              class="card bg-white shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all cursor-pointer group"
+              class="card bg-base shadow-sm border border-base-100 overflow-hidden hover:shadow-lg transition-all cursor-pointer group"
             >
-              <figure class="h-40 w-full relative overflow-hidden bg-gray-200">
+              <figure class="h-40 w-full relative overflow-hidden bg-base-200">
                 <img
                   [ngSrc]="getCoverImage(club)"
                   [alt]="club.name"
@@ -170,15 +170,15 @@
                 />
               </figure>
               <div class="p-4">
-                <h3 class="font-bold text-md text-gray-900 line-clamp-1">{{ club.name }}</h3>
-                <p class="text-xs text-gray-500 mb-2 truncate">{{ formatLocation(club) }}</p>
+                <h3 class="font-bold text-md text-base-900 line-clamp-1">{{ club.name }}</h3>
+                <p class="text-xs text-base-500 mb-2 truncate">{{ formatLocation(club) }}</p>
                 <div class="flex items-center justify-between mt-3">
-                  <span class="text-primary font-bold text-xs bg-primary/10 px-2 py-1 rounded"
+                  <span class="text-base-500 font-bold text-xs bg-base/10 px-2 py-1 rounded"
                     >{{ club.courtCount }} quadras</span
                   >
                   <span class="text-sm font-bold"
                     >R$ {{ club.minPrice
-                    }}<span class="text-xs font-normal text-gray-500">/h</span></span
+                    }}<span class="text-xs font-normal text-base-500">/h</span></span
                   >
                 </div>
               </div>
@@ -194,10 +194,10 @@
       Não foi possivel encontrar nenhum clube no momento.
     </div>
   } @else {
-    <section class="py-12 px-4 bg-white">
+    <section class="py-12 px-4 bg-base">
       <div class="container mx-auto max-w-6xl">
         <div class="mb-8">
-          <h2 class="font-destaque text-2xl font-bold text-gray-900">Recomendados para você</h2>
+          <h2 class="font-destaque text-2xl font-bold text-base-900">Recomendados para você</h2>
           <p class="text-gray-500 text-sm">Os clubes em destaque da plataforma.</p>
         </div>
 
@@ -205,9 +205,9 @@
           @for (club of featuredClubs(); track club.id) {
             <div
               [routerLink]="['/clubs', club.id]"
-              class="card bg-white shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group"
+              class="card bg-base shadow-sm border border-base-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group"
             >
-              <figure class="h-56 w-full bg-gray-200 relative overflow-hidden">
+              <figure class="h-56 w-full bg-base-200 relative overflow-hidden">
                 <img
                   [ngSrc]="getCoverImage(club)"
                   [alt]="club.name"
@@ -217,21 +217,21 @@
               </figure>
               <div class="card-body p-6">
                 <div class="flex justify-between items-start mb-1">
-                  <h3 class="font-bold text-lg text-gray-900 line-clamp-1">{{ club.name }}</h3>
+                  <h3 class="font-bold text-lg text-base-900 line-clamp-1">{{ club.name }}</h3>
                   <div
-                    class="flex items-center gap-1 text-primary font-bold text-xs bg-primary/8 px-2 py-1 rounded-md"
+                    class="flex items-center gap-1 text-base font-bold text-xs bg-base/8 px-2 py-1 rounded-md"
                   >
                     {{ club.courtCount }} quadras
                   </div>
                 </div>
-                <div class="flex items-center gap-2 text-gray-500 text-sm mb-5">
+                <div class="flex items-center gap-2 text-base-500 text-sm mb-5">
                   <span class="truncate">{{ formatLocation(club) }}</span>
                 </div>
                 <div
-                  class="pt-4 border-t border-gray-100 mt-auto flex items-center justify-between"
+                  class="pt-4 border-t border-base-100 mt-auto flex items-center justify-between"
                 >
-                  <span class="text-xs text-gray-400 uppercase font-semibold">A partir de</span>
-                  <span class="text-sm font-bold text-gray-900">R$ {{ club.minPrice }}/h</span>
+                  <span class="text-xs text-base-400 uppercase font-semibold">A partir de</span>
+                  <span class="text-sm font-bold text-base-900">R$ {{ club.minPrice }}/h</span>
                 </div>
               </div>
             </div>
@@ -241,7 +241,7 @@
     </section>
   }
 
-  <section class="py-12 px-4 bg-white">
+  <section class="py-12 px-4 bg-base">
     <div class="container mx-auto max-w-4xl">
       <div
         class="bg-zinc-900 rounded-3xl p-8 md:p-12 text-center text-white relative overflow-hidden shadow-xl"
