@@ -1,21 +1,32 @@
-<div class="cursor-pointer flex items-center justify-center">
-    <div class="indicator">
+<div class="relative flex items-center justify-center">
+  <div class="indicator">
         <span class="indicator-item status status-error"></span>
             
-        <button class="btn-ghost text-white cursor-pointer" popovertarget="notifications" style="anchor-name:--anchor-1">
+        <button class="btn-ghost text-white cursor-pointer" popovertarget="notifications-popover" style="anchor-name:--notifications-anchor">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bell-icon lucide-bell"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg>
-        </button>
+        </button>   
     </div>
 
-        
-    <ul class="dropdown dropdown-end menu w-100 h-50 rounded-md bg-base-100 shadow-sm" popover id="notifications" 
-        style="position-anchor:--anchor-1">
-        <span class="font-bold ">Notificações</span>
-        <div class="divider my-0"></div>
-            <div class="flex items-center justify-center">
-                <span class="text-sm text-base-content/60">Você não possui notificações</span>
-            </div>
-        <div class="divider my-0"></div>
-        <a class="text-sm text-base">Ver todas Notificações</a>
-    </ul>
+  <section
+    id="notifications-popover"
+    class="dropdown dropdown-end menu rounded-box border border-base-300 bg-base-100 p-0 shadow-lg"
+    popover
+    style="position-anchor: --notifications-anchor; width: 20rem;"
+    aria-label="Notificações"
+  >
+    <header class="border-b border-base-300 px-3 py-2.5">
+      <h2 class="text-sm font-bold">Notificações</h2>
+    </header>
+
+    <div class="px-3 py-3">
+      <div class="flex items-center justify-center">
+        <span class="text-sm text-base-content/60">Você não possui notificações</span>
+      </div>
+    </div>
+
+    <footer class="border-t border-base-300 px-3 py-2.5">
+      <a href="#" class="text-sm text-base-content hover:underline">Ver todas Notificações</a>
+    </footer>
+  </section>
 </div>
+
