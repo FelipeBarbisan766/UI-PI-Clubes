@@ -1,7 +1,7 @@
 # Lista de Bugs ou Fix Necessarios
 > ( Essa lista nao tem uma ordem correta )
 
-## Geral
+### Geral
 
 * Criação de um botao de voltar (Padronizado para ser usado em todas as telas)
 
@@ -9,7 +9,7 @@
 
 * alinhamento padronizado 
 
-## HomePage
+### HomePage
 
 * ~~O search da HomePage~~ 
 ```bash 
@@ -18,7 +18,7 @@ src/app/shared/components/search-home/search-home.html
 
 * Melhoria na homepage quando logado
 
-## Admin
+### Admin
 
 * Repensar no Fluxo de conversao para admin (Principalmente na tela de Select-role)
 ```bash 
@@ -47,6 +47,15 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 ```
 
 * Adicionar um visual para poder editar as imagens do clube e quadra
+
+### Pós Pagamento
+* visual da tela pós pagamentos
+* tela de planos
+
+### Planos
+* Definir visual
+* Definir local da tela
+* Colocar travas de planos
 
 ---
 
@@ -82,7 +91,7 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 
 ### Email
 
-- deixar bonito
+- ~~deixar bonito~~
 - ~~nao redirecionar~~ 
 
 ### User 
