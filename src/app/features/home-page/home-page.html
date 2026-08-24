@@ -24,6 +24,21 @@
         <p class="text-lg md:text-xl">Clubes, quadras e horários perto de você.</p>
       </div>
     </section>
+    <section class="py-12 px-4 bg-base-200">
+      <div class="container mx-auto max-w-6xl text-center">
+        <h2 class="font-destaque text-3xl font-bold mb-3 text-base-900">Cadastre-se e aproveite</h2>
+        <p class="text-base-500 mb-8 font-light">Crie sua conta e tenha acesso a todos os recursos.</p>
+
+        <button
+          [routerLink]="['/sign-up']"
+          class="btn btn-primary btn-md border-none text-white px-8 rounded-lg font-bold"
+        >
+          Criar minha conta
+        </button>
+      </div>
+    </section>
+  
+    
     <section class="py-24 px-4 bg-base">
       <div class="container mx-auto max-w-6xl text-center">
         <h2 class="font-destaque text-3xl font-bold mb-3 text-base-900">Como funciona</h2>
@@ -190,9 +205,7 @@
   }
 
   @if (featuredClubs().length === 0) {
-    <div class="col-span-full text-center text-gray-500 py-12">
-      Não foi possivel encontrar nenhum clube no momento.
-    </div>
+
   } @else {
     <section class="py-12 px-4 bg-base">
       <div class="container mx-auto max-w-6xl">

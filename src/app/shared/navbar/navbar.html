@@ -1,96 +1,80 @@
 <nav
   aria-label="Principal"
-  class="fixed top-0 inset-x-0 z-50 h-[var(--nav-h)] transition-all duration-300 border-b border-white/5 bg-neutral/80 backdrop-blur-md"
+  class="fixed top-0 inset-x-0 z-50 h-16 border-b border-white/5 bg-neutral/80 backdrop-blur-md"
 >
-  <div class="container mx-auto px-4 h-full ">
-    <div class="navbar h-full min-h-0 p-0">
+  <div class="container mx-auto px-3 sm:px-4 lg:px-6 h-full">
+    <div class="navbar h-full min-h-0 p-0 gap-2">
 
-      <div class="navbar-start">
-        <div class="flex items-center gap-2">
-
+      <div class="navbar-start min-w-0">
+        <div class="flex items-center gap-2 shrink-0">
           <svg
-          width="25"
-          height="25"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-          fill-rule="evenodd"
-          clip-rule="evenodd"
-          class="fill-white">
-          <path
-            d="M22.672 15.226l-2.432.811.841 2.515c.33 1.019-.209 2.127-1.23 2.456-1.15.325-2.148-.321-2.463-1.226l-.84-2.518-5.013 1.677.84 2.517c.391 1.203-.434 2.542-1.831 2.542-.88 0-1.601-.564-1.86-1.314l-.842-2.516-2.431.809c-1.135.328-2.145-.317-2.463-1.229-.329-1.018.211-2.127 1.231-2.456l2.432-.809-1.621-4.823-2.432.808c-1.355.384-2.558-.59-2.558-1.839 0-.817.509-1.582 1.327-1.846l2.433-.809-.842-2.515c-.33-1.02.211-2.129 1.232-2.458 1.02-.329 2.13.209 2.461 1.229l.842 2.515 5.011-1.677-.839-2.517c-.403-1.238.484-2.553 1.843-2.553.819 0 1.585.509 1.85 1.326l.841 2.517 2.431-.81c1.02-.33 2.131.211 2.461 1.229.332 1.018-.21 2.126-1.23 2.456l-2.433.809 1.622 4.823 2.433-.809c1.242-.401 2.557.484 2.557 1.838 0 .819-.51 1.583-1.328 1.847m-8.992-6.428l-5.01 1.675 1.619 4.828 5.011-1.674-1.62-4.829z"></path>
-        </svg>
-        <button
-          type="button"
-          (click)="goToHome()"
-          class="font-destaque text-xl text-white font-bold cursor-pointer"
-        >
-          Clubera
-        </button>
-      </div>
-
-      
-       <div class="ml-6 hidden md:flex">
-        <ul class="menu menu-horizontal px-1 gap-1">
-          <li>
-            <a
-              
-              (click)="goToHome()"
-              class="text-gray-300 hover:text-white hover:bg-white/10 rounded-lg font-medium text-sm transition-colors"
-            >
-              Início
-          </a>
-          </li>
-          <li>
-            <a
-              
-              (click)="goToClubsList()"
-              class="text-gray-300 hover:text-white hover:bg-white/10 rounded-lg font-medium text-sm transition-colors"
-            >
-              Clubes
-          </a>
-          </li>
-          <li>
-            <a
-             
-              (click)="goToCourtsList()"
-              class="text-gray-300 hover:text-white hover:bg-white/10 rounded-lg font-medium text-sm transition-colors"
-            >
-              Quadras
-            </a>
-          </li>
-
-        </ul>
-      </div>
-      </div>
-
-      <div class="navbar-end gap-4">
-
-        
-        @if (!isAuthenticated()) {
-          
-          <li class="list-none">
-              <a
-                [routerLink]="['/login']"
-                class="text-gray-300 hover:text-white rounded-lg font-medium text-sm transition-colors"
-              >
-              Entrar
-              </a>
-          </li>
-
+            width="25"
+            height="25"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+            fill-rule="evenodd"
+            clip-rule="evenodd"
+            class="fill-white shrink-0"
+            aria-hidden="true"
+          >
+            <path
+              d="M22.672 15.226l-2.432.811.841 2.515c.33 1.019-.209 2.127-1.23 2.456-1.15.325-2.148-.321-2.463-1.226l-.84-2.518-5.013 1.677.84 2.517c.391 1.203-.434 2.542-1.831 2.542-.88 0-1.601-.564-1.86-1.314l-.842-2.516-2.431.809c-1.135.328-2.145-.317-2.463-1.229-.329-1.018.211-2.127 1.231-2.456l2.432-.809-1.621-4.823-2.432.808c-1.355.384-2.558-.59-2.558-1.839 0-.817.509-1.582 1.327-1.846l2.433-.809-.842-2.515c-.33-1.02.211-2.129 1.232-2.458 1.02-.329 2.13.209 2.461 1.229l.842 2.515 5.011-1.677-.839-2.517c-.403-1.238.484-2.553 1.843-2.553.819 0 1.585.509 1.85 1.326l.841 2.517 2.431-.81c1.02-.33 2.131.211 2.461 1.229.332 1.018-.21 2.126-1.23 2.456l-2.433.809 1.622 4.823 2.433-.809c1.242-.401 2.557.484 2.557 1.838 0 .819-.51 1.583-1.328 1.847m-8.992-6.428l-5.01 1.675 1.619 4.828 5.011-1.674-1.62-4.829z"
+            ></path>
+          </svg>
           <button
             type="button"
-            (click)="goToSignUp()"
-            class="btn btn-sm rounded-lg btn-primary border-none text-white shadow-none font-bold"
+            (click)="goToHome()"
+            class="font-destaque text-lg sm:text-xl text-white font-bold cursor-pointer whitespace-nowrap hidden min-[350px]:inline"
           >
-            Cadastrar-se
+            Clubera
           </button>
+        </div>
+
+        <div class="hidden lg:flex ml-6 min-w-0">
+          <ul class="menu menu-horizontal px-1 gap-1">
+            <li>
+              <a
+                (click)="goToHome()"
+                class="text-gray-300 hover:text-white hover:bg-white/10 rounded-lg font-medium text-sm transition-colors"
+              >
+                Início
+              </a>
+            </li>
+            <li>
+              <a
+                (click)="goToClubsList()"
+                class="text-gray-300 hover:text-white hover:bg-white/10 rounded-lg font-medium text-sm transition-colors"
+              >
+                Clubes
+              </a>
+            </li>
+            <li>
+              <a
+                (click)="goToCourtsList()"
+                class="text-gray-300 hover:text-white hover:bg-white/10 rounded-lg font-medium text-sm transition-colors"
+              >
+                Quadras
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="navbar-end gap-1 sm:gap-2 lg:gap-4 shrink-0">
+
+        @if (!isAuthenticated()) {
+          <a
+            [routerLink]="['/login']"
+            class="btn btn-outline btn-primary btn-sm rounded-lg font-semibold text-white"
+          >
+            Entrar
+          </a>
         } @else {
           <app-notification-icon></app-notification-icon>
-
           <app-user-menu></app-user-menu>
         }
 
-        <div class="md:hidden">
+        <div class="lg:hidden shrink-0">
           <button
             type="button"
             class="btn btn-sm btn-ghost btn-circle text-white"
@@ -100,17 +84,26 @@
             aria-controls="mobile-nav-menu"
             aria-label="Abrir menu de navegação"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-              aria-hidden="true">
-              <path d="M4 5h16"/><path d="M4 12h16"/><path d="M4 19h16"/>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M4 5h16" /><path d="M4 12h16" /><path d="M4 19h16" />
             </svg>
           </button>
 
           <ul
             id="mobile-nav-menu"
             popover
-            class="dropdown dropdown-end menu w-56 rounded-box bg-base-100 shadow-sm mt-2"
+            class="dropdown dropdown-end menu w-64 max-w-[90vw] rounded-box bg-base-100 shadow-sm mt-2"
             style="position-anchor: --mobile-nav-anchor"
             role="menu"
           >
