@@ -3,25 +3,26 @@ import {
   Component,
   DestroyRef,
   computed,
+  effect,
   inject,
   OnInit,
   signal,
 } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { debounceTime, distinctUntilChanged, filter, map, switchMap } from 'rxjs/operators';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { toSignal, takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { debounceTime, distinctUntilChanged, filter, finalize, map, switchMap } from 'rxjs/operators';
 import { ServiceClub } from '../../services/service-club';
-import { Modal } from '../../../../shared/components/modal/modal';
 import { ViaCepService } from '../../../../core/services/via-cep';
 import { NgxMaskDirective } from 'ngx-mask';
+import { ToastAlert } from '../../../../shared/components/toast-alert/toast-alert';
 
-type FormMode = 'edit' | null;
+
+type ToastType = 'success' | 'error' | 'warning' | 'info';
 
 @Component({
   selector: 'app-club',
-  imports: [ReactiveFormsModule, Modal, NgxMaskDirective],
+  imports: [ReactiveFormsModule, NgxMaskDirective, ToastAlert],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './config-club.html',
 })
@@ -34,11 +35,10 @@ export class ConfigClub implements OnInit {
 
   protected readonly clubService = inject(ServiceClub);
 
-  protected readonly formMode = signal<FormMode>(null);
-  protected readonly editingId = signal<string | null>(null);
   protected readonly deleteConfirmOpen = signal(false);
+  protected readonly isSubmitting = signal(false);
 
-  protected readonly isFormOpen = computed(() => this.formMode() !== null);
+  protected readonly toast = signal<{ message: string; type: ToastType } | null>(null);
 
   protected readonly form = this.fb.group({
     name: ['', [Validators.required, Validators.minLength(3)]],
@@ -54,16 +54,48 @@ export class ConfigClub implements OnInit {
     country: ['', Validators.required],
   });
 
+  private readonly formValue = toSignal(this.form.valueChanges, {
+    initialValue: this.form.getRawValue(),
+  });
   private readonly formStatus = toSignal(this.form.statusChanges, {
     initialValue: this.form.status,
   });
 
+  protected readonly isSubmitEnabled = computed(() => {
+    this.formValue();
+    this.formStatus();
+    return this.form.dirty && this.form.valid;
+  });
+
   private clubId: string = '';
 
-  protected readonly isSubmitEnabled = computed(() => this.formStatus() === 'VALID');
+  constructor() {
+    effect(() => {
+      const club = this.clubService.selectedClub();
+      if (!club) return;
+
+      this.form.patchValue(
+        {
+          name: club.name,
+          phoneNumber: club.phoneNumber,
+          description: club.description,
+          zipCode: club.zipCode,
+          street: club.street,
+          number: club.number,
+          neighborhood: club.neighborhood,
+          complement: club.complement ?? '',
+          city: club.city,
+          state: club.state,
+          country: club.country,
+        },
+        { emitEvent: false },
+      );
+      this.form.markAsPristine();
+    });
+  }
 
   ngOnInit(): void {
-    const clubId = 
+    const clubId =
       this.route.snapshot.paramMap.get('clubId') ??
       this.route.parent?.snapshot.paramMap.get('clubId') ??
       '';
@@ -101,43 +133,14 @@ export class ConfigClub implements OnInit {
       });
   }
 
-  // --- Navigation ---
 
   protected goToCourts(clubId: string): void {
     this.router.navigate(['/admin/club', clubId, 'courts']);
   }
 
-  // --- Form actions ---
-
-  protected openEdit(): void {
-    const club = this.clubService.selectedClub();
-    if (!club) return;
-
-    this.form.reset({
-      name: club.name,
-      phoneNumber: club.phoneNumber,
-      description: club.description,
-      zipCode: club.zipCode,
-      street: club.street,
-      number: club.number,
-      neighborhood: club.neighborhood,
-      complement: club.complement ?? '',
-      city: club.city,
-      state: club.state,
-      country: club.country,
-    });
-    this.editingId.set(this.clubId);
-    this.formMode.set('edit');
-  }
-
-  protected closeForm(): void {
-    this.formMode.set(null);
-    this.editingId.set(null);
-    this.form.reset();
-  }
 
   protected onSubmit(): void {
-    if (!this.isSubmitEnabled()) {
+    if (!this.isSubmitEnabled() || this.isSubmitting()) {
       this.form.markAllAsTouched();
       return;
     }
@@ -146,14 +149,24 @@ export class ConfigClub implements OnInit {
   }
 
   private submitUpdate(): void {
-    const id = this.editingId();
-    if (id === null) return;
+    const {
+      name,
+      phoneNumber,
+      description,
+      zipCode,
+      street,
+      number,
+      neighborhood,
+      complement,
+      city,
+      state,
+      country,
+    } = this.form.getRawValue();
 
-    const { name, phoneNumber, description, zipCode, street, number, neighborhood, complement, city, state, country } =
-      this.form.getRawValue();
+    this.isSubmitting.set(true);
 
     this.clubService
-      .update(id, {
+      .update(this.clubId, {
         name: name!,
         phoneNumber: phoneNumber!,
         description: description!,
@@ -166,15 +179,47 @@ export class ConfigClub implements OnInit {
         state: state!,
         country: country!,
       })
+      .pipe(finalize(() => this.isSubmitting.set(false)))
       .subscribe({
-        next: () => this.closeForm(),
+        next: () => {
+          this.form.markAsPristine();
+          this.toast.set({ message: 'Clube atualizado com sucesso!', type: 'success' });
+        },
         error: (err: unknown) => {
           console.error('Erro ao atualizar clube', err);
+          this.toast.set({
+            message: this.clubService.error() ?? 'Erro ao salvar as alterações.',
+            type: 'error',
+          });
         },
       });
   }
 
-  // --- Delete ---
+  protected onReset(): void {
+    const club = this.clubService.selectedClub();
+    if (!club) return;
+
+    this.form.patchValue({
+      name: club.name,
+      phoneNumber: club.phoneNumber,
+      description: club.description,
+      zipCode: club.zipCode,
+      street: club.street,
+      number: club.number,
+      neighborhood: club.neighborhood,
+      complement: club.complement ?? '',
+      city: club.city,
+      state: club.state,
+      country: club.country,
+    });
+    this.form.markAsPristine();
+    this.toast.set(null);
+  }
+
+  protected dismissToast(): void {
+    this.toast.set(null);
+  }
+
 
   protected requestDelete(): void {
     this.deleteConfirmOpen.set(true);
@@ -183,16 +228,21 @@ export class ConfigClub implements OnInit {
   protected confirmDelete(): void {
     const club = this.clubService.selectedClub();
     if (!club) return;
-    this.clubService
-      .delete(this.clubId)
-      .subscribe({ next: () => this.deleteConfirmOpen.set(false) });
+    this.clubService.delete(this.clubId).subscribe({
+      next: () => this.deleteConfirmOpen.set(false),
+      error: () => {
+        this.toast.set({
+          message: this.clubService.error() ?? 'Erro ao excluir o clube.',
+          type: 'error',
+        });
+      },
+    });
   }
 
   protected cancelDelete(): void {
     this.deleteConfirmOpen.set(false);
   }
 
-  // --- Helpers ---
 
   protected fieldInvalid(field: string): boolean {
     const ctrl = this.form.get(field);

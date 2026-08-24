@@ -3,11 +3,10 @@ import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { BreadCrumb } from "../../shared/components/bread-crumb/bread-crumb";
 import { AuthService } from '../../core/services/auth-service';
 import { take } from 'rxjs';
-import { NgOptimizedImage } from '@angular/common';
 
 @Component({
   selector: 'app-admin-layout',
-  imports: [RouterOutlet, BreadCrumb,NgOptimizedImage],
+  imports: [RouterOutlet, BreadCrumb],
   templateUrl: './admin-layout.html',
   styleUrl: './admin-layout.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

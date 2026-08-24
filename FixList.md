@@ -42,7 +42,7 @@ src/app/features/auth/pages/select-role/select-role.html
     * Arrumar os filtros
 
 
-* Ajeitar o visual da tela de configuraçoes do clube (talvez deixar parecido com o visual do editar usuario)
+* ~~Ajeitar o visual da tela de configuraçoes do clube (talvez deixar parecido com o visual do editar usuario)~~
 
 * ~~Arrumar os link do bread-crumb~~
 ```bash
@@ -58,12 +58,12 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 
 ### Homepage
 
-* erro de nao autorizado, na home page 
+* ~~erro de nao autorizado, na home page~~ 
 * ~~logo~~ 
 * ~~o botao de entrar esta no como lista~~ 
-* baner precisa de atenção pois nao envia voce para lugar nenhum (colocar o cadrastrar talvez)
-* problemas de resposividade
-* informaçoes sobre nao ter clube ( esconder/tirar )
+* ~~baner precisa de atenção pois nao envia voce para lugar nenhum (colocar o cadrastrar talvez)~~
+* ~~problemas de resposividade~~
+* ~~informaçoes sobre nao ter clube ( esconder/tirar )~~
 * ~~tornar a logo ficar com o cursor do tipo poiter~~
 * ~~primeiro nome~~
 * ~~links footer~~

@@ -15,11 +15,15 @@ import { AuthService } from '../../../core/services/auth-service';
 import { UpdateProfileDTO, UserProfileService } from '../services/service-user';
 import { NgxMaskDirective } from 'ngx-mask';
 import { NgOptimizedImage } from '@angular/common';
+import { ToastAlert } from '../../../shared/components/toast-alert/toast-alert';
+import { OnlyLetters } from '../../../shared/directives/only-letters';
+
+type ToastType = 'success' | 'error' | 'warning' | 'info';
 
 @Component({
   selector: 'app-user-profile',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule,NgxMaskDirective, NgOptimizedImage],
+  imports: [ReactiveFormsModule, NgxMaskDirective, NgOptimizedImage, ToastAlert, OnlyLetters],
   templateUrl: './user-profile.html',
 })
 export class UserProfile implements OnInit, OnDestroy {
@@ -31,19 +35,17 @@ export class UserProfile implements OnInit, OnDestroy {
   readonly user = this.profileService.user;
   readonly loading = this.profileService.loading;
   readonly error = this.profileService.error;
-  
+
   readonly initials = computed(() => {
     const name = this.user()?.name ?? '';
     return name
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map(part => part[0].toUpperCase())
-    .join('');
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map(part => part[0].toUpperCase())
+      .join('');
   });
 
-  // Evita que o navegador exiba a foto antiga em cache quando o backend
-  // reaproveita a mesma URL/nome de arquivo após a troca de avatar.
   private readonly avatarCacheBuster = signal(Date.now());
   readonly displayAvatarUrl = computed(() => {
     const url = this.user()?.avatarUrl;
@@ -51,20 +53,19 @@ export class UserProfile implements OnInit, OnDestroy {
     const separator = url.includes('?') ? '&' : '?';
     return `${url}${separator}v=${this.avatarCacheBuster()}`;
   });
-  
+
   readonly form = this.fb.group({
-    name: ['', [Validators.required, Validators.minLength(2)]],
+    name: ['', [Validators.required, Validators.minLength(2),]],
     email: this.fb.control({ value: '', disabled: true }),
     phoneNumber: [''],
   });
-  
-  // Expose controls for clean template access
+
   readonly nameControl = this.form.controls.name;
-  
+
   readonly ModalOpen = signal(false);
   readonly isSubmitting = signal(false);
-  readonly successMessage = signal<string | null>(null);
-  readonly submitError = signal<string | null>(null);
+
+  readonly toast = signal<{ message: string; type: ToastType } | null>(null);
 
   private static readonly MAX_AVATAR_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
 
@@ -81,7 +82,7 @@ export class UserProfile implements OnInit, OnDestroy {
       .getById(userId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(user => {
-        user.avatarUrl; 
+        user.avatarUrl;
         this.form.patchValue({
           name: user.name,
           email: user.email,
@@ -101,8 +102,6 @@ export class UserProfile implements OnInit, OnDestroy {
     const dto: UpdateProfileDTO = { name, phoneNumber };
 
     this.isSubmitting.set(true);
-    this.successMessage.set(null);
-    this.submitError.set(null);
 
     this.profileService
       .update(dto)
@@ -112,13 +111,14 @@ export class UserProfile implements OnInit, OnDestroy {
       )
       .subscribe({
         next: () => {
-          this.successMessage.set('Perfil atualizado com sucesso!');
           this.form.markAsPristine();
+          this.toast.set({ message: 'Perfil atualizado com sucesso!', type: 'success' });
         },
         error: () =>
-          this.submitError.set(
-            this.profileService.error() ?? 'Erro ao salvar as alterações.'
-          ),
+          this.toast.set({
+            message: this.profileService.error() ?? 'Erro ao salvar as alterações.',
+            type: 'error',
+          }),
       });
   }
 
@@ -168,6 +168,7 @@ export class UserProfile implements OnInit, OnDestroy {
         next: () => {
           this.avatarCacheBuster.set(Date.now());
           this.closeModal();
+          this.toast.set({ message: 'Foto de perfil atualizada com sucesso!', type: 'success' });
         },
         error: () => this.avatarError.set('Não foi possível atualizar a foto.'),
       });
@@ -183,8 +184,11 @@ export class UserProfile implements OnInit, OnDestroy {
       phoneNumber: user.phoneNumber ?? '',
     });
     this.form.markAsPristine();
-    this.successMessage.set(null);
-    this.submitError.set(null);
+    this.toast.set(null);
+  }
+
+  dismissToast(): void {
+    this.toast.set(null);
   }
 
   openModal(): void {

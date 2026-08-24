@@ -22,6 +22,7 @@ import { ServiceSignUp } from '../../services/service-sign-up';
 import { ToastAlert } from '../../../../shared/components/toast-alert/toast-alert';
 import { GoogleAuthService } from '../../services/service-google';
 import { AuthService } from '../../../../core/services/auth-service';
+import { OnlyLetters } from '../../../../shared/directives/only-letters';
 
 function passwordsMatchValidator(control: AbstractControl): ValidationErrors | null {
   const password = control.get('password')?.value ?? '';
@@ -31,7 +32,7 @@ function passwordsMatchValidator(control: AbstractControl): ValidationErrors | n
 
 @Component({
   selector: 'app-sign-up',
-  imports: [ReactiveFormsModule, RouterLink, ToastAlert],
+  imports: [ReactiveFormsModule, RouterLink, ToastAlert, OnlyLetters],
   templateUrl: './sign-up.html',
   styleUrl: './sign-up.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
