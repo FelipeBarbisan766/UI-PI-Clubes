@@ -35,9 +35,6 @@ src/app/features/auth/pages/select-role/select-role.html
     * ~~Adicionar talvez um botao para se comunicar via Email~~
     
     * ~~Arrumar/Melhorar as informações da parte de açoes~~ 
-    
-    * Talvez adicionar a data na qual foi reservada (Create-date) 
-        > Obs: ja foi adicionado no backend so ficou para confirmar no front
 
     * Arrumar os filtros
 
