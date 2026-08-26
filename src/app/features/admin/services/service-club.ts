@@ -1,7 +1,14 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { Observable, tap, catchError, throwError } from 'rxjs';
-import { ResponseClubDTO, ResponseClubByIdDTO, CreateClubDTO, UpdateClubDTO, ResponseDashboardDTO } from '../models/model-club';
+import {
+  ResponseClubDTO,
+  ResponseClubByIdDTO,
+  CreateClubDTO,
+  UpdateClubDTO,
+  ResponseDashboardDTO,
+  ReorderImageDTO,
+} from '../models/model-club';
 import { environment } from '../../../../environments/environment';
 
 export interface ClubState {
@@ -110,11 +117,14 @@ export class ServiceClub {
 
     return this.http.put<ResponseClubDTO>(`${this.apiUrl}/${id}`, dto).pipe(
       tap((updated) => {
-        this._clubs.update((clubs) =>
-          clubs.map((c) => (c.id === id ? updated : c)),
-        );
+        this._clubs.update((clubs) => clubs.map((c) => (c.id === id ? updated : c)));
         if (this._selectedClub()) {
-          this._selectedClub.set({ ...this._selectedClub()!, ...dto, imagesUrls: this._selectedClub()!.imagesUrls, courts: this._selectedClub()!.courts });
+          this._selectedClub.set({
+            ...this._selectedClub()!,
+            ...dto,
+            imagesUrls: this._selectedClub()!.imagesUrls,
+            courts: this._selectedClub()!.courts,
+          });
         }
         this._loading.set(false);
       }),
@@ -135,6 +145,27 @@ export class ServiceClub {
     );
   }
 
+  addImages(clubId: string, images: File[]): Observable<void> {
+    const formData = new FormData();
+    images.forEach((img) => formData.append('Images', img));
+
+    return this.http
+      .post<void>(`${this.apiUrl}/images/${clubId}`, formData)
+      .pipe(catchError((err) => this.handleError(err)));
+  }
+
+  deleteImage(clubId: string, imageId: string): Observable<void> {
+    return this.http
+      .delete<void>(`${this.apiUrl}/${clubId}/images/${encodeURIComponent(imageId)}`)
+      .pipe(catchError((err) => this.handleError(err)));
+  }
+
+  reorderImages(clubId: string, orders: ReorderImageDTO[]): Observable<void> {
+    return this.http
+      .put<void>(`${this.apiUrl}/${clubId}/images/reorder`, { orders })
+      .pipe(catchError((err) => this.handleError(err)));
+  }
+
   // --- Helpers ---
 
   selectClub(club: ResponseClubByIdDTO | null): void {
@@ -146,8 +177,7 @@ export class ServiceClub {
   }
 
   private handleError(err: unknown): Observable<never> {
-    const message =
-      err instanceof Error ? err.message : 'Ocorreu um erro inesperado.';
+    const message = err instanceof Error ? err.message : 'Ocorreu um erro inesperado.';
     this._error.set(message);
     this._loading.set(false);
     return throwError(() => err);
