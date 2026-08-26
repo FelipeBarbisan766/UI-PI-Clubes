@@ -68,3 +68,21 @@ export interface ResponseClubByIdDTO {
   imagesUrls: string[];
   courts: import('./model-court').ResponseCourtDTO[];
 }
+
+export interface ReorderImageDTO {
+  id: string;
+  order: number;
+}
+
+export interface ExistingPhoto {
+  kind: 'existing';
+  id: string;
+  url: string;
+}
+
+export interface NewPhoto {
+  kind: 'new';
+  id: string;
+  file: File;
+  previewUrl: string;
+}
