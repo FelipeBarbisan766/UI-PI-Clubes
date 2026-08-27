@@ -31,6 +31,14 @@ export interface UpdateClubDTO {
   country: string;
 }
 
+export interface ImageDTO {
+  id: string;
+  thumbUrl: string;
+  mediumUrl: string;
+  fullUrl: string;
+  order: number;
+}
+
 export interface ResponseClubDTO {
   id: string;
   name: string;
@@ -43,7 +51,7 @@ export interface ResponseClubDTO {
   minPrice: number;
   courtCount: number;
   types: TypeEnum[];
-  imagesUrls: string[];
+  images: ImageDTO[];
 }
 
 export interface ResponseDashboardDTO {
@@ -65,7 +73,7 @@ export interface ResponseClubByIdDTO {
   city: string;
   state: string;
   country: string;
-  imagesUrls: string[];
+  images: ImageDTO[];
   courts: import('./model-court').ResponseCourtDTO[];
 }
 
@@ -77,7 +85,7 @@ export interface ReorderImageDTO {
 export interface ExistingPhoto {
   kind: 'existing';
   id: string;
-  url: string;
+  thumbUrl: string;
 }
 
 export interface NewPhoto {

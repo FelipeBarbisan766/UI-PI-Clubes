@@ -70,7 +70,7 @@
               (drop)="onExistingDrop(photo, $event)"
               (dragend)="onExistingDragEnd()"
             >
-              <img [ngSrc]="photo.url" fill class="object-cover" alt="Foto do clube" />
+              <img [ngSrc]="photo.thumbUrl" fill class="object-cover" alt="Foto do clube" />
               <button
                 type="button"
                 class="absolute top-1 right-1 flex h-6 w-6 items-center justify-center rounded-full bg-base-100/90 text-base-content/70 opacity-0 group-hover:opacity-100 transition-opacity hover:text-error"
