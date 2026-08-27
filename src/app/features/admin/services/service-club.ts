@@ -122,7 +122,7 @@ export class ServiceClub {
           this._selectedClub.set({
             ...this._selectedClub()!,
             ...dto,
-            imagesUrls: this._selectedClub()!.imagesUrls,
+            images: this._selectedClub()!.images,
             courts: this._selectedClub()!.courts,
           });
         }
@@ -150,7 +150,7 @@ export class ServiceClub {
     images.forEach((img) => formData.append('Images', img));
 
     return this.http
-      .post<void>(`${this.apiUrl}/images/${clubId}`, formData)
+      .post<void>(`${this.apiUrl}/${clubId}/images`, formData)
       .pipe(catchError((err) => this.handleError(err)));
   }
 

@@ -27,7 +27,7 @@ import { ViaCepService } from '../../../../core/services/via-cep';
 import { NgxMaskDirective } from 'ngx-mask';
 import { ToastAlert } from '../../../../shared/components/toast-alert/toast-alert';
 import { NgOptimizedImage } from '@angular/common';
-import { ExistingPhoto, NewPhoto } from '../../models/model-club';
+import { ExistingPhoto, NewPhoto, ImageDTO } from '../../models/model-club';
 import { forkJoin, Observable } from 'rxjs';
 
 type ToastType = 'success' | 'error' | 'warning' | 'info';
@@ -124,18 +124,24 @@ export class ConfigClub implements OnInit {
           { emitEvent: false },
         );
         this.form.markAsPristine();
-        this.resetPhotosState(club.imagesUrls);
+        this.resetPhotosState(club.images);
       });
     });
   }
 
-  private resetPhotosState(imagesUrls: string[] | undefined | null): void {
+  private resetPhotosState(images: ImageDTO[] | undefined | null): void {
     this.newPhotos().forEach((p) => URL.revokeObjectURL(p.previewUrl));
     this.newPhotos.set([]);
 
-    const urls = imagesUrls ?? [];
-    this.existingPhotos.set(urls.map((url) => ({ kind: 'existing' as const, id: url, url })));
-    this.initialExistingOrder = [...urls];
+    const sorted = [...(images ?? [])].sort((a, b) => a.order - b.order);
+    this.existingPhotos.set(
+      sorted.map((image) => ({
+        kind: 'existing' as const,
+        id: image.id,
+        thumbUrl: image.thumbUrl,
+      })),
+    );
+    this.initialExistingOrder = sorted.map((image) => image.id);
     this.removedExistingIds.set(new Set());
     this.photosDirty.set(false);
   }
@@ -284,7 +290,7 @@ export class ConfigClub implements OnInit {
       country: club.country,
     });
     this.form.markAsPristine();
-    this.resetPhotosState(club.imagesUrls);
+    this.resetPhotosState(club.images);
     this.toast.set(null);
   }
 
