@@ -1,18 +1,14 @@
-<div class="p-4 sm:p-6 max-w-7xl mx-auto">
-
-  <!-- Cabeçalho -->
-  <div class="flex flex-col gap-4 mb-6 sm:mb-8">
+<div class="p-6 max-w-7xl mx-auto">
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
     <div>
-      <h1 class="text-2xl md:text-3xl font-bold text-base-content">Gestão de Horários</h1>
-      <p class="text-base-content/60 mt-1 text-sm">
-        Gerencie os horários disponíveis para esta quadra.
-      </p>
+      <h1 class="text-3xl font-bold text-base-content">Gestão de Horários</h1>
+      <p class="text-base-content/60 mt-1">Gerencie os horários disponíveis para esta quadra.</p>
     </div>
-    <div class="flex flex-col sm:flex-row gap-2">
-      <button class="btn btn-outline w-full sm:w-auto" (click)="openBulkCreate()">
+    <div class="flex gap-2">
+      <button class="btn btn-outline btn-primary" (click)="openBulkCreate()">
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          class="h-4 w-4"
+          class="h-5 w-5 mr-1"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -27,10 +23,10 @@
         </svg>
         Criar em Massa
       </button>
-      <button class="btn btn-primary text-primary-content w-full sm:w-auto" (click)="openCreate()">
+      <button class="btn btn-primary text-primary-content" (click)="openCreate()">
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          class="h-4 w-4"
+          class="h-5 w-5 mr-1"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -50,10 +46,10 @@
 
   <!-- Alertas -->
   @if (scheduleService.error()) {
-    <div role="alert" class="alert alert-error alert-soft mb-6 rounded-xl text-sm">
+    <div role="alert" class="alert alert-error mb-6">
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        class="stroke-current shrink-0 h-5 w-5"
+        class="stroke-current shrink-0 h-6 w-6"
         fill="none"
         viewBox="0 0 24 24"
         aria-hidden="true"
@@ -70,60 +66,27 @@
   }
 
   @if (scheduleService.loading()) {
-    <div class="flex justify-center items-center gap-3 my-16" aria-live="polite" aria-busy="true">
-      <span class="loading loading-spinner loading-md text-primary" aria-hidden="true"></span>
-      <span class="text-base-content/50 text-sm">Carregando horários...</span>
+    <div class="flex justify-center my-10" aria-live="polite" aria-busy="true">
+      <span class="loading loading-spinner loading-lg text-primary"></span>
+      <span class="sr-only">Carregando horários...</span>
     </div>
   }
 
-  <!-- Listagem de Horários -->
   @if (!isFormOpen()) {
     @if (scheduleService.isEmpty()) {
       <div
-        class="flex flex-col items-center justify-center py-14 sm:py-20 px-4 text-center border-2 border-dashed border-base-300 rounded-3xl bg-base-100/50"
+        class="text-center py-16 text-base-content/50 border-2 border-dashed border-base-300 rounded-box"
       >
-        <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-base-200 mb-4">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-7 w-7 text-base-content/30"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            aria-hidden="true"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="1.5"
-              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-            />
-          </svg>
-        </div>
-        <p class="text-base-content/60 font-medium">Nenhum horário cadastrado ainda.</p>
-        <p class="text-base-content/40 text-sm mt-1 mb-5 max-w-xs">
-          Adicione horários manualmente ou gere vários de uma vez com a criação em massa.
-        </p>
-        <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto px-4 sm:px-0">
-          <button class="btn btn-sm btn-outline" (click)="openBulkCreate()">Criar em Massa</button>
-          <button class="btn btn-sm btn-primary text-primary-content" (click)="openCreate()">
-            Novo Horário
-          </button>
-        </div>
+        <p class="text-lg">Nenhum horário cadastrado para esta quadra ainda.</p>
       </div>
     } @else {
-      <div class="flex flex-col gap-4">
+      <div class="flex flex-col gap-4 pb-16">
         @for (group of scheduleGroups(); track group.day) {
-          <section class="card bg-base-100 border border-base-200 rounded-2xl">
-            <div class="card-body p-4 sm:p-5 gap-3">
-              <div class="flex items-center justify-between gap-2">
-                <h2 class="card-title text-base font-bold text-base-content">
-                  {{ group.label }}
-                </h2>
-                <span class="badge badge-ghost badge-sm shrink-0">
-                  {{ group.schedules.length }}
-                  {{ group.schedules.length === 1 ? 'horário' : 'horários' }}
-                </span>
-              </div>
+          <section class="card bg-base-100 card-border shadow-sm">
+            <div class="card-body p-5">
+              <h2 class="card-title text-lg font-bold text-base-content mb-3">
+                {{ group.label }}
+              </h2>
 
               <div
                 class="flex flex-wrap gap-2"
@@ -134,7 +97,7 @@
                   @if (deleteConfirmId() === schedule.id) {
                     <div
                       role="alert"
-                      class="alert alert-warning alert-soft p-2.5 text-xs flex-col items-start gap-2 rounded-xl w-full sm:w-auto"
+                      class="alert alert-warning p-2 text-xs flex-col items-start gap-2 rounded-xl w-full sm:w-auto"
                     >
                       <span class="font-semibold">Excluir este horário?</span>
                       <div class="flex gap-2 w-full">
@@ -155,15 +118,13 @@
                   } @else {
                     <div
                       role="listitem"
-                      class="join border border-base-200 rounded-full hover:border-primary/40 hover:shadow-sm transition-colors overflow-hidden"
+                      class="flex items-center gap-1 rounded-xl border border-base-200 bg-base-100 pl-3 pr-1 py-1 hover:border-primary/40 hover:shadow-sm transition-colors"
                     >
-                      <span
-                        class="join-item flex items-center px-3 sm:px-3.5 py-1.5 text-xs sm:text-sm font-semibold text-base-content bg-base-100 whitespace-nowrap"
-                      >
+                      <span class="text-sm font-semibold text-base-content">
                         {{ schedule.startTime }} – {{ schedule.endTime }}
                       </span>
                       <button
-                        class="join-item btn btn-ghost btn-xs btn-square text-base-content/50 hover:text-primary"
+                        class="btn btn-ghost btn-xs btn-square text-base-content/60 hover:text-primary"
                         aria-label="Editar horário"
                         title="Editar"
                         (click)="openEdit(schedule)"
@@ -185,7 +146,7 @@
                         </svg>
                       </button>
                       <button
-                        class="join-item btn btn-ghost btn-xs btn-square text-base-content/50 hover:text-error"
+                        class="btn btn-ghost btn-xs btn-square text-base-content/60 hover:text-error"
                         aria-label="Excluir horário"
                         title="Excluir"
                         (click)="requestDelete(schedule.id)"
@@ -216,12 +177,10 @@
       </div>
     }
   }
-
-  <!-- Modal de Criação em Massa -->
   @if (formMode() === 'bulk') {
     <app-modal>
-      <div class="flex justify-between items-center mb-5 border-b border-base-200 pb-3">
-        <h3 id="bulk-modal-title" class="font-bold text-lg text-base-content">
+      <div class="flex justify-between items-center mb-4 border-b border-base-200 pb-3">
+        <h3 id="bulk-modal-title" class="font-bold text-xl text-base-content">
           Criar Horários em Massa
         </h3>
         <button
@@ -233,14 +192,14 @@
         </button>
       </div>
 
-      <form [formGroup]="bulkForm" (ngSubmit)="onBulkSubmit()" class="flex flex-col gap-5">
-        <!-- Seleção de dias da semana -->
-        <div class="flex flex-col gap-1.5">
-          <label class="text-xs font-semibold text-base-content/60 uppercase tracking-wide">
-            Dias da Semana
-          </label>
+      <form [formGroup]="bulkForm" (ngSubmit)="onBulkSubmit()" class="flex flex-col gap-4">
+        <!-- Seleção de dias da semana (pills, mesmo padrão das datas) -->
+        <div>
+          <label class="py-1 font-medium text-xs text-base-content block mb-1"
+            >Dias da Semana</label
+          >
           <div
-            class="flex gap-2 overflow-x-auto pb-1 snap-x -mx-1 px-1"
+            class="flex gap-2 overflow-x-auto pb-2 snap-x"
             role="group"
             aria-label="Selecione os dias da semana"
           >
@@ -250,8 +209,6 @@
                 class="btn btn-sm rounded-full shrink-0 snap-start"
                 [class.btn-primary]="isDaySelected(day.value)"
                 [class.btn-ghost]="!isDaySelected(day.value)"
-                [class.border]="!isDaySelected(day.value)"
-                [class.border-base-300]="!isDaySelected(day.value)"
                 (click)="toggleDay(day.value)"
                 [attr.aria-pressed]="isDaySelected(day.value)"
                 [attr.aria-label]="'Selecionar ' + day.label"
@@ -261,51 +218,51 @@
             }
           </div>
           @if (bulkForm.touched && selectedDays().length === 0) {
-            <span role="alert" class="text-error text-[11px] font-medium px-1">
+            <span role="alert" class="block text-error text-[11px] mt-1 font-medium px-1">
               Selecione ao menos um dia
             </span>
           }
         </div>
 
         <!-- Horário e duração -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-x-4 gap-y-3">
-          <div class="flex flex-col gap-1">
-            <label class="text-xs font-semibold text-base-content/60 uppercase tracking-wide" for="bulkStartTime">
-              Início
-            </label>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-2">
+          <div class="flex flex-col w-full">
+            <label class="py-1 font-medium text-xs text-base-content" for="bulkStartTime"
+              >Início</label
+            >
             <input
               id="bulkStartTime"
               type="time"
               formControlName="startTime"
-              class="input input-bordered input-sm rounded-lg w-full"
+              class="input input-bordered input-sm w-full"
               [class.input-error]="bulkFieldInvalid('startTime')"
             />
           </div>
 
-          <div class="flex flex-col gap-1">
-            <label class="text-xs font-semibold text-base-content/60 uppercase tracking-wide" for="bulkEndTime">
-              Término
-            </label>
+          <div class="flex flex-col w-full">
+            <label class="py-1 font-medium text-xs text-base-content" for="bulkEndTime"
+              >Término</label
+            >
             <input
               id="bulkEndTime"
               type="time"
               formControlName="endTime"
-              class="input input-bordered input-sm rounded-lg w-full"
+              class="input input-bordered input-sm w-full"
               [class.input-error]="bulkFieldInvalid('endTime')"
             />
           </div>
 
-          <div class="flex flex-col gap-1">
-            <label class="text-xs font-semibold text-base-content/60 uppercase tracking-wide" for="slotDuration">
-              Duração (min)
-            </label>
+          <div class="flex flex-col w-full">
+            <label class="py-1 font-medium text-xs text-base-content" for="slotDuration"
+              >Duração (min)</label
+            >
             <input
               id="slotDuration"
               type="number"
               step="15"
               min="15"
               formControlName="slotDurationMinutes"
-              class="input input-bordered input-sm rounded-lg w-full"
+              class="input input-bordered input-sm w-full"
               [class.input-error]="bulkFieldInvalid('slotDurationMinutes')"
             />
           </div>
@@ -322,9 +279,9 @@
                 role="alert"
                 class="alert alert-soft alert-warning rounded-xl text-sm flex-col items-start gap-2"
               >
-                <span class="font-semibold">
-                  {{ result.conflicts.length }} ignorado(s) por conflito:
-                </span>
+                <span class="font-semibold"
+                  >{{ result.conflicts.length }} ignorado(s) por conflito:</span
+                >
                 <ul class="list-disc list-inside text-xs">
                   @for (conflict of result.conflicts; track $index) {
                     <li>
@@ -340,13 +297,11 @@
         }
 
         <!-- Ações -->
-        <div class="modal-action flex-col-reverse sm:flex-row mt-1 pt-4 border-t border-base-200">
-          <button type="button" class="btn btn-ghost btn-sm w-full sm:w-auto" (click)="closeForm()">
-            Fechar
-          </button>
+        <div class="modal-action mt-2 pt-3 border-t border-base-200">
+          <button type="button" class="btn btn-ghost btn-sm" (click)="closeForm()">Fechar</button>
           <button
             type="submit"
-            class="btn btn-primary btn-sm text-primary-content px-6 w-full sm:w-auto"
+            class="btn btn-primary btn-sm text-primary-content px-6"
             [disabled]="!isBulkSubmitEnabled() || scheduleService.loading()"
           >
             @if (scheduleService.loading()) {
@@ -358,12 +313,11 @@
       </form>
     </app-modal>
   }
-
-  <!-- Modal de Criação/Edição -->
+  <!-- Modal Form -->
   @if (formMode() === 'create' || formMode() === 'edit') {
     <app-modal>
-      <div class="flex justify-between items-center mb-5 border-b border-base-200 pb-3">
-        <h3 id="modal-title" class="font-bold text-lg text-base-content">
+      <div class="flex justify-between items-center mb-4 border-b border-base-200 pb-3">
+        <h3 id="modal-title" class="font-bold text-xl text-base-content">
           {{ isEditing() ? 'Editar Horário' : 'Cadastrar Horário' }}
         </h3>
         <button
@@ -375,48 +329,52 @@
         </button>
       </div>
 
-      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
-          <div class="flex flex-col gap-1">
-            <label class="text-xs font-semibold text-base-content/60 uppercase tracking-wide" for="startTime">
-              Horário de Início
-            </label>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-3">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
+          <div class="flex flex-col w-full">
+            <label class="py-1 font-medium text-xs text-base-content" for="startTime"
+              >Horário de Início</label
+            >
             <input
               id="startTime"
               type="time"
               formControlName="startTime"
-              class="input input-bordered input-sm rounded-lg w-full"
+              class="input input-bordered input-sm w-full"
               [class.input-error]="fieldInvalid('startTime')"
             />
             @if (fieldInvalid('startTime')) {
-              <span role="alert" class="text-error text-[11px] font-medium px-1">Obrigatório</span>
+              <span role="alert" class="block text-error text-[11px] mt-1 font-medium px-1"
+                >Obrigatório</span
+              >
             }
           </div>
 
-          <div class="flex flex-col gap-1">
-            <label class="text-xs font-semibold text-base-content/60 uppercase tracking-wide" for="endTime">
-              Horário de Término
-            </label>
+          <div class="flex flex-col w-full">
+            <label class="py-1 font-medium text-xs text-base-content" for="endTime"
+              >Horário de Término</label
+            >
             <input
               id="endTime"
               type="time"
               formControlName="endTime"
-              class="input input-bordered input-sm rounded-lg w-full"
+              class="input input-bordered input-sm w-full"
               [class.input-error]="fieldInvalid('endTime')"
             />
             @if (fieldInvalid('endTime')) {
-              <span role="alert" class="text-error text-[11px] font-medium px-1">Obrigatório</span>
+              <span role="alert" class="block text-error text-[11px] mt-1 font-medium px-1"
+                >Obrigatório</span
+              >
             }
           </div>
 
-          <div class="flex flex-col gap-1 sm:col-span-2">
-            <label class="text-xs font-semibold text-base-content/60 uppercase tracking-wide" for="dayOfWeek">
-              Dia da Semana
-            </label>
+          <div class="flex flex-col w-full md:col-span-2">
+            <label class="py-1 font-medium text-xs text-base-content" for="dayOfWeek"
+              >Dia da Semana</label
+            >
             <select
               id="dayOfWeek"
               formControlName="dayOfWeek"
-              class="select select-bordered select-sm rounded-lg w-full"
+              class="select select-bordered select-sm w-full"
               [class.select-error]="fieldInvalid('dayOfWeek')"
             >
               <option [value]="null" disabled>Selecione um dia</option>
@@ -425,19 +383,19 @@
               }
             </select>
             @if (fieldInvalid('dayOfWeek')) {
-              <span role="alert" class="text-error text-[11px] font-medium px-1">Obrigatório</span>
+              <span role="alert" class="block text-error text-[11px] mt-1 font-medium px-1"
+                >Obrigatório</span
+              >
             }
           </div>
         </div>
 
         <!-- Ações do Modal -->
-        <div class="modal-action flex-col-reverse sm:flex-row mt-1 pt-4 border-t border-base-200">
-          <button type="button" class="btn btn-ghost btn-sm w-full sm:w-auto" (click)="closeForm()">
-            Cancelar
-          </button>
+        <div class="modal-action mt-4 pt-3 border-t border-base-200">
+          <button type="button" class="btn btn-ghost btn-sm" (click)="closeForm()">Cancelar</button>
           <button
             type="submit"
-            class="btn btn-primary btn-sm text-primary-content px-6 w-full sm:w-auto"
+            class="btn btn-primary btn-sm text-primary-content px-6"
             [disabled]="!isSubmitEnabled() || scheduleService.loading()"
           >
             @if (scheduleService.loading()) {
