@@ -1,5 +1,4 @@
 <div class="p-6 max-w-7xl mx-auto">
-  <!-- Cabeçalho -->
   <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
     <div>
       <h1 class="text-3xl font-bold text-base-content">Gestão de Horários</h1>
@@ -73,7 +72,6 @@
     </div>
   }
 
-  <!-- Listagem de Horários -->
   @if (!isFormOpen()) {
     @if (scheduleService.isEmpty()) {
       <div
@@ -82,7 +80,7 @@
         <p class="text-lg">Nenhum horário cadastrado para esta quadra ainda.</p>
       </div>
     } @else {
-      <div class="flex flex-col gap-4">
+      <div class="flex flex-col gap-4 pb-16">
         @for (group of scheduleGroups(); track group.day) {
           <section class="card bg-base-100 card-border shadow-sm">
             <div class="card-body p-5">
