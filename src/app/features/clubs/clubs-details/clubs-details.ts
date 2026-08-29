@@ -24,6 +24,7 @@ import { AuthService } from '../../../core/services/auth-service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ServiceCourtAvailabilitySignalR } from '../services/service-court-availability-signalr';
 import { ReserveAvailabilityChangedDTO } from '../models/model-reserve';
+import { ImageCarousel } from '../../../shared/components/image-carousel/image-carousel';
 
 const TYPE_LABELS: Record<TypeEnum, string> = {
   [TypeEnum.None]: 'Outro',
@@ -141,7 +142,7 @@ export interface TimeSlot {
 
 @Component({
   selector: 'app-clubs-detail',
-  imports: [NgOptimizedImage, RouterLink, NgClass],
+  imports: [RouterLink, NgClass, ImageCarousel],
   templateUrl: './clubs-details.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

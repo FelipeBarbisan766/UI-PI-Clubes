@@ -27,7 +27,9 @@
     <section class="py-12 px-4 bg-base-200">
       <div class="container mx-auto max-w-6xl text-center">
         <h2 class="font-destaque text-3xl font-bold mb-3 text-base-900">Cadastre-se e aproveite</h2>
-        <p class="text-base-500 mb-8 font-light">Crie sua conta e tenha acesso a todos os recursos.</p>
+        <p class="text-base-500 mb-8 font-light">
+          Crie sua conta e tenha acesso a todos os recursos.
+        </p>
 
         <button
           [routerLink]="['/sign-up']"
@@ -37,8 +39,7 @@
         </button>
       </div>
     </section>
-  
-    
+
     <section class="py-24 px-4 bg-base">
       <div class="container mx-auto max-w-6xl text-center">
         <h2 class="font-destaque text-3xl font-bold mb-3 text-base-900">Como funciona</h2>
@@ -176,13 +177,8 @@
               [routerLink]="['/clubs', club.id]"
               class="card bg-base shadow-sm border border-base-100 overflow-hidden hover:shadow-lg transition-all cursor-pointer group"
             >
-              <figure class="h-40 w-full relative overflow-hidden bg-base-200">
-                <img
-                  [ngSrc]="getCoverImage(club)"
-                  [alt]="club.name"
-                  fill
-                  class="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
+              <figure class="h-56 w-full bg-base-200 relative overflow-hidden">
+                <app-image-carousel [images]="club.images" [alt]="club.name" size="thumb" />
               </figure>
               <div class="p-4">
                 <h3 class="font-bold text-md text-base-900 line-clamp-1">{{ club.name }}</h3>
@@ -205,7 +201,6 @@
   }
 
   @if (featuredClubs().length === 0) {
-
   } @else {
     <section class="py-12 px-4 bg-base">
       <div class="container mx-auto max-w-6xl">
@@ -221,12 +216,7 @@
               class="card bg-base shadow-sm border border-base-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group"
             >
               <figure class="h-56 w-full bg-base-200 relative overflow-hidden">
-                <img
-                  [ngSrc]="getCoverImage(club)"
-                  [alt]="club.name"
-                  fill
-                  class="object-cover transition-transform duration-700 group-hover:scale-110"
-                />
+                <app-image-carousel [images]="club.images" [alt]="club.name" size="thumb" />
               </figure>
               <div class="card-body p-6">
                 <div class="flex justify-between items-start mb-1">

@@ -13,12 +13,13 @@ import { debounceTime, skip, switchMap, take } from 'rxjs';
 import { ServiceCourt } from '../services/service-court';
 import { CourtQueryDTO, ResponseCourtDTO } from '../models/model-court';
 import { TypeEnum } from '../models/model-court';
+import { ImageCarousel } from "../../../shared/components/image-carousel/image-carousel";
 
 const PAGE_SIZE = 10;
 
 @Component({
   selector: 'app-courts-list',
-  imports: [NgOptimizedImage],
+  imports: [ImageCarousel],
   templateUrl: './courts-list.html',
   styleUrl: './courts-list.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

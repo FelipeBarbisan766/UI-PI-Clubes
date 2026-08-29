@@ -15,11 +15,12 @@ import { ServiceClub } from '../clubs/services/service-club';
 import { ResponseClubDTO } from '../clubs/models/model-club';
 import { SearchHome } from '../../shared/components/search-home/search-home';
 import { AuthService } from '../../core/services/auth-service';
-import { ProfileAlertModal } from "../../shared/components/profile-alert-modal/profile-alert-modal"; // Ajuste o caminho conforme seu projeto
+import { ProfileAlertModal } from "../../shared/components/profile-alert-modal/profile-alert-modal";
+import { ImageCarousel } from "../../shared/components/image-carousel/image-carousel"; // Ajuste o caminho conforme seu projeto
 
 @Component({
   selector: 'app-home-page',
-  imports: [NgOptimizedImage, RouterLink, ProfileAlertModal],
+  imports: [RouterLink, ProfileAlertModal, ImageCarousel],
   templateUrl: './home-page.html',
   // NOTA: standalone: true é o padrão no Angular v20+, então não o declaramos.
   changeDetection: ChangeDetectionStrategy.OnPush,

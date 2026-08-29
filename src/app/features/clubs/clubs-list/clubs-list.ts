@@ -13,12 +13,13 @@ import { debounceTime, skip, switchMap, take } from 'rxjs';
 import { ServiceClub } from '../services/service-club';
 import { ClubQueryDTO, ResponseClubDTO } from '../models/model-club';
 import { TypeEnum } from '../models/model-court';
+import { ImageCarousel } from "../../../shared/components/image-carousel/image-carousel";
 
 const PAGE_SIZE = 10;
 
 @Component({
   selector: 'app-clubs-list',
-  imports: [NgOptimizedImage],
+  imports: [ImageCarousel],
   templateUrl: './clubs-list.html',
   styleUrl: './clubs-list.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -1,5 +1,11 @@
 import { TypeEnum } from './model-court';
 
+export interface ImageDTO {
+  thumbUrl: string;
+  mediumUrl: string;
+  fullUrl: string;
+}
+
 export interface ResponseClubDTO {
   id: string;
   name: string;
@@ -12,13 +18,7 @@ export interface ResponseClubDTO {
   minPrice: number;
   courtCount: number;
   types: TypeEnum[];
-  images: [
-    {
-      thumbUrl: string;
-      mainUrl: string;
-      fullUrl: string;
-    }
-  ];
+  images: ImageDTO[]; // ← era [{ ... }]
 }
 
 export interface ResponseClubByIdDTO {
@@ -33,15 +33,10 @@ export interface ResponseClubByIdDTO {
   city: string;
   state: string;
   country: string;
-  images: [
-    {
-      thumbUrl: string;
-      mainUrl: string;
-      fullUrl: string;
-    }
-  ];
+  images: ImageDTO[]; // ← era [{ ... }]
   courts: import('./model-court').ResponseCourtDTO[];
 }
+
 export interface ClubQueryDTO {
   name?: string;
   city?: string;
