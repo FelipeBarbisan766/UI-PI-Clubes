@@ -1,3 +1,5 @@
+import { ImageDTO } from "./model-club";
+
 export enum TypeEnum {
     None = 'None',
     Futsal = 'Futsal',
@@ -47,7 +49,7 @@ export enum SurfaceEnum {
 }
 
 export interface ResponseCourtDTO {
-  id : string;
+  id: string;
   name: string;
   type: TypeEnum;
   surface: SurfaceEnum;
@@ -55,14 +57,9 @@ export interface ResponseCourtDTO {
   pricePerHour: number;
   description: string;
   clubId: string;
-  images: [
-    {
-      thumbUrl: string;
-      mainUrl: string;
-      fullUrl: string;
-    }
-  ];
+  images: ImageDTO[]; // ← era [{ ... }]
 }
+
 export interface CourtState {
   courts: ResponseCourtDTO[];
   selectedCourt: ResponseCourtDTO | null;

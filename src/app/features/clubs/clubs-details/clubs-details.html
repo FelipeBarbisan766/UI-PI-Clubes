@@ -50,11 +50,17 @@
         Voltar
       </a>
 
-      @if (getFirstImage(club()); as heroUrl) {
+      @if (club()!.images.length) {
         <div
           class="h-64 sm:h-96 w-full rounded-3xl overflow-hidden relative shadow-sm border border-base-200"
         >
-          <img [ngSrc]="heroUrl" [alt]="club()!.name" fill priority class="object-cover" />
+          <app-image-carousel
+            [images]="club()!.images"
+            [alt]="club()!.name"
+            size="full"
+            [autoplay]="true"
+            [priority]="true"
+          />
         </div>
       }
 
@@ -182,12 +188,7 @@
                 >
                   @if (court.images.length) {
                     <div class="h-32 w-full rounded-xl overflow-hidden mb-3 bg-base-200 relative">
-                      <img
-                        [ngSrc]="court.images[0].thumbUrl"
-                        [alt]="court.name"
-                        fill
-                        class="object-cover"
-                      />
+                      <app-image-carousel [images]="court.images" [alt]="court.name" size="thumb" />
                     </div>
                   }
 
@@ -219,7 +220,6 @@
               <h2 id="slots-heading" class="text-xl font-bold text-base-content mb-4">
                 Horários — {{ selectedCourt()!.name }}
               </h2>
-              
 
               <!-- Seleção de data -->
               <div
