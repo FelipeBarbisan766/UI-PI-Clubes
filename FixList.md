@@ -62,6 +62,7 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 ### Detalhes clubes
 * reorganizar lugar dos elementos
 * trocar google maps por outra api
+* separar arquivo em componentes
 
 ### Verificar Email
 * Criar botão de enviar novamente
@@ -75,6 +76,8 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 ### Tema Claro / Escuro
 * Ajustar cores/contraste de elementos
 
+### Cadastro
+* Ajustar telefone
 
 
 ---
