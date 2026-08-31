@@ -198,9 +198,9 @@
                     <p>{{ getTypeName(court.type) }} · {{ getSurfaceName(court.surface) }}</p>
                     <p class="flex items-center gap-1">
                       @if (court.isCovered) {
-                        <span class="text-success text-xs font-medium">● Coberta</span>
+                        <span class="badge badge-sm badge-soft badge-success">Coberta</span>
                       } @else {
-                        <span class="text-warning text-xs font-medium">● Descoberta</span>
+                        <span class="badge badge-sm badge-soft badge-warning">Descoberta</span>
                       }
                     </p>
                   </div>

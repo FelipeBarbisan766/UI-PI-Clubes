@@ -57,6 +57,10 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 * Definir local da tela
 * Colocar travas de planos
 
+### Detalhes clubes
+* reorganizar lugar dos elementos
+
+
 ---
 
 # Fix's do Gustavo
