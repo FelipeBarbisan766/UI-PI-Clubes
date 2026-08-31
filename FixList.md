@@ -79,6 +79,8 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 ### Cadastro
 * Ajustar telefone
 
+### Reservas
+* resolver erros console <span style="background-color: #FFCCCC; color: red; padding: 4px;">WEB</span>
 
 ---
 
