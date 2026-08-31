@@ -202,7 +202,7 @@
 
   @if (featuredClubs().length === 0) {
   } @else {
-    <section class="py-12 px-4 bg-base">
+    <section class="py-12 px-4 bg-base-200">
       <div class="container mx-auto max-w-6xl">
         <div class="mb-8">
           <h2 class="font-destaque text-2xl font-bold text-base-900">Recomendados para você</h2>
@@ -213,7 +213,7 @@
           @for (club of featuredClubs(); track club.id) {
             <div
               [routerLink]="['/clubs', club.id]"
-              class="card bg-base shadow-sm border border-base-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group"
+              class="card bg-base-100 shadow-sm border border-base-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group"
             >
               <figure class="h-56 w-full bg-base-200 relative overflow-hidden">
                 <app-image-carousel [images]="club.images" [alt]="club.name" size="thumb" />
