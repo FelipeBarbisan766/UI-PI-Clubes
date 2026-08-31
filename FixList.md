@@ -59,6 +59,11 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 
 ### Detalhes clubes
 * reorganizar lugar dos elementos
+* trocar google maps por outra api
+
+### Verificar Email
+* Criar botão de enviar novamente
+
 
 
 ---
