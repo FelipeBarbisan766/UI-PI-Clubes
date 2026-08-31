@@ -1,4 +1,6 @@
-<main class="min-h-screen w-full pattern-background flex items-center justify-center px-4 py-12 pt-20">
+<main
+  class="min-h-screen w-full pattern-background flex items-center justify-center px-4 py-12 pt-20"
+>
   <section class="card bg-base-100 shadow-sm w-full max-w-2xl" aria-labelledby="verify-mail-title">
     <div class="card-body">
       <header class="text-center mb-6 max-w-xl mx-auto">
@@ -8,7 +10,8 @@
 
         @if (status() === 'pending') {
           <p class="text-sm md:text-base" aria-live="polite">
-            Enviamos um link de verificação para seu e-mail. Acesse sua caixa de entrada e clique no link para ativar sua conta.
+            Enviamos um link de verificação para seu e-mail. Acesse sua caixa de entrada e clique no
+            link para ativar sua conta.
           </p>
         }
 
@@ -66,7 +69,6 @@
 
         @if (status() === 'error') {
           <a
-            
             class="btn btn-primary rounded-full text-white w-full"
             aria-label="Reenviar verificação"
           >

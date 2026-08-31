@@ -31,21 +31,20 @@ export class VerifyMail {
     this.status.set('loading');
 
     this.verifyMailService
-  .verifyEmail(token)
-  .pipe(take(1))
-  .subscribe({
-    next: (result) => {
-      this.status.set('success');
-      this.successMessage.set(result.message);
-      
-    },
-    error: (error: unknown) => {
-      this.status.set('error');
-      this.errorMessage.set(
-        error instanceof Error ? error.message : 'Link inválido ou expirado.'
-      );
-    },
-  });
+      .verifyEmail(token)
+      .pipe(take(1))
+      .subscribe({
+        next: (result) => {
+          this.status.set('success');
+          this.successMessage.set(result.message);
+        },
+        error: (error: unknown) => {
+          this.status.set('error');
+          this.errorMessage.set(
+            error instanceof Error ? error.message : 'Link inválido ou expirado.',
+          );
+        },
+      });
   }
 
   goToLogin() {
