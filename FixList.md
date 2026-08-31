@@ -9,6 +9,8 @@
 
 * alinhamento padronizado 
 
+* Mudar visual das telas de login, cadastro, minhas reservas, meus clubes e minha conta
+
 ### HomePage
 
 * ~~O search da HomePage~~ 
@@ -64,6 +66,15 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 ### Verificar Email
 * Criar botão de enviar novamente
 
+### MInhas reservas
+* Ajustar responsividade
+
+### Termos e Privacidade
+* Criar documento de termos de uso e privacidade de usuário
+
+### Tema Claro / Escuro
+* Ajustar cores/contraste de elementos
+
 
 
 ---
@@ -116,3 +127,6 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 - erros no console 
 
 --- 
+
+- [x] teste
+- [ ] teste
