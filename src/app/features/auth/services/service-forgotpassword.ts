@@ -24,29 +24,44 @@ export class ServiceForgotPassword {
         success: true,
         message: (message || '').trim() || 'Verifique seu e-mail para continuar.',
       })),
-      catchError((error: unknown) => {
+       catchError((error: unknown) => {
+        let defaultMessage = 'Não foi possível reenviar o e-mail de redefinição de senha.';
+
         if (error instanceof HttpErrorResponse && typeof error.error === 'string') {
-          return throwError(() => new Error(error.error || 'Não foi possível enviar o e-mail.'));
+          try {
+            const parsedError = JSON.parse(error.error);
+            defaultMessage = parsedError.Message || parsedError.message || defaultMessage;
+          } catch {
+            defaultMessage = error.error || defaultMessage;
+          }
         }
-        return throwError(() => new Error('Não foi possível enviar o e-mail.'));
-      })
+
+        return throwError(() => new Error(defaultMessage));
+      }),
     );
   }
 
   resetPassword(token: string, password: string): Observable<ForgotPasswordResult> {
     const url = `${environment.apiUrl}${this.resetPath}?token=${encodeURIComponent(token)}&password=${encodeURIComponent(password)}`;
-
-    return this.http.get(url, { responseType: 'text' }).pipe(
+    return this.http.post(url, null, { responseType: 'text' }).pipe(
       map((message: string) => ({
         success: true,
         message: (message || '').trim() || 'Senha recuperada com sucesso!',
       })),
-      catchError((error: unknown) => {
+       catchError((error: unknown) => {
+        let defaultMessage = 'Não foi possível resetar a senha.';
+
         if (error instanceof HttpErrorResponse && typeof error.error === 'string') {
-          return throwError(() => new Error(error.error || 'O link de verificação é inválido ou expirou.'));
+          try {
+            const parsedError = JSON.parse(error.error);
+            defaultMessage = parsedError.Message || parsedError.message || defaultMessage;
+          } catch {
+            defaultMessage = error.error || defaultMessage;
+          }
         }
-        return throwError(() => new Error('O link de verificação é inválido ou expirou.'));
-      })
+
+        return throwError(() => new Error(defaultMessage));
+      }),
     );
   }
 }

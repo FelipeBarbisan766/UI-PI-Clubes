@@ -39,16 +39,26 @@ export class ServiceSignUp {
 }
 
   private handleError(err: unknown): Observable<never> {
-    if (err instanceof HttpErrorResponse) {
-      const message =
-        typeof err.error === 'string' && err.error.trim()
-          ? err.error
-          : 'Ocorreu um erro inesperado.';
-      return throwError(() => new Error(message));
+  if (err instanceof HttpErrorResponse) {
+    let errorMessage = 'Ocorreu um erro inesperado.';
+
+    if (typeof err.error === 'string' && err.error.trim()) {
+      try {
+        const parsedError = JSON.parse(err.error);
+        errorMessage = parsedError.Message || parsedError.message || err.error;
+      } catch {
+        errorMessage = err.error; 
+      }
+    } 
+    else if (err.error && typeof err.error === 'object') {
+      errorMessage = err.error.Message || err.error.message || errorMessage;
     }
 
-    const message = err instanceof Error ? err.message : 'Ocorreu um erro inesperado.';
-    return throwError(() => new Error(message));
+    return throwError(() => new Error(errorMessage));
   }
+
+  const message = err instanceof Error ? err.message : 'Ocorreu um erro inesperado.';
+  return throwError(() => new Error(message));
+}
 
 }

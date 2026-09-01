@@ -83,9 +83,12 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 * ~~primeiro nome~~
 * ~~links footer~~
 
+* icone fazer parte do botao 
+
 ### Login 
 
 - erros no console ( diversos ) 
+* bloquear caracteres especiais 
 
 ### Clubs/Court-list
 
@@ -114,5 +117,11 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 ### Clube details
 
 - erros no console 
+
+minhas reservas 
+
+erro 
+c
+
 
 --- 
