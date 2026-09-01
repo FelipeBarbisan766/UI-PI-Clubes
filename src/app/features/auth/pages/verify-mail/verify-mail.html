@@ -32,6 +32,36 @@
             {{ errorMessage() }}
           </p>
         }
+
+        @if (status() === 'InputResendEmail') {
+          <p class="text-sm md:text-base text-base" aria-live="polite">
+            Para poder reenviar o link de verificação, Precisamos que digite seu e-mail novamente.
+          </p>
+          <form [formGroup]="emailForm" class="flex flex-col gap-4 w-full max-w-md mx-auto">
+            <input
+              type="email"
+              formControlName="email"
+              placeholder="Digite seu e-mail"
+              class="input input-bordered w-full"
+              required
+            />
+            <button
+              type="button"
+              (click)="resendVerificationEmail()"
+              class="btn btn-primary rounded-full text-white w-full"
+              aria-label="Reenviar verificação"
+            >
+              Reenviar verificação
+            </button>
+          </form>
+        }
+
+        @if (status() === 'resendSuccess') {
+          <p class="text-sm md:text-base text-success" aria-live="polite">
+            Enviamos um novo link de verificação para seu e-mail. Acesse sua caixa de entrada e
+            clique no link para ativar sua conta.
+          </p>
+        }
       </header>
 
       <div class="grid grid-cols-1 gap-4 w-full max-w-md mx-auto">
@@ -42,6 +72,13 @@
             aria-label="Ir para login"
           >
             Ir para login
+          </a>
+          <a
+            (click)="requestResendEmail()"
+            class="btn btn-primary rounded-full text-white w-full"
+            aria-label="Reenviar verificação"
+          >
+            Reenviar verificação
           </a>
         }
 

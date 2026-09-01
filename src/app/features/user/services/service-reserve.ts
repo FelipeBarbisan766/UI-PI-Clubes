@@ -9,7 +9,7 @@ import {
   ReserveQueryParams,
   StatusEnum,
 } from '../models/model-reserve';
-import { environment } from '../../../../environments/environment.development';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class UserReserveService {
