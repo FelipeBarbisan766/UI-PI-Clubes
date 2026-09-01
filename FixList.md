@@ -9,6 +9,8 @@
 
 * alinhamento padronizado 
 
+* Mudar visual das telas de login, cadastro, minhas reservas, meus clubes e minha conta
+
 ### HomePage
 
 * ~~O search da HomePage~~ 
@@ -60,11 +62,25 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 ### Detalhes clubes
 * reorganizar lugar dos elementos
 * trocar google maps por outra api
+* separar arquivo em componentes
 
 ### Verificar Email
 * Criar botão de enviar novamente
 
+### MInhas reservas
+* Ajustar responsividade
 
+### Termos e Privacidade
+* Criar documento de termos de uso e privacidade de usuário
+
+### Tema Claro / Escuro
+* Ajustar cores/contraste de elementos
+
+### Cadastro
+* Ajustar telefone
+
+### Reservas
+* resolver erros console <span style="background-color: #FFCCCC; color: red; padding: 4px;">WEB</span>
 
 ---
 
@@ -117,11 +133,5 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 ### Clube details
 
 - erros no console 
-
-minhas reservas 
-
-erro 
-c
-
 
 --- 
