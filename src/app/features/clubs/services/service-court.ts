@@ -45,8 +45,7 @@ export class ServiceCourt {
     if (query.page)     params = params.set('page', String(query.page));
     if (query.pageSize) params = params.set('pageSize', String(query.pageSize));
 
-    query.types?.forEach(t => (params = params.append('types', String(t))));
-
+    query.sportIds?.forEach(id => (params = params.append('SportIds', id)));
 
     return this.http.get<PagedResultDTO<ResponseCourtDTO>>(this.apiUrl, { params }).pipe(
       tap((result) => {
@@ -72,7 +71,6 @@ export class ServiceCourt {
       catchError((err) => this.handleError(err)),
     );
   }
-
 
   // --- Helpers ---
 

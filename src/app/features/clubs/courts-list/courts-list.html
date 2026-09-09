@@ -13,13 +13,6 @@
       </div>
 
       <div class="flex items-center gap-2 self-start sm:self-auto">
-        <!-- Ordenação: conectar ao backend quando suportado -->
-        <!-- <select class="select select-bordered select-sm w-48 rounded-md" aria-label="Ordenar resultados por">
-          <option value="price">Preço (menor primeiro)</option>
-          <option value="name">Nome (A-Z)</option>
-          <option value="courts">Mais quadras</option>
-        </select> -->
-
         <button class="btn btn-sm btn-outline rounded-md lg:hidden" aria-label="Abrir filtros">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -46,134 +39,18 @@
     <div class="container mx-auto max-w-6xl px-4 flex gap-4 xl:gap-6">
       <!-- Sidebar de filtros (desktop) -->
       <aside class="hidden lg:block w-[260px] shrink-0" aria-label="Filtros de busca">
-        <div class="sticky top-24 rounded-lg border border-base-300 bg-base-100 p-5 shadow-sm">
-          <h2 class="font-bold text-base-content text-base mb-4 border-b border-base-200 pb-2">
-            Filtrar por:
-          </h2>
-
-          <div class="space-y-6">
-            <!-- Busca por nome -->
-            <div>
-              <label for="search-input" class="text-sm font-bold text-base-content block mb-2">
-                Pesquisar propriedade
-              </label>
-              <div class="relative">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  class="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-base-content/50"
-                  aria-hidden="true"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
-                  />
-                </svg>
-                <input
-                  id="search-input"
-                  type="search"
-                  placeholder="Nome da Quadra..."
-                  class="input input-bordered input-sm w-full pl-9 rounded-md"
-                  [value]="searchTerm()"
-                  (input)="onSearchChange($event)"
-                />
-              </div>
-            </div>
-
-            <!-- Cidade -->
-            <div>
-              <label for="city-input" class="text-sm font-bold text-base-content block mb-2">
-                Destino / Cidade
-              </label>
-
-              @if (detectedCity()) {
-                <div
-                  class="flex items-center gap-1 mb-2 text-xs text-success bg-success/10 border border-success/30 rounded px-2 py-1"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="size-3 shrink-0"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="2"
-                    stroke="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                    />
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"
-                    />
-                  </svg>
-                  <span class="truncate">Localização detectada</span>
-                  <button
-                    class="ml-auto shrink-0 text-success/70 hover:text-error transition-colors"
-                    (click)="clearDetectedCity()"
-                    type="button"
-                    aria-label="Remover filtro de localização"
-                  >
-                    ✕
-                  </button>
-                </div>
-              }
-
-              <input
-                id="city-input"
-                type="text"
-                placeholder="Ex: São Paulo"
-                class="input input-bordered input-sm w-full rounded-md"
-                [value]="cityFilter()"
-                (input)="onCityChange($event)"
-              />
-            </div>
-
-            <!-- Modalidades (TypeEnum) -->
-            <div>
-              <span class="text-sm font-bold text-base-content block mb-3" id="sports-filter-label">
-                Comodidades / Modalidades
-              </span>
-
-              @if (selectedTypes().length > 0) {
-                <button
-                  class="btn btn-xs btn-ghost text-error mb-2 px-0"
-                  (click)="selectedTypes.set([]); currentPage.set(1)"
-                  type="button"
-                >
-                  Limpar seleção ({{ selectedTypes().length }})
-                </button>
-              }
-
-              <div
-                class="space-y-2.5 max-h-60 overflow-y-auto pr-2"
-                role="group"
-                aria-labelledby="sports-filter-label"
-              >
-                @for (type of availableTypes; track type.value) {
-                  <label
-                    class="flex items-center gap-3 cursor-pointer text-sm text-base-content/80 hover:text-base-content"
-                  >
-                    <input
-                      type="checkbox"
-                      class="checkbox checkbox-primary checkbox-sm rounded"
-                      [checked]="isTypeSelected(type.value)"
-                      (change)="toggleType(type.value)"
-                    />
-                    {{ type.label }}
-                  </label>
-                }
-              </div>
-            </div>
-          </div>
-        </div>
+        <app-search-filters
+          [searchTerm]="searchTerm()"
+          searchPlaceholder="Nome da Quadra..."
+          [cityFilter]="cityFilter()"
+          [detectedCity]="detectedCity()"
+          [selectedSportIds]="selectedSportIds()"
+          (searchTermChange)="onSearchChange($event)"
+          (cityFilterChange)="onCityChange($event)"
+          (clearDetectedCity)="clearDetectedCity()"
+          (toggleSport)="toggleSport($event)"
+          (clearSports)="clearSports()"
+        />
       </aside>
 
       <!-- Lista de courtes -->
@@ -243,11 +120,6 @@
                       {{ court.name }}
                     </h3>
 
-                    <!-- <p class="text-xs link link-hover flex items-center gap-1 mt-0.5 truncate">
-                      {{ court.street }}, {{ court.city }} •
-                      <span class="font-semibold">Mostrar no mapa</span>
-                    </p> -->
-
                     @if (court.description) {
                       <p
                         class="text-xs text-base-content/70 mt-2 line-clamp-2 border-l-2 border-base-300 pl-2"
@@ -256,24 +128,15 @@
                       </p>
                     }
 
-                    <div class="mt-2">
-                      <span
-                        class="ml-2 badge badge-outline badge-sm text-[10px] text-base-content/70"
-                      >
-                        {{ getTypeName(court.type) }}
-                      </span>
+                    <div class="mt-2 flex flex-wrap gap-1">
+                      @for (sport of court.sports; track sport.id) {
+                        <span
+                          class="badge badge-outline badge-sm text-[10px] text-base-content/70"
+                        >
+                          {{ sport.name }}
+                        </span>
+                      }
                     </div>
-
-                    <!-- <div class="mt-auto pt-3 flex flex-wrap gap-1 items-center">
-                      <span
-                        class="text-[11px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded mr-1"
-                      >
-                        ✓ {{ court.courtCount }} quadra{{
-                          court.courtCount !== 1 ? 's' : ''
-                        }}
-                        disponíve{{ court.courtCount !== 1 ? 'is' : 'l' }}
-                      </span>
-                    </div> -->
                   </div>
 
                   <div
@@ -320,7 +183,6 @@
         @if (!loading() && !isEmpty() && totalPages() > 1) {
           <nav aria-label="Paginação" class="flex justify-center sm:justify-start mt-8 mb-4">
             <div class="join border border-base-300 rounded-md">
-              <!-- Anterior -->
               <button
                 class="join-item btn btn-sm bg-base-100 hover:bg-base-200"
                 [disabled]="currentPage() <= 1"
@@ -330,7 +192,6 @@
                 «
               </button>
 
-              <!-- Páginas -->
               @for (page of visiblePages(); track $index) {
                 @if (page === '...') {
                   <button class="join-item btn btn-sm bg-base-100" disabled aria-hidden="true">
@@ -354,7 +215,6 @@
                 }
               }
 
-              <!-- Próxima -->
               <button
                 class="join-item btn btn-sm bg-base-100 hover:bg-base-200"
                 [disabled]="currentPage() >= totalPages()"

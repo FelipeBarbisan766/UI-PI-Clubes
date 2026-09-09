@@ -8,18 +8,17 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { NgOptimizedImage } from '@angular/common';
 import { debounceTime, skip, switchMap, take } from 'rxjs';
 import { ServiceCourt } from '../services/service-court';
 import { CourtQueryDTO, ResponseCourtDTO } from '../models/model-court';
-import { TypeEnum } from '../models/model-court';
 import { ImageCarousel } from "../../../shared/components/image-carousel/image-carousel";
+import { SearchFilters } from "../../../shared/components/search-filters/search-filters";
 
 const PAGE_SIZE = 10;
 
 @Component({
   selector: 'app-courts-list',
-  imports: [ImageCarousel],
+  imports: [ImageCarousel, SearchFilters],
   templateUrl: './courts-list.html',
   styleUrl: './courts-list.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -36,10 +35,10 @@ export class CourtsList {
   readonly courtsCount  = this.courtService.courtsCount;
   readonly totalPages  = this.courtService.totalPages;
 
-  readonly searchTerm    = signal('');
-  readonly cityFilter    = signal('');
-  readonly selectedTypes = signal<TypeEnum[]>([]);
-  readonly currentPage   = signal(1);
+  readonly searchTerm      = signal('');
+  readonly cityFilter      = signal('');
+  readonly selectedSportIds = signal<string[]>([]);
+  readonly currentPage     = signal(1);
 
   // Indica se a localização foi detectada automaticamente (para mostrar badge)
   readonly detectedCity  = signal<string | null>(null);
@@ -47,7 +46,7 @@ export class CourtsList {
   private readonly query = computed<CourtQueryDTO>(() => ({
     name:     this.searchTerm() || undefined,
     city:     this.cityFilter() || undefined,
-    types:    this.selectedTypes().length > 0 ? this.selectedTypes() : undefined,
+    sportIds: this.selectedSportIds().length > 0 ? this.selectedSportIds() : undefined,
     page:     this.currentPage(),
     pageSize: PAGE_SIZE,
   }));
@@ -135,27 +134,28 @@ export class CourtsList {
 
   // --- Handlers de filtro ---
 
-  onSearchChange(event: Event): void {
-    this.searchTerm.set((event.target as HTMLInputElement).value);
+  onSearchChange(value: string): void {
+    this.searchTerm.set(value);
     this.currentPage.set(1);
   }
 
-  onCityChange(event: Event): void {
-    this.cityFilter.set((event.target as HTMLInputElement).value);
+  onCityChange(value: string): void {
+    this.cityFilter.set(value);
     this.detectedCity.set(null);
     this.currentPage.set(1);
   }
 
-  toggleType(type: TypeEnum): void {
-    const current = this.selectedTypes();
-    this.selectedTypes.set(
-      current.includes(type) ? current.filter(t => t !== type) : [...current, type],
+  toggleSport(id: string): void {
+    const current = this.selectedSportIds();
+    this.selectedSportIds.set(
+      current.includes(id) ? current.filter(s => s !== id) : [...current, id],
     );
     this.currentPage.set(1);
   }
 
-  isTypeSelected(type: TypeEnum): boolean {
-    return this.selectedTypes().includes(type);
+  clearSports(): void {
+    this.selectedSportIds.set([]);
+    this.currentPage.set(1);
   }
 
   goToPage(page: number | '...'): void {
@@ -169,54 +169,11 @@ export class CourtsList {
     this.router.navigate(['clubs', court.clubId, 'court', court.id]);
   }
 
-  getFirstImage(court: ResponseCourtDTO): string | null {
-    return court.images?.length > 0 ? court.images[0].thumbUrl : null;
-  }
-
   formatPrice(price: number): string {
     return price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   }
 
   clearError(): void {
     this.courtService.clearError();
-  }
-
-  readonly typeLabels: Record<TypeEnum, string> = {
-    [TypeEnum.None]:         'Outro',
-    [TypeEnum.Futsal]:       'Futsal',
-    [TypeEnum.Basquetebol]:  'Basquetebol',
-    [TypeEnum.Basquete]:     'Basquete',
-    [TypeEnum.Voleibol]:     'Vôlei',
-    [TypeEnum.VôleiSentado]: 'Vôlei Sentado',
-    [TypeEnum.Handebol]:     'Handebol',
-    [TypeEnum.Netball]:      'Netball',
-    [TypeEnum.Tênis]:        'Tênis',
-    [TypeEnum.Badminton]:    'Badminton',
-    [TypeEnum.Squash]:       'Squash',
-    [TypeEnum.Padel]:        'Padel',
-    [TypeEnum.Pickleball]:   'Pickleball',
-    [TypeEnum.TênisDeMesa]:  'Tênis de Mesa',
-    [TypeEnum.Judô]:         'Judô',
-    [TypeEnum.Karatê]:       'Karatê',
-    [TypeEnum.Taekwondo]:    'Taekwondo',
-    [TypeEnum.Esgrima]:      'Esgrima',
-    [TypeEnum.SepakTakraw]:  'Sepak Takraw',
-    [TypeEnum.Hóquei]:       'Hóquei',
-    [TypeEnum.Dodgeball]:    'Dodgeball',
-    [TypeEnum.Raquetebol]:   'Raquetebol',
-    [TypeEnum.PelotaBasca]:  'Pelota Basca',
-    [TypeEnum.Floorball]:    'Floorball',
-    [TypeEnum.Korfball]:     'Korfball',
-    [TypeEnum.Tchoukball]:   'Tchoukball',
-    [TypeEnum.Goalball]:     'Goalball',
-    [TypeEnum.Futebol]:      'Futebol',
-  };
-
-  readonly availableTypes = Object.entries(this.typeLabels)
-    .filter(([value]) => value !== TypeEnum.None)
-    .map(([value, label]) => ({ value: value as TypeEnum, label }));
-
-  getTypeName(type: TypeEnum | string): string {
-    return this.typeLabels[type as TypeEnum] ?? 'Outro';
   }
 }

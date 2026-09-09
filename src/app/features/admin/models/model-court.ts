@@ -1,33 +1,5 @@
-export enum TypeEnum {
-    None = 'None',
-    Futsal = 'Futsal',
-    Basquetebol = 'Basquetebol',
-    Basquete = 'Basquete',
-    Voleibol = 'Voleibol',
-    VôleiSentado = 'VôleiSentado',
-    Handebol = 'Handebol',
-    Netball = 'Netball',
-    Tênis = 'Tênis',
-    Badminton = 'Badminton',
-    Squash = 'Squash',
-    Padel = 'Padel',
-    Pickleball = 'Pickleball',
-    TênisDeMesa = 'TênisDeMesa',
-    Judô = 'Judô',
-    Karatê = 'Karatê',
-    Taekwondo = 'Taekwondo',
-    Esgrima = 'Esgrima',
-    SepakTakraw = 'SepakTakraw',
-    Hóquei = 'Hóquei',
-    Dodgeball = 'Dodgeball',
-    Raquetebol = 'Raquetebol',
-    PelotaBasca = 'PelotaBasca',
-    Floorball = 'Floorball',
-    Korfball = 'Korfball',
-    Tchoukball = 'Tchoukball',
-    Goalball = 'Goalball',
-    Futebol = 'Futebol',
-}
+import { SportDTO } from "../../../core/models/model-sport";
+
 export enum SurfaceEnum {
     None = 'None',
     Saibro = 'Saibro',
@@ -47,7 +19,7 @@ export enum SurfaceEnum {
 
 export interface CreateCourtDTO {
   name: string;
-  type: TypeEnum;
+  sportIds: string[];
   surface: SurfaceEnum;
   isCovered: boolean;
   pricePerHour: number;
@@ -58,7 +30,7 @@ export interface CreateCourtDTO {
 
 export interface UpdateCourtDTO {
   name: string;
-  type: TypeEnum;
+  sportIds: string[];
   surface: SurfaceEnum;
   isCovered: boolean;
   pricePerHour: number;
@@ -68,7 +40,7 @@ export interface UpdateCourtDTO {
 export interface ResponseCourtDTO {
   id : string;
   name: string;
-  type: TypeEnum;
+  sports: SportDTO[];
   surface: SurfaceEnum;
   isCovered: boolean;
   pricePerHour: number;

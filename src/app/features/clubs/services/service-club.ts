@@ -2,7 +2,6 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { Observable, tap, catchError, throwError } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { TypeEnum } from '../models/model-court';
 import { ClubQueryDTO, PagedResultDTO, ResponseClubByIdDTO, ResponseClubDTO } from '../models/model-club';
 
 @Injectable({
@@ -43,7 +42,7 @@ export class ServiceClub {
     if (query.page)     params = params.set('page', String(query.page));
     if (query.pageSize) params = params.set('pageSize', String(query.pageSize));
 
-    query.types?.forEach(t => (params = params.append('types', String(t))));
+    query.sportIds?.forEach(id => (params = params.append('SportIds', id)));
 
     this._loading.set(true);
     this._error.set(null);
