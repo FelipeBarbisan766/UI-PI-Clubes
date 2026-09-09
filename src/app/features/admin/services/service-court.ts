@@ -67,7 +67,7 @@ export class ServiceCourt {
 
     const formData = new FormData();
     formData.append('name', dto.name);
-    formData.append('type', dto.type.toString());
+    dto.sportIds.forEach(id => formData.append('SportIds', id));
     formData.append('surface', dto.surface.toString());
     formData.append('isCovered', String(dto.isCovered));
     formData.append('pricePerHour', dto.pricePerHour.toString());

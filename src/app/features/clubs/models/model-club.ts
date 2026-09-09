@@ -1,4 +1,4 @@
-import { TypeEnum } from './model-court';
+import { SportDTO } from '../../../core/models/model-sport';
 
 export interface ImageDTO {
   thumbUrl: string;
@@ -17,8 +17,8 @@ export interface ResponseClubDTO {
   country: string;
   minPrice: number;
   courtCount: number;
-  types: TypeEnum[];
-  images: ImageDTO[]; // ← era [{ ... }]
+  sports: SportDTO[];
+  images: ImageDTO[];
 }
 
 export interface ResponseClubByIdDTO {
@@ -33,14 +33,14 @@ export interface ResponseClubByIdDTO {
   city: string;
   state: string;
   country: string;
-  images: ImageDTO[]; // ← era [{ ... }]
+  images: ImageDTO[];
   courts: import('./model-court').ResponseCourtDTO[];
 }
 
 export interface ClubQueryDTO {
   name?: string;
   city?: string;
-  types?: TypeEnum[];   
+  sportIds?: string[];
   page?: number;
   pageSize?: number;
 }

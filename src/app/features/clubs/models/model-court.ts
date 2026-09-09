@@ -1,35 +1,5 @@
 import { ImageDTO } from "./model-club";
-
-export enum TypeEnum {
-    None = 'None',
-    Futsal = 'Futsal',
-    Basquetebol = 'Basquetebol',
-    Basquete = 'Basquete',
-    Voleibol = 'Voleibol',
-    VôleiSentado = 'VôleiSentado',
-    Handebol = 'Handebol',
-    Netball = 'Netball',
-    Tênis = 'Tênis',
-    Badminton = 'Badminton',
-    Squash = 'Squash',
-    Padel = 'Padel',
-    Pickleball = 'Pickleball',
-    TênisDeMesa = 'TênisDeMesa',
-    Judô = 'Judô',
-    Karatê = 'Karatê',
-    Taekwondo = 'Taekwondo',
-    Esgrima = 'Esgrima',
-    SepakTakraw = 'SepakTakraw',
-    Hóquei = 'Hóquei',
-    Dodgeball = 'Dodgeball',
-    Raquetebol = 'Raquetebol',
-    PelotaBasca = 'PelotaBasca',
-    Floorball = 'Floorball',
-    Korfball = 'Korfball',
-    Tchoukball = 'Tchoukball',
-    Goalball = 'Goalball',
-    Futebol = 'Futebol',
-}
+import { SportDTO } from "../../../core/models/model-sport";
 
 export enum SurfaceEnum {
     None = 'None',
@@ -51,13 +21,13 @@ export enum SurfaceEnum {
 export interface ResponseCourtDTO {
   id: string;
   name: string;
-  type: TypeEnum;
+  sports: SportDTO[];
   surface: SurfaceEnum;
   isCovered: boolean;
   pricePerHour: number;
   description: string;
   clubId: string;
-  images: ImageDTO[]; // ← era [{ ... }]
+  images: ImageDTO[];
 }
 
 export interface CourtState {
@@ -69,7 +39,7 @@ export interface CourtState {
 export interface CourtQueryDTO {
   name?: string;
   city?: string;
-  types?: TypeEnum[];   
+  sportIds?: string[];
   page?: number;
   pageSize?: number;
 }

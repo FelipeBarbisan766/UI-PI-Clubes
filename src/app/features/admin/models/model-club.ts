@@ -1,4 +1,4 @@
-import { TypeEnum } from './model-court';
+import { SportDTO } from '../../../core/models/model-sport';
 import { ResponseReserveDetailDTO } from './model-reserve';
 
 export interface CreateClubDTO {
@@ -50,7 +50,7 @@ export interface ResponseClubDTO {
   country: string;
   minPrice: number;
   courtCount: number;
-  types: TypeEnum[];
+  sports: SportDTO[];
   images: ImageDTO[];
 }
 

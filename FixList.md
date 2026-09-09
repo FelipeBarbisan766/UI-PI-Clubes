@@ -48,7 +48,7 @@ src/app/features/auth/pages/select-role/select-role.html
 src/app/shared/components/bread-crumb/bread-crumb.html
 ```
 
-* Adicionar um visual para poder editar as imagens do clube e quadra
+* Adicionar um visual para poder editar as imagens do ~~clube~~ e quadra
 
 ### Pós Pagamento
 * visual da tela pós pagamentos
@@ -65,9 +65,9 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 * separar arquivo em componentes
 
 ### Verificar Email
-* Criar botão de enviar novamente
+* ~~Criar botão de enviar novamente~~
 
-### MInhas reservas
+### Minhas reservas
 * Ajustar responsividade
 
 ### Termos e Privacidade
@@ -80,7 +80,7 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 * Ajustar telefone
 
 ### Reservas
-* resolver erros console <span style="background-color: #FFCCCC; color: red; padding: 4px;">WEB</span>
+* ~~resolver erros console <span style="background-color: #FFCCCC; color: red; padding: 4px;">WEB</span>~~
 
 ---
 

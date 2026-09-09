@@ -6,16 +6,13 @@ import {
   signal,
   computed,
 } from '@angular/core';
-import {
-  FormBuilder,
-  Validators,
-  ReactiveFormsModule,
-} from '@angular/forms';
+import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ServiceCourt } from '../../services/service-court';
-import { TypeEnum, SurfaceEnum, ResponseCourtDTO } from '../../models/model-court';
-import { Modal } from "../../../../shared/components/modal/modal";
+import { SurfaceEnum, ResponseCourtDTO } from '../../models/model-court';
+import { ServiceSport } from '../../../../core/services/service-sport';
+import { Modal } from '../../../../shared/components/modal/modal';
 
 type FormMode = 'create' | 'edit' | null;
 
@@ -28,17 +25,13 @@ type FormMode = 'create' | 'edit' | null;
 export class Courts implements OnInit {
   private readonly fb = inject(FormBuilder);
   protected readonly courtService = inject(ServiceCourt);
+  protected readonly sportService = inject(ServiceSport);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute); // Injeção da rota para pegar o ID
 
-  // ID do clube capturado da URL
   private currentClubId: string = '';
 
   // --- Enum options for selects ---
-  protected readonly typeOptions = Object.entries(TypeEnum)
-    .filter(([, v]) => typeof v === 'string')
-    .map(([label, value]) => ({ label, value: value as string }));
-
   protected readonly surfaceOptions = Object.entries(SurfaceEnum)
     .filter(([, v]) => typeof v === 'string')
     .map(([label, value]) => ({ label, value: value as string }));
@@ -49,10 +42,14 @@ export class Courts implements OnInit {
   protected readonly selectedFiles = signal<File[]>([]);
   protected readonly deleteConfirmId = signal<string | null>(null);
 
+  // --- Esportes selecionados (fora do reactive form, mesmo padrão de selectedFiles) ---
+  protected readonly selectedSportIds = signal<string[]>([]);
+  protected readonly sportsTouched = signal(false);
+
   protected readonly isFormOpen = computed(() => this.formMode() !== null);
   protected readonly isEditing = computed(() => this.formMode() === 'edit');
 
-    // --- Navigation ---
+  // --- Navigation ---
 
   protected goToSchedules(courtId: string): void {
     this.router.navigate(['/admin/club', this.currentClubId, 'court', courtId, 'schedule']);
@@ -62,7 +59,6 @@ export class Courts implements OnInit {
   // clubId foi removido pois agora é preenchido de forma transparente via URL
   protected readonly form = this.fb.group({
     name: ['', [Validators.required, Validators.minLength(3)]],
-    type: [null as TypeEnum | null, Validators.required],
     surface: [null as SurfaceEnum | null, Validators.required],
     isCovered: [false],
     pricePerHour: [null as number | null, [Validators.required, Validators.min(0)]],
@@ -73,11 +69,13 @@ export class Courts implements OnInit {
     initialValue: this.form.status,
   });
 
+  protected readonly hasSports = computed(() => this.selectedSportIds().length > 0);
+
   protected readonly isSubmitEnabled = computed(() => {
     if (this.formMode() === 'create') {
-      return this.formStatus() === 'VALID' && this.selectedFiles().length > 0;
+      return this.formStatus() === 'VALID' && this.selectedFiles().length > 0 && this.hasSports();
     }
-    return this.formStatus() === 'VALID';
+    return this.formStatus() === 'VALID' && this.hasSports();
   });
 
   ngOnInit(): void {
@@ -87,25 +85,26 @@ export class Courts implements OnInit {
       '';
 
     this.loadCourts();
+    this.sportService.getAll().subscribe();
   }
 
   private loadCourts(): void {
     this.courtService.getByClubId(this.currentClubId).subscribe();
   }
 
-
   // --- Form actions ---
 
   protected openCreate(): void {
     this.form.reset({
       name: '',
-      type: null,
       surface: null,
       isCovered: false,
       pricePerHour: null,
       description: '',
     });
     this.selectedFiles.set([]);
+    this.selectedSportIds.set([]);
+    this.sportsTouched.set(false);
     this.editingId.set(null);
     this.formMode.set('create');
   }
@@ -113,13 +112,14 @@ export class Courts implements OnInit {
   protected openEdit(court: ResponseCourtDTO): void {
     this.form.reset({
       name: court.name,
-      type: court.type,
       surface: court.surface,
       isCovered: court.isCovered,
       pricePerHour: court.pricePerHour,
       description: court.description,
     });
     this.selectedFiles.set([]);
+    this.selectedSportIds.set(court.sports.map((s) => s.id));
+    this.sportsTouched.set(false);
     this.editingId.set(court.id);
     this.formMode.set('edit');
   }
@@ -128,6 +128,8 @@ export class Courts implements OnInit {
     this.formMode.set(null);
     this.editingId.set(null);
     this.form.reset();
+    this.selectedSportIds.set([]);
+    this.sportsTouched.set(false);
   }
 
   protected onFilesSelected(event: Event): void {
@@ -141,20 +143,34 @@ export class Courts implements OnInit {
     this.selectedFiles.update((files) => files.filter((_, i) => i !== index));
   }
 
+  // --- Esportes ---
+
+  protected toggleSport(id: string): void {
+    this.sportsTouched.set(true);
+    this.selectedSportIds.update((current) =>
+      current.includes(id) ? current.filter((s) => s !== id) : [...current, id],
+    );
+  }
+
+  protected isSportSelected(id: string): boolean {
+    return this.selectedSportIds().includes(id);
+  }
+
   protected onSubmit(): void {
+    this.sportsTouched.set(true);
+
     if (!this.isSubmitEnabled()) {
       this.form.markAllAsTouched();
       return;
     }
 
-    const { name, type, surface, isCovered, pricePerHour, description } =
-      this.form.getRawValue();
+    const { name, surface, isCovered, pricePerHour, description } = this.form.getRawValue();
 
     if (this.formMode() === 'create') {
       this.courtService
         .create({
           name: name!,
-          type: type!,
+          sportIds: this.selectedSportIds(),
           surface: surface!,
           isCovered: isCovered!,
           pricePerHour: pricePerHour!,
@@ -164,11 +180,11 @@ export class Courts implements OnInit {
         })
         .subscribe({
           next: () => {
-             this.closeForm();
-             this.loadCourts();
+            this.closeForm();
+            this.loadCourts();
           },
           error: (err: unknown) => {
-             console.error('Erro ao criar quadra', err);
+            console.error('Erro ao criar quadra', err);
           },
         });
     } else {
@@ -178,16 +194,17 @@ export class Courts implements OnInit {
       this.courtService
         .update(id, {
           name: name!,
-          type: type!,
+          sportIds: this.selectedSportIds(),
           surface: surface!,
           isCovered: isCovered!,
           pricePerHour: pricePerHour!,
           description: description!,
         })
-        .subscribe({ next: () => {
-          this.closeForm();
-          this.loadCourts();
-          }
+        .subscribe({
+          next: () => {
+            this.closeForm();
+            this.loadCourts();
+          },
         });
     }
   }
@@ -201,14 +218,12 @@ export class Courts implements OnInit {
   protected confirmDelete(): void {
     const id = this.deleteConfirmId();
     if (id === null) return;
-    this.courtService
-      .delete(id)
-      .subscribe({ 
-        next: () => {
-        this.deleteConfirmId.set(null); 
-        this.loadCourts(); 
-        }
-      });
+    this.courtService.delete(id).subscribe({
+      next: () => {
+        this.deleteConfirmId.set(null);
+        this.loadCourts();
+      },
+    });
   }
 
   protected cancelDelete(): void {
@@ -216,10 +231,6 @@ export class Courts implements OnInit {
   }
 
   // --- Helpers ---
-
-  protected getTypeName(value: string): string {
-    return TypeEnum[value as keyof typeof TypeEnum] ?? 'Desconhecido';
-  }
 
   protected getSurfaceName(value: string): string {
     return SurfaceEnum[value as keyof typeof SurfaceEnum] ?? 'Desconhecido';

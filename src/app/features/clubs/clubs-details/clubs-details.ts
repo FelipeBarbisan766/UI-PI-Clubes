@@ -14,7 +14,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { NgOptimizedImage, NgClass, ViewportScroller } from '@angular/common';
 import { EMPTY, catchError, distinctUntilChanged, map, switchMap } from 'rxjs';
-import { TypeEnum, SurfaceEnum, ResponseCourtDTO } from '../models/model-court';
+import { SurfaceEnum, ResponseCourtDTO } from '../models/model-court';
 import { ResponseClubByIdDTO } from '../models/model-club';
 import { ServiceClub } from '../services/service-club';
 import { ServiceSchedule } from '../services/service-schedule';
@@ -24,38 +24,8 @@ import { AuthService } from '../../../core/services/auth-service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ServiceCourtAvailabilitySignalR } from '../services/service-court-availability-signalr';
 import { ReserveAvailabilityChangedDTO } from '../models/model-reserve';
+import { SportDTO } from '../../../core/models/model-sport';
 import { ImageCarousel } from '../../../shared/components/image-carousel/image-carousel';
-
-const TYPE_LABELS: Record<TypeEnum, string> = {
-  [TypeEnum.None]: 'Outro',
-  [TypeEnum.Futsal]: 'Futsal',
-  [TypeEnum.Basquetebol]: 'Basquetebol',
-  [TypeEnum.Basquete]: 'Basquete',
-  [TypeEnum.Voleibol]: 'Vôlei',
-  [TypeEnum.VôleiSentado]: 'Vôlei Sentado',
-  [TypeEnum.Handebol]: 'Handebol',
-  [TypeEnum.Netball]: 'Netball',
-  [TypeEnum.Tênis]: 'Tênis',
-  [TypeEnum.Badminton]: 'Badminton',
-  [TypeEnum.Squash]: 'Squash',
-  [TypeEnum.Padel]: 'Padel',
-  [TypeEnum.Pickleball]: 'Pickleball',
-  [TypeEnum.TênisDeMesa]: 'Tênis de Mesa',
-  [TypeEnum.Judô]: 'Judô',
-  [TypeEnum.Karatê]: 'Karatê',
-  [TypeEnum.Taekwondo]: 'Taekwondo',
-  [TypeEnum.Esgrima]: 'Esgrima',
-  [TypeEnum.SepakTakraw]: 'Sepak Takraw',
-  [TypeEnum.Hóquei]: 'Hóquei',
-  [TypeEnum.Dodgeball]: 'Dodgeball',
-  [TypeEnum.Raquetebol]: 'Raquetebol',
-  [TypeEnum.PelotaBasca]: 'Pelota Basca',
-  [TypeEnum.Floorball]: 'Floorball',
-  [TypeEnum.Korfball]: 'Korfball',
-  [TypeEnum.Tchoukball]: 'Tchoukball',
-  [TypeEnum.Goalball]: 'Goalball',
-  [TypeEnum.Futebol]: 'Futebol',
-};
 
 const SURFACE_LABELS: Record<SurfaceEnum, string> = {
   [SurfaceEnum.None]: 'Outro',
@@ -104,12 +74,12 @@ function getFirstImage(club: ResponseClubByIdDTO | null): string | null {
   return images?.length ? images[0].fullUrl : null;
 }
 
-function getTypeName(type: TypeEnum): string {
-  return TYPE_LABELS[type] ?? 'Outro';
-}
-
 function getSurfaceName(surface: SurfaceEnum): string {
   return SURFACE_LABELS[surface] ?? 'Outro';
+}
+
+function sportsLabel(court: ResponseCourtDTO): string {
+  return court.sports.map((s) => s.name).join(', ') || 'Sem modalidade';
 }
 
 /** Gera os próximos `days` dias a partir de hoje em 'YYYY-MM-DD'. */
@@ -197,8 +167,17 @@ export class ClubsDetail {
   readonly bookingError = signal<string | null>(null);
   readonly bookingSuccess = signal(false);
 
-  /** Tipos únicos de todas as quadras do clube (usado na sidebar). */
-  readonly courtTypes = computed(() => [...new Set(this.club()?.courts.map((c) => c.type) ?? [])]);
+  /** Modalidades únicas de todas as quadras do clube (usado na sidebar). */
+  readonly courtSports = computed<SportDTO[]>(() => {
+    const courts = this.club()?.courts ?? [];
+    const unique = new Map<string, SportDTO>();
+    for (const court of courts) {
+      for (const sport of court.sports) {
+        unique.set(sport.id, sport);
+      }
+    }
+    return [...unique.values()];
+  });
 
   private readonly courtAndDate = computed(() => ({
     court: this.selectedCourt(),
@@ -271,7 +250,6 @@ export class ClubsDetail {
     this.courtAvailabilitySignalR.reserveStatusChanged$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((dto) => {
-        // console.log('SignalR event recebido:', dto); // TEMPORÁRIO
         this.applyReserveStatusChanged(dto);
       });
 
@@ -376,7 +354,7 @@ export class ClubsDetail {
         next: () => {
           this.isConfirming.set(false);
           this.bookingSuccess.set(true);
-          this.markSlotUnavailable(slot.id); // ← atualização local imediata
+          this.markSlotUnavailable(slot.id);
         },
         error: (err: Error) => {
           this.isConfirming.set(false);
@@ -397,8 +375,8 @@ export class ClubsDetail {
   readonly formatPrice = formatPrice;
   readonly formatDate = formatDate;
   readonly getFirstImage = getFirstImage;
-  readonly getTypeName = getTypeName;
   readonly getSurfaceName = getSurfaceName;
+  readonly sportsLabel = sportsLabel;
 
   // ── Helpers privados ─────────────────────────────────────────────────────
 

@@ -156,13 +156,13 @@
                 </iframe>
               </div>
             }
-            @if (club()!.courts.length) {
+             @if (club()!.courts.length) {
               <div class="divider"></div>
               <h3 class="text-sm font-semibold text-base-content mb-3">Modalidades</h3>
               <div class="flex flex-wrap gap-2">
-                @for (type of courtTypes(); track type) {
+                @for (sport of courtSports(); track sport.id) {
                   <span class="badge badge-neutral badge-sm font-medium">
-                    {{ getTypeName(type) }}
+                    {{ sport.name }}
                   </span>
                 }
               </div>
@@ -195,7 +195,7 @@
                   <h3 class="font-semibold text-base-content">{{ court.name }}</h3>
 
                   <div class="mt-2 space-y-1 text-sm text-base-content/70">
-                    <p>{{ getTypeName(court.type) }} · {{ getSurfaceName(court.surface) }}</p>
+                    <p>{{ sportsLabel(court) }} · {{ getSurfaceName(court.surface) }}</p>
                     <p class="flex items-center gap-1">
                       @if (court.isCovered) {
                         <span class="badge badge-sm badge-soft badge-success">Coberta</span>

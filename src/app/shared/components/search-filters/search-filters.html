@@ -1,0 +1,128 @@
+<div class="sticky top-24 rounded-lg border border-base-300 bg-base-100 p-5 shadow-sm">
+  <h2 class="font-bold text-base-content text-base mb-4 border-b border-base-200 pb-2">
+    Filtrar por:
+  </h2>
+
+  <div class="space-y-6">
+    <!-- Busca por nome -->
+    <div>
+      <label for="search-input" class="text-sm font-bold text-base-content block mb-2">
+        Pesquisar propriedade
+      </label>
+      <div class="relative">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-base-content/50"
+          aria-hidden="true"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+          />
+        </svg>
+        <input
+          id="search-input"
+          type="search"
+          [placeholder]="searchPlaceholder()"
+          class="input input-bordered input-sm w-full pl-9 rounded-md"
+          [value]="searchTerm()"
+          (input)="onSearchInput($event)"
+        />
+      </div>
+    </div>
+
+    <!-- Cidade -->
+    <div>
+      <label for="city-input" class="text-sm font-bold text-base-content block mb-2">
+        Destino / Cidade
+      </label>
+
+      @if (detectedCity()) {
+        <div
+          class="flex items-center gap-1 mb-2 text-xs text-success bg-success/10 border border-success/30 rounded px-2 py-1"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="size-3 shrink-0"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+            />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"
+            />
+          </svg>
+          <span class="truncate">Localização detectada</span>
+          <button
+            class="ml-auto shrink-0 text-success/70 hover:text-error transition-colors"
+            (click)="clearDetectedCity.emit()"
+            type="button"
+            aria-label="Remover filtro de localização"
+          >
+            ✕
+          </button>
+        </div>
+      }
+
+      <input
+        id="city-input"
+        type="text"
+        placeholder="Ex: São Paulo"
+        class="input input-bordered input-sm w-full rounded-md"
+        [value]="cityFilter()"
+        (input)="onCityInput($event)"
+      />
+    </div>
+
+    <!-- Modalidades (Sport) -->
+    <div>
+      <span class="text-sm font-bold text-base-content block mb-3" id="sports-filter-label">
+        Comodidades / Modalidades
+      </span>
+
+      @if (selectedSportIds().length > 0) {
+        <button
+          class="btn btn-xs btn-ghost text-error mb-2 px-0"
+          (click)="clearSports.emit()"
+          type="button"
+        >
+          Limpar seleção ({{ selectedSportIds().length }})
+        </button>
+      }
+
+      <div
+        class="space-y-2.5 max-h-60 overflow-y-auto pr-2"
+        role="group"
+        aria-labelledby="sports-filter-label"
+      >
+        @for (sport of sportService.sports(); track sport.id) {
+          <label
+            class="flex items-center gap-3 cursor-pointer text-sm text-base-content/80 hover:text-base-content"
+          >
+            <input
+              type="checkbox"
+              class="checkbox checkbox-primary checkbox-sm rounded"
+              [checked]="isSportSelected(sport.id)"
+              (change)="toggleSport.emit(sport.id)"
+            />
+            {{ sport.name }}
+          </label>
+        }
+      </div>
+    </div>
+  </div>
+</div>
