@@ -17,7 +17,7 @@
             <p class="text-sm md:text-base text-base-content/70">
               Você escolheu o
               <strong class="text-base-content">{{ selectedPlan()!.name }}</strong>
-              — {{ formatPrice(selectedPlan()!.price) }}{{ formatPrice(selectedPlan()!.price) && '' }}
+              — {{ formatPrice(selectedPlan()!.price) }}
               — escolha como deseja pagar.
             </p>
           } @else {
@@ -115,6 +115,19 @@
                 d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
             </svg>
             <span>{{ errorMessage() }}</span>
+          </div>
+        }
+
+        @if (hasActiveSubscriptionConflict()) {
+          <div class="grid grid-cols-1 gap-3 w-full max-w-md mx-auto mb-4">
+            <button
+              type="button"
+              class="btn btn-outline rounded-full w-full"
+              (click)="goToSubscription()"
+              aria-label="Ver minha assinatura"
+            >
+              Ver minha assinatura
+            </button>
           </div>
         }
 

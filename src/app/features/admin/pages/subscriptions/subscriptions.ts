@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   ElementRef,
   OnInit,
   computed,
@@ -8,6 +9,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { take } from 'rxjs/operators';
@@ -19,7 +21,6 @@ import {
   TypeAccess,
   ServiceSubscription,
 } from '../../services/service-subscription';
-import { AuthService } from '../../../../core/services/auth-service';
 
 // ─── Display maps (pure constants, no globals) ────────────────────────────────
 
@@ -62,8 +63,7 @@ export class Subscriptions implements OnInit {
   private readonly cancelModalEl =
     viewChild<ElementRef<HTMLDialogElement>>('cancelModal');
 
-  private readonly authService = inject(AuthService);
-  private adminId: string | null = null;
+  private readonly destroyRef = inject(DestroyRef);
 
   // ─── State signals ─────────────────────────────────────────────────────
   readonly isLoading = signal(true);
@@ -100,33 +100,22 @@ export class Subscriptions implements OnInit {
   // ─── Lifecycle ─────────────────────────────────────────────────────────
 
   ngOnInit(): void {
-    
-    this.authService.getAdminMe().subscribe({
-      next: (admin) => {
-        this.adminId = admin.id;
-      },
-      error: (err: unknown) => {
-        console.error('Não foi possível obter o perfil do administrador.', err);
-      },
-    });
-    if (this.adminId) {
-        forkJoin({
-        subscription: this.subscriptionService.getActiveSubscription(this.adminId),
-        history: this.subscriptionService.getPaymentHistory(this.adminId),
-        })
-        .pipe(take(1))
-        .subscribe({
-            next: ({ subscription, history }) => {
-            this.subscription.set(subscription);
-            this.paymentHistory.set(history);
-            this.isLoading.set(false);
-            },
-            error: (err: Error) => {
-            this.isLoading.set(false);
-            this.errorMessage.set(err.message);
-            },
-        });
-    }
+    forkJoin({
+      subscription: this.subscriptionService.getActiveSubscription(),
+      history: this.subscriptionService.getPaymentHistory(),
+    })
+      .pipe(take(1), takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: ({ subscription, history }) => {
+          this.subscription.set(subscription);
+          this.paymentHistory.set(history);
+          this.isLoading.set(false);
+        },
+        error: (err: Error) => {
+          this.isLoading.set(false);
+          this.errorMessage.set(err.message);
+        },
+      });
   }
 
   // ─── Cancel modal ──────────────────────────────────────────────────────
