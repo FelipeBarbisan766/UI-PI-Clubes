@@ -113,7 +113,7 @@ export class AuthService {
 
   logout(): Observable<string> {
     return this.http
-      .get(`${this.baseUrl}/logout`, { responseType: 'text', withCredentials: true })
+      .post(`${this.baseUrl}/logout`, null, { responseType: 'text', withCredentials: true })
       .pipe(
         map((message) => message || 'Logout realizado com sucesso.'),
         tap(() => this.clearSession()),

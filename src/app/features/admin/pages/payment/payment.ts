@@ -14,6 +14,7 @@ import {
   Plan,
   PaymentMethod,
   ServiceSubscription,
+  SubscriptionApiError,
 } from '../../services/service-subscription';
 import { AuthService } from '../../../../core/services/auth-service';
 
@@ -40,19 +41,18 @@ export class Payment implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly subscriptionService = inject(ServiceSubscription);
+  private readonly authService = inject(AuthService);
 
   // ─── State signals ──────────────────────────────────────────────────────
   readonly step = signal<PaymentStep>('select-method');
   readonly isLoading = signal(false);
   readonly errorMessage = signal('');
+  readonly hasActiveSubscriptionConflict = signal(false);
   readonly selectedMethod = signal<PaymentMethod | null>(null);
   readonly selectedPlan = signal<Plan | null>(null);
   readonly isPolling = signal(false);
   readonly accessConfirmed = signal(false);
   readonly pollTimedOut = signal(false);
-
-  private readonly authService = inject(AuthService);
-  private adminId: string | null = null;
 
   // ─── Derived state ──────────────────────────────────────────────────────
   readonly methodOptions: PaymentMethod[] = ['Pix', 'CreditCard', 'Boleto'];
@@ -72,33 +72,17 @@ export class Payment implements OnInit, OnDestroy {
   // ─── Lifecycle ──────────────────────────────────────────────────────────
 
   ngOnInit(): void {
-  this.route.data.pipe(take(1)).subscribe((data) => {
-    const step = (data['paymentStep'] as PaymentStep) ?? 'select-method';
-    this.step.set(step);
+    this.route.data.pipe(take(1)).subscribe((data) => {
+      const step = (data['paymentStep'] as PaymentStep) ?? 'select-method';
+      this.step.set(step);
 
-    if (step === 'success') {
-      // Busca o adminId PRIMEIRO, só então inicia o polling
-      this.authService.getAdminMe().pipe(take(1)).subscribe({
-        next: (admin) => {
-          this.adminId = admin.id;
-          this.startPolling();
-        },
-        error: (err: unknown) => {
-          console.error('Não foi possível obter o perfil do administrador.', err);
-        },
-      });
-    } else if (step === 'select-method') {
-      // Para select-method o adminId é necessário pro initiatePayment
-      // então busca aqui também
-      this.authService.getAdminMe().pipe(take(1)).subscribe({
-        next: (admin) => {
-          this.adminId = admin.id;
-        },
-      });
-      this.loadPlanFromQueryParams();
-    }
-  });
-}
+      if (step === 'success') {
+        this.startPolling();
+      } else if (step === 'select-method') {
+        this.loadPlanFromQueryParams();
+      }
+    });
+  }
 
   ngOnDestroy(): void {
     this.pollingSubscription?.unsubscribe();
@@ -113,25 +97,38 @@ export class Payment implements OnInit, OnDestroy {
   initiatePayment(): void {
     const method = this.selectedMethod();
     const plan = this.selectedPlan();
-    const adminId = this.adminId;
 
-    if (!method || !plan || !adminId) return;
+    if (!method || !plan) return;
+
+    if (!this.authService.isAuthenticated()) {
+      this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
+      return;
+    }
 
     this.isLoading.set(true);
     this.errorMessage.set('');
+    this.hasActiveSubscriptionConflict.set(false);
     this.step.set('redirecting');
 
     this.subscriptionService
-      .initiatePayment(adminId, plan.id, method)
+      .initiatePayment(plan.id, method)
       .pipe(take(1))
       .subscribe({
         next: (result) => {
           window.location.href = result.checkoutUrl;
         },
-        error: (err: Error) => {
+        error: (err: SubscriptionApiError) => {
           this.isLoading.set(false);
           this.step.set('select-method');
-          this.errorMessage.set(err.message);
+
+          if (err.status === 409) {
+            this.hasActiveSubscriptionConflict.set(true);
+            this.errorMessage.set(
+              'Você já possui uma assinatura ativa. Acesse "Minha assinatura" para gerenciar ou renovar seu plano.',
+            );
+          } else {
+            this.errorMessage.set(err.message);
+          }
         },
       });
   }
@@ -177,15 +174,12 @@ export class Payment implements OnInit, OnDestroy {
 
 
   private startPolling(): void {
-    const adminId = this.adminId;
-    if (!adminId) return;
-
     this.isPolling.set(true);
     this.pollAttempts = 0;
 
     this.pollingSubscription = interval(3000)
       .pipe(
-        switchMap(() => this.subscriptionService.checkAccess(adminId)),
+        switchMap(() => this.subscriptionService.checkAccess()),
         take(this.MAX_POLL_ATTEMPTS)
       )
       .subscribe({
@@ -211,39 +205,5 @@ export class Payment implements OnInit, OnDestroy {
 
   formatPrice(price: number): string {
     return price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-  }
-  beAdmin() {
-    // const userId = this.currentUserId();
-    // if (!userId) {
-    //   this.errorMessage.set('Sessão inválida. Faça login novamente.');
-    //   return;
-    // }
-
-    // this.isSubmitting.set(true);
-    // this.errorMessage.set('');
-    // this.successMessage.set('');
-
-    // this.adminService
-    //   .createAdmin(userId)
-    //   .pipe(
-    //     take(1),
-    //     switchMap(() => this.authService.refreshMe()),
-    //     finalize(() => this.isSubmitting.set(false)),
-    //   )
-    //   .subscribe({
-    //     next: () => {
-    //       console.log('Admin role assigned and session refreshed successfully');
-    //       this.successMessage.set('Perfil de administrador salvo com sucesso.');
-
-    //       void this.router.navigateByUrl('/admin/clubs');
-    //     },
-    //     error: (error: unknown) => {
-    //       this.errorMessage.set(
-    //         error instanceof Error ? error.message : 'Erro ao salvar perfil de administrador.',
-    //       );
-    //     },
-    //   });
-
-    // this.beAdminEvent.emit();
   }
 }

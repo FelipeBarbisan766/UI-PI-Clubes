@@ -49,6 +49,19 @@ export interface CheckAccessResult {
   hasAccess: boolean;
 }
 
+/**
+ * Error thrown by ServiceSubscription methods. Extends the native `Error` so
+ * every existing `err.message` usage keeps working unchanged; `status` is
+ * optional and only present when the failure came from an HTTP response,
+ * letting callers branch on specific status codes (e.g. 409 Conflict).
+ */
+export class SubscriptionApiError extends Error {
+  constructor(message: string, readonly status?: number) {
+    super(message);
+    this.name = 'SubscriptionApiError';
+  }
+}
+
 // ─── Service ─────────────────────────────────────────────────────────────────
 
 @Injectable({
@@ -59,27 +72,28 @@ export class ServiceSubscription {
 
   getPlans(): Observable<Plan[]> {
     return this.http
-      .get<Plan[]>(`${environment.apiUrl}/plan`)
+      .get<Plan[]>(`${environment.apiUrl}/plan`, { withCredentials: true })
       .pipe(catchError(this.handleError));
   }
 
   initiatePayment(
-    adminId: string,
     planId: string,
     method: PaymentMethod
   ): Observable<PaymentInitiateResult> {
     return this.http
-      .post<PaymentInitiateResult>(`${environment.apiUrl}/payment/initiate`, {
-        adminId,
-        planId,
-        method,
-      })
+      .post<PaymentInitiateResult>(
+        `${environment.apiUrl}/payment/initiate`,
+        { planId, method },
+        { withCredentials: true },
+      )
       .pipe(catchError(this.handleError));
   }
 
-  getPaymentHistory(adminId: string): Observable<PaymentHistory[]> {
+  getPaymentHistory(): Observable<PaymentHistory[]> {
     return this.http
-      .get<PaymentHistory[]>(`${environment.apiUrl}/payment/history/${adminId}`)
+      .get<PaymentHistory[]>(`${environment.apiUrl}/payment/history`, {
+        withCredentials: true,
+      })
       .pipe(catchError(this.handleError));
   }
 
@@ -87,11 +101,11 @@ export class ServiceSubscription {
    * Returns null (instead of throwing) when the admin has no active subscription (HTTP 404).
    * All other errors are propagated normally.
    */
-  getActiveSubscription(adminId: string): Observable<ActiveSubscription | null> {
+  getActiveSubscription(): Observable<ActiveSubscription | null> {
     return this.http
-      .get<ActiveSubscription>(
-        `${environment.apiUrl}/subscription/active/${adminId}`
-      )
+      .get<ActiveSubscription>(`${environment.apiUrl}/subscription/active`, {
+        withCredentials: true,
+      })
       .pipe(
         catchError((error: unknown) => {
           if (error instanceof HttpErrorResponse && error.status === 404) {
@@ -102,11 +116,11 @@ export class ServiceSubscription {
       );
   }
 
-  checkAccess(adminId: string): Observable<CheckAccessResult> {
+  checkAccess(): Observable<CheckAccessResult> {
     return this.http
-      .get<CheckAccessResult>(
-        `${environment.apiUrl}/subscription/check-access/${adminId}`
-      )
+      .get<CheckAccessResult>(`${environment.apiUrl}/subscription/check-access`, {
+        withCredentials: true,
+      })
       .pipe(catchError(this.handleError));
   }
 
@@ -114,7 +128,8 @@ export class ServiceSubscription {
     return this.http
       .post<void>(
         `${environment.apiUrl}/subscription/cancel/${subscriptionId}`,
-        null
+        null,
+        { withCredentials: true },
       )
       .pipe(catchError(this.handleError));
   }
@@ -125,8 +140,8 @@ export class ServiceSubscription {
         typeof error.error === 'string'
           ? error.error
           : error.message || 'Ocorreu um erro inesperado.';
-      return throwError(() => new Error(message));
+      return throwError(() => new SubscriptionApiError(message, error.status));
     }
-    return throwError(() => new Error('Ocorreu um erro inesperado.'));
+    return throwError(() => new SubscriptionApiError('Ocorreu um erro inesperado.'));
   }
 }

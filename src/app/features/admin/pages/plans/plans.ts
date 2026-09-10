@@ -78,4 +78,38 @@ export class Plans implements OnInit {
     this.errorMessage.set('');
     this.ngOnInit();
   }
+  // beAdmin() {
+  //   const userId = this.currentUserId();
+  //   if (!userId) {
+  //     this.errorMessage.set('Sessão inválida. Faça login novamente.');
+  //     return;
+  //   }
+
+  //   this.isSubmitting.set(true);
+  //   this.errorMessage.set('');
+  //   this.successMessage.set('');
+
+  //   this.adminService
+  //     .createAdmin(userId)
+  //     .pipe(
+  //       take(1),
+  //       switchMap(() => this.authService.refreshMe()),
+  //       finalize(() => this.isSubmitting.set(false)),
+  //     )
+  //     .subscribe({
+  //       next: () => {
+  //         console.log('Admin role assigned and session refreshed successfully');
+  //         this.successMessage.set('Perfil de administrador salvo com sucesso.');
+
+  //         void this.router.navigateByUrl('/admin/clubs');
+  //       },
+  //       error: (error: unknown) => {
+  //         this.errorMessage.set(
+  //           error instanceof Error ? error.message : 'Erro ao salvar perfil de administrador.',
+  //         );
+  //       },
+  //     });
+
+  //   this.beAdminEvent.emit();
+  // }
 }

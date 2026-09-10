@@ -49,7 +49,7 @@ export class Login implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.googleAuth.cancel();
+    // this.googleAuth.cancel();
   }
 
   private handleGoogleLogin(idToken: string): void {
