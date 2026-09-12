@@ -11,7 +11,7 @@ export interface CreatePlayerRequest {
 }
 
 @Injectable({ providedIn: 'root' })
-export class FormPlayerService {
+export class PlayerService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/Player`;
 
