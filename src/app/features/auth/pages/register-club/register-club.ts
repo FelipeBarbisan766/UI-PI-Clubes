@@ -1,4 +1,12 @@
-import { afterNextRender, Component, computed, inject, Injector, output, signal } from '@angular/core';
+import {
+  afterNextRender,
+  Component,
+  computed,
+  inject,
+  Injector,
+  output,
+  signal,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth-service';
 import { finalize, switchMap, take } from 'rxjs';
@@ -33,22 +41,22 @@ export class RegisterClub {
     {
       question: 'Preciso pagar para cadastrar meu clube?',
       answer:
-        'Sim, Você só paga o plano de assinatura referente ao seu clube, tudo dependerá do tipo de clube que voce tem e pretende registrar.',
+        'Sim. O pagamento é feito através do plano de assinatura do seu clube. O valor depende do tipo de clube que você deseja registrar.',
     },
     {
       question: 'Quanto tempo leva para meu clube estar ativo?',
       answer:
-        'Em menos de 15 minutos você pode ter seu clube configurado e visível para os jogadores. Basta preencher as informações, cadastrar as quadras e definir os horários.',
+        'Em menos de 15 minutos seu clube já estará configurado e visível. Basta preencher as informações, cadastrar as quadras e definir os horários.',
     },
     {
       question: 'Posso gerenciar mais de uma quadra?',
       answer:
-        'Sim! Você pode cadastrar quantas quadras quiser dentro do seu clube, cada uma com seus próprios horários, preços e disponibilidade.',
+        'Sim! A quantidade de quadras disponíveis depende do seu plano de assinatura. Cada uma pode ter horários, preços e disponibilidade próprios.',
     },
     {
       question: 'Como recebo o dinheiro das reservas?',
       answer:
-        'Os pagamentos são responsabilidade do dono de quadras, nos disponibilizamos meios de comunição para que o valor seja acertado do meio desejado por fora do site.',
+        'O pagamento é combinado diretamente com o dono da quadra, fora do site. Nós apenas fornecemos os canais de contato para que vocês acertem o valor e a forma de pagamento.',
     },
   ];
 
@@ -63,7 +71,7 @@ export class RegisterClub {
   goToPlans() {
     void this.router.navigateByUrl('/plans');
   }
-  
+
   private scrollToTop(): void {
     afterNextRender(() => this.viewportScroller.scrollToAnchor('top-section'), {
       injector: this.injector,
