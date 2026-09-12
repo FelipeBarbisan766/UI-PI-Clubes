@@ -1,186 +1,194 @@
-<main id="top-section" class="min-h-screen w-full bg-base-200 pattern-background flex justify-center px-4 py-10">
-  <div class="w-full max-w-4xl bg-base-100 rounded-2xl shadow-sm overflow-hidden self-start">
+<div class="flex-1 overflow-y-auto w-full bg-base-100">
+  <div class="max-w-4xl mx-auto px-4 py-10 md:py-14">
+    <section
+      aria-labelledby="hero-title"
+      class="grid md:grid-cols-2 gap-10 items-center pb-14 md:pb-20"
+    >
+      <div>
+        <h1
+          id="hero-title"
+          class="text-3xl md:text-4xl font-extrabold text-base-content leading-tight mb-4"
+        >
+          Torne-se administrador
+          <span class="text-primary">do seu clube</span>
+        </h1>
 
-  <!-- ── TOP BAR ─────────────────────────────────────────────────────── -->
-  <header  class="bg-base-100 border-b border-base-300">
-    <div class="px-6 h-14 flex items-center justify-between">
-      <span class="font-bold text-lg text-primary tracking-tight">Clubera</span>
-    </div>
-  </header>
+        <p class="text-base text-base-content/70 mb-8 leading-relaxed max-w-md">
+          Gerencie quadras, horários e reservas num só lugar. Deixa o sistema trabalhar — você foca
+          em receber os jogadores.
+        </p>
 
-  <!-- ── HERO ──────────────────────────────────────────────────────────── -->
-  <section class="bg-base-100 border-b border-base-300" aria-labelledby="hero-title">
-    <div class="px-6 md:px-10 py-14 md:py-20 text-center">
+        <button
+          type="button"
+          class="btn btn-primary btn-lg text-white"
+          (click)="goToPlans()"
+          aria-label="Começar como Dono de Clube"
+        >
+          Quero cadastrar meu clube
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <line x1="5" y1="12" x2="19" y2="12" />
+            <polyline points="12 5 19 12 12 19" />
+          </svg>
+        </button>
 
-      <div class="inline-flex items-center gap-2 bg-primary/10 text-primary text-xs font-semibold
-                  px-3 py-1.5 rounded-full mb-6 uppercase tracking-widest">
-        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
-          fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
-          stroke-linejoin="round" aria-hidden="true">
-          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-        </svg>
-        Para donos de clube
+        <p class="text-xs text-base-content/40 mt-4">Sujeito a cobrança. Assinatura paga.</p>
       </div>
 
-      <h1 id="hero-title" class="text-4xl md:text-5xl font-extrabold text-base-content leading-tight mb-4">
-        Seu clube, completamente<br class="hidden md:block" />
-        <span class="text-primary">organizado</span>
-      </h1>
-
-      <p class="text-base md:text-lg text-base-content/70 max-w-xl mx-auto mb-10 leading-relaxed">
-        Gerencie quadras, horários e reservas num só lugar. Deixa o sistema trabalhar
-        — você foca em receber os jogadores.
-      </p>
-
-      <button
-        type="button"
-        class="btn btn-primary btn-lg rounded-full px-10 text-white shadow-lg
-               hover:scale-[1.03] active:scale-[0.98] transition-transform"
-        (click)="goToPlans()"
-        aria-label="Começar como Dono de Clube"
-      >
-        Quero cadastrar meu clube
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
-          fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
-          stroke-linejoin="round" aria-hidden="true">
-          <line x1="5" y1="12" x2="19" y2="12"/>
-          <polyline points="12 5 19 12 12 19"/>
-        </svg>
-      </button>
-
-      <p class="text-xs text-base-content/40 mt-4">Sujeito a cobrança. Assinatura paga.</p>
-    </div>
-  </section>
-
-  <!-- ── STATS STRIP ──────────────────────────────────────────────────── -->
-  <section class="bg-primary" aria-label="Destaques da plataforma">
-    <div class="px-6 py-6 grid grid-cols-3 divide-x divide-primary-content/20">
-      @for (stat of [
-        { value: '100%', label: 'Online' },
-        { value: '< 15min', label: 'Para ativar' },
-        { value: '24/7', label: 'Reservas abertas' }
-      ]; track stat.label) {
-        <div class="text-center px-4">
-          <p class="text-xl md:text-2xl font-extrabold text-primary-content">{{ stat.value }}</p>
-          <p class="text-xs text-primary-content/70 mt-0.5">{{ stat.label }}</p>
+      <div class="mockup-window border border-base-300">
+        <div class="px-4 pb-4 pt-2">
+          <p class="text-xs font-semibold text-base-content/50 mb-2">Hoje · Quadras</p>
+          <div class="overflow-x-auto">
+            <table class="table table-sm">
+              <thead>
+                <tr class="text-xs">
+                  <th class="text-base-content/50 font-normal"></th>
+                  <th class="text-base-content/50 font-normal">Quadra 1</th>
+                  <th class="text-base-content/50 font-normal">Quadra 2</th>
+                  <th class="text-base-content/50 font-normal">Quadra 3</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th class="text-xs font-normal text-base-content/50">18:00</th>
+                  <td><span class="badge badge-soft badge-success badge-sm">Livre</span></td>
+                  <td><span class="badge badge-soft badge-neutral badge-sm">Reservada</span></td>
+                  <td><span class="badge badge-soft badge-success badge-sm">Livre</span></td>
+                </tr>
+                <tr>
+                  <th class="text-xs font-normal text-base-content/50">19:00</th>
+                  <td><span class="badge badge-soft badge-neutral badge-sm">Reservada</span></td>
+                  <td><span class="badge badge-soft badge-neutral badge-sm">Reservada</span></td>
+                  <td><span class="badge badge-soft badge-success badge-sm">Livre</span></td>
+                </tr>
+                <tr>
+                  <th class="text-xs font-normal text-base-content/50">20:00</th>
+                  <td><span class="badge badge-soft badge-success badge-sm">Livre</span></td>
+                  <td><span class="badge badge-soft badge-success badge-sm">Livre</span></td>
+                  <td><span class="badge badge-soft badge-neutral badge-sm">Reservada</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-      }
-    </div>
-  </section>
-
-
-  <!-- ── HOW IT WORKS ───────────────────────────────────────────────────── -->
-  <section class="bg-base-200 border-b border-base-300 py-16 md:py-20" aria-labelledby="steps-title">
-    <div class="px-6 md:px-10">
-
-      <div class="text-center mb-12">
-        <p class="text-xs font-semibold text-primary uppercase tracking-widest mb-2">É simples assim</p>
-        <h2 id="steps-title" class="text-2xl md:text-3xl font-bold text-base-content">
-          Ative seu clube em 3 passos
-        </h2>
       </div>
+    </section>
 
-      <ol class="grid grid-cols-1 md:grid-cols-3 gap-6 list-none" aria-label="Passos para ativar o clube">
+    <div class="divider my-0"></div>
 
-        <li class="card bg-base-100 border border-base-300 shadow-sm">
-          <div class="card-body items-center text-center gap-3">
-            <div class="w-12 h-12 rounded-full bg-primary text-primary-content font-extrabold
-                        text-lg flex items-center justify-center shrink-0" aria-hidden="true">
-              1
-            </div>
-            <div>
-              <h3 class="font-bold text-base-content">Crie o perfil do clube</h3>
-              <p class="text-sm text-base-content/65 mt-1 leading-relaxed">
-                Nome, endereço, fotos e informações de contato. Leva menos de 5 minutos.
-              </p>
-            </div>
+    <section class="py-10" aria-label="Destaques da plataforma">
+      <div class="stats stats-horizontal w-full border border-base-300 shadow-none">
+        @for (
+          stat of [
+            { value: '100%', label: 'Online' },
+            { value: '< 15min', label: 'Para ativar' },
+            { value: '24/7', label: 'Reservas abertas' },
+          ];
+          track stat.label
+        ) {
+          <div class="stat place-items-center">
+            <div class="stat-value text-xl md:text-2xl text-primary">{{ stat.value }}</div>
+            <div class="stat-desc text-xs">{{ stat.label }}</div>
           </div>
+        }
+      </div>
+    </section>
+
+    <div class="divider my-0"></div>
+
+    <section class="py-14 md:py-20" aria-labelledby="steps-title">
+      <h2 id="steps-title" class="text-2xl md:text-3xl font-bold text-base-content mb-10">
+        Ative seu clube em 3 passos
+      </h2>
+
+      <ol
+        class="join join-vertical md:join-horizontal w-full border border-base-300 list-none"
+        aria-label="Passos para ativar o clube"
+      >
+        <li class="join-item flex-1 p-6 md:p-8 md:border-r border-base-300 last:border-r-0">
+          <div
+            class="w-10 h-10 rounded-full bg-primary text-primary-content font-bold flex items-center justify-center shrink-0 mb-4"
+            aria-hidden="true"
+          >
+            1
+          </div>
+          <h3 class="font-bold text-base-content mb-1">Crie o perfil do clube</h3>
+          <p class="text-sm text-base-content/65 leading-relaxed">
+            Nome, endereço, fotos e informações de contato. Leva menos de 5 minutos.
+          </p>
         </li>
 
-        <li class="card bg-base-100 border border-base-300 shadow-sm">
-          <div class="card-body items-center text-center gap-3">
-            <div class="w-12 h-12 rounded-full bg-primary text-primary-content font-extrabold
-                        text-lg flex items-center justify-center shrink-0" aria-hidden="true">
-              2
-            </div>
-            <div>
-              <h3 class="font-bold text-base-content">Cadastre suas quadras</h3>
-              <p class="text-sm text-base-content/65 mt-1 leading-relaxed">
-                Adicione quadras com tipo, fotos, horários disponíveis e preços.
-              </p>
-            </div>
+        <li class="join-item flex-1 p-6 md:p-8 md:border-r border-base-300 last:border-r-0">
+          <div
+            class="w-10 h-10 rounded-full bg-primary text-primary-content font-bold flex items-center justify-center shrink-0 mb-4"
+            aria-hidden="true"
+          >
+            2
           </div>
+          <h3 class="font-bold text-base-content mb-1">Cadastre suas quadras</h3>
+          <p class="text-sm text-base-content/65 leading-relaxed">
+            Adicione quadras com tipo, fotos, horários disponíveis e preços.
+          </p>
         </li>
 
-        <li class="card bg-base-100 border border-base-300 shadow-sm">
-          <div class="card-body items-center text-center gap-3">
-            <div class="w-12 h-12 rounded-full bg-primary text-primary-content font-extrabold
-                        text-lg flex items-center justify-center shrink-0" aria-hidden="true">
-              3
-            </div>
-            <div>
-              <h3 class="font-bold text-base-content">Comece a receber</h3>
-              <p class="text-sm text-base-content/65 mt-1 leading-relaxed">
-                Seu clube já aparece para os jogadores. Reservas e pagamentos chegam
-                automaticamente.
-              </p>
-            </div>
+        <li class="join-item flex-1 p-6 md:p-8 md:border-r border-base-300 last:border-r-0">
+          <div
+            class="w-10 h-10 rounded-full bg-primary text-primary-content font-bold flex items-center justify-center shrink-0 mb-4"
+            aria-hidden="true"
+          >
+            3
           </div>
+          <h3 class="font-bold text-base-content mb-1">Comece a receber</h3>
+          <p class="text-sm text-base-content/65 leading-relaxed">
+            Seu clube já aparece para os jogadores. Reservas e pagamentos chegam automaticamente.
+          </p>
         </li>
-
       </ol>
-    </div>
-  </section>
+    </section>
 
-  <!-- ── FAQ ───────────────────────────────────────────────────────────── -->
-  <section class="bg-base-100 border-b border-base-300 py-16 md:py-20" aria-labelledby="faq-title">
-    <div class="px-6 md:px-10 max-w-2xl mx-auto">
+    <div class="divider my-0"></div>
 
-      <div class="text-center mb-10">
-        <p class="text-xs font-semibold text-primary uppercase tracking-widest mb-2">Dúvidas</p>
-        <h2 id="faq-title" class="text-2xl md:text-3xl font-bold text-base-content">
-          Perguntas frequentes
-        </h2>
-      </div>
+    <section class="py-14 md:py-20 pb-4" aria-labelledby="faq-title">
+      <h2 id="faq-title" class="text-2xl md:text-3xl font-bold text-base-content mb-10">
+        Perguntas frequentes
+      </h2>
 
-      <div class="space-y-2" role="list">
+      <div class="join join-vertical w-full border border-base-300" role="list">
         @for (faq of faqs; track faq.question; let i = $index) {
-          <div class="card bg-base-200 border border-base-300 overflow-hidden" role="listitem">
+          <div
+            class="join-item collapse collapse-plus border-b border-base-300 last:border-b-0"
+            [class.collapse-open]="openFaqIndex() === i"
+            role="listitem"
+          >
             <button
               type="button"
-              class="w-full flex items-center justify-between gap-3 px-5 py-4 text-left
-                     hover:bg-base-300 transition-colors"
+              class="collapse-title font-semibold text-sm text-base-content"
               [attr.aria-expanded]="openFaqIndex() === i"
               [attr.aria-controls]="'faq-answer-' + i"
               (click)="toggleFaq(i)"
             >
-              <span class="font-semibold text-sm text-base-content">{{ faq.question }}</span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
-                stroke-linejoin="round" aria-hidden="true"
-                [class]="openFaqIndex() === i
-                  ? 'text-primary rotate-180 transition-transform shrink-0'
-                  : 'text-base-content/50 rotate-0 transition-transform shrink-0'"
-              >
-                <polyline points="6 9 12 15 18 9"/>
-              </svg>
+              {{ faq.question }}
             </button>
-            @if (openFaqIndex() === i) {
-              <div
-                [id]="'faq-answer-' + i"
-                role="region"
-                class="px-5 pb-4 text-sm text-base-content/70 leading-relaxed"
-              >
-                {{ faq.answer }}
-              </div>
-            }
+            <div
+              [id]="'faq-answer-' + i"
+              role="region"
+              class="collapse-content text-sm text-base-content/70 leading-relaxed"
+            >
+              <p>{{ faq.answer }}</p>
+            </div>
           </div>
         }
       </div>
-
-    </div>
-  </section>
-
-  </div><!-- /card wrapper -->
-</main>
+    </section>
+  </div>
+</div>

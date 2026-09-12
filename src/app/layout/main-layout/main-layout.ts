@@ -30,7 +30,7 @@ export class MainLayout {
   }
 
   private checkFooterVisibility(url: string): void {
-    const routesWithFooter = new Set(['/', '/clubs', '/plans', '/courts']);
+    const routesWithFooter = new Set(['/', '/clubs', '/plans', '/courts', '/register-club']);
     const path = url.split('?')[0].split('#')[0];
 
     this.showFooter.set(routesWithFooter.has(path));
