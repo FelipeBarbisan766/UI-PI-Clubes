@@ -2,8 +2,8 @@ import { afterNextRender, Component, computed, inject, Injector, output, signal 
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth-service';
 import { finalize, switchMap, take } from 'rxjs';
-import { FormAdminService } from '../../../../core/services/formAdmin-service';
 import { ViewportScroller } from '@angular/common';
+import { AdminService } from '../../../../core/services/admin-service';
 
 @Component({
   selector: 'app-register-club',
@@ -15,7 +15,7 @@ export class RegisterClub {
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
   private readonly viewportScroller = inject(ViewportScroller);
-  private readonly adminService = inject(FormAdminService);
+  private readonly adminService = inject(AdminService);
   private readonly injector = inject(Injector);
 
   readonly isSubmitting = signal(false);

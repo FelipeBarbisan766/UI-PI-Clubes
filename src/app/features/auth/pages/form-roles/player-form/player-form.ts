@@ -3,7 +3,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { finalize, take } from 'rxjs';
 import { AuthService } from '../../../../../core/services/auth-service'; 
-import { FormPlayerService } from '../../../../../core/services/formPlayer-service';
+import { PlayerService } from '../../../../../core/services/player-service';
 
 @Component({
   selector: 'app-player-form',
@@ -14,7 +14,7 @@ import { FormPlayerService } from '../../../../../core/services/formPlayer-servi
 export class PlayerForm {
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
-  private readonly playerService = inject(FormPlayerService);
+  private readonly playerService = inject(PlayerService);
   private readonly router = inject(Router);
 
   readonly isSubmitting = signal(false);

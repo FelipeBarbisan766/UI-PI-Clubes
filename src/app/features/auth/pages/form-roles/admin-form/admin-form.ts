@@ -3,7 +3,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { finalize, take } from 'rxjs';
 import { AuthService } from '../../../../../core/services/auth-service'; 
-import { FormAdminService } from '../../../../../core/services/formAdmin-service';
+import { AdminService } from '../../../../../core/services/admin-service';
 
 @Component({
   selector: 'app-admin-form',
@@ -14,7 +14,7 @@ import { FormAdminService } from '../../../../../core/services/formAdmin-service
 export class AdminForm {
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
-  private readonly adminService = inject(FormAdminService);
+  private readonly adminService = inject(AdminService);
   private readonly router = inject(Router);
 
   readonly isSubmitting = signal(false);
