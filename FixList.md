@@ -9,7 +9,7 @@
 
 * alinhamento padronizado 
 
-* Mudar visual das telas de login, cadastro, minhas reservas, meus clubes e minha conta
+* Mudar visual das telas de login, cadastro, minhas reservas, meus clubes e minha conta (talvez)
 
 ### HomePage
 
@@ -61,7 +61,7 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 
 ### Detalhes clubes
 * reorganizar lugar dos elementos
-* trocar google maps por outra api
+* trocar google maps por outra api (talvez deixar a do maps mesmo)
 * separar arquivo em componentes
 
 ### Verificar Email
@@ -99,12 +99,12 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 * ~~primeiro nome~~
 * ~~links footer~~
 
-* icone fazer parte do botao 
+* ~~icone fazer parte do botao~~ 
 
 ### Login 
 
 - erros no console ( diversos ) 
-* bloquear caracteres especiais 
+* ~~bloquear caracteres especiais~~
 
 ### Clubs/Court-list
 
@@ -133,5 +133,6 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 ### Clube details
 
 - erros no console 
+- (verificar se é erro do sistema ou do cliente/navegador/apis de terceiros)
 
 --- 

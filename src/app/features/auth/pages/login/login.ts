@@ -13,10 +13,11 @@ import { Router, RouterLink } from '@angular/router';
 import { catchError, EMPTY, switchMap, take, tap } from 'rxjs';
 import { AuthService } from '../../../../core/services/auth-service';
 import { GoogleAuthService } from '../../services/service-google';
+import { EmailDirective } from '../../../../shared/directives/email-directive';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, EmailDirective],
   templateUrl: './login.html',
   styleUrl: './login.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
