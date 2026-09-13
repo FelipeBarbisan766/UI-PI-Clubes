@@ -9,7 +9,7 @@
 
 * alinhamento padronizado 
 
-* Mudar visual das telas de login, cadastro, minhas reservas, meus clubes e minha conta (talvez)
+* Mudar visual das telas de login, cadastro, ~~minhas reservas~~, meus clubes e ~~minha conta~~ (talvez)
 
 ### HomePage
 
@@ -60,7 +60,7 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 * Colocar travas de planos
 
 ### Detalhes clubes
-* reorganizar lugar dos elementos
+* ~~reorganizar lugar dos elementos~~
 * trocar google maps por outra api (talvez deixar a do maps mesmo)
 * separar arquivo em componentes
 
@@ -68,7 +68,7 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 * ~~Criar botão de enviar novamente~~
 
 ### Minhas reservas
-* Ajustar responsividade
+* ~~Ajustar responsividade~~
 
 ### Termos e Privacidade
 * Criar documento de termos de uso e privacidade de usuário

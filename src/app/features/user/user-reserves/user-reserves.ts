@@ -13,6 +13,7 @@ import { Reservation, StatusEnum } from '../models/model-reserve';
 import { AuthService } from '../../../core/services/auth-service';
 import { debounceTime, distinctUntilChanged, filter, merge, switchMap } from 'rxjs';
 import { computed } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 interface StatusConfig {
   label: string;
@@ -30,7 +31,7 @@ const PAGE_SIZE_OPTIONS = [5, 10, 20, 50] as const;
   selector: 'app-reserve',
   templateUrl: './user-reserves.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, RouterLink],
 })
 export class UserReserve implements OnInit {
   private readonly reserveService = inject(UserReserveService);
