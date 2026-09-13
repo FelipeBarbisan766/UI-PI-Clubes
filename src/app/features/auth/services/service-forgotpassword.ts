@@ -42,7 +42,7 @@ export class ServiceForgotPassword {
   }
 
   resetPassword(token: string, password: string): Observable<ForgotPasswordResult> {
-    const url = `${environment.apiUrl}/resetPassword`;
+    const url = `${environment.apiUrl}${this.resetPath}`;
     return this.http.post(url, { token, password }, { responseType: 'text' }).pipe(
       map((message: string) => ({
         success: true,
