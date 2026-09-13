@@ -42,8 +42,8 @@ export class ServiceForgotPassword {
   }
 
   resetPassword(token: string, password: string): Observable<ForgotPasswordResult> {
-    const url = `${environment.apiUrl}${this.resetPath}?token=${encodeURIComponent(token)}&password=${encodeURIComponent(password)}`;
-    return this.http.post(url, null, { responseType: 'text' }).pipe(
+    const url = `${environment.apiUrl}`;
+    return this.http.post(url, { token, password }, { responseType: 'text' }).pipe(
       map((message: string) => ({
         success: true,
         message: (message || '').trim() || 'Senha recuperada com sucesso!',
