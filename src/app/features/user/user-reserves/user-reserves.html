@@ -1,273 +1,274 @@
-<section class="space-y-6 m-15" aria-labelledby="reservations-title">
-  <!-- ── Header ── -->
-  <header
-    class="flex card bg-base-100 shadow-sm border border-base-200 rounded-box flex-col gap-1 sm:flex-row sm:items-center sm:justify-between"
-  >
-    <div class="m-5">
-      <h1 id="reservations-title" class="text-2xl font-bold tracking-tight">Reservas</h1>
-      <p class="text-base-content/60">
+<div class="bg-base-200 min-h-screen">
+    <header class="bg-base-100 border-b border-base-300">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-6">
+      <a
+        [routerLink]="['/']"
+        class="inline-flex items-center gap-1.5 text-sm text-base-content/60 hover:text-base-content transition-colors w-fit"
+        aria-label="Voltar para lista de clubes"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="size-4"
+          aria-hidden="true"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
+          />
+        </svg>
+        Voltar
+      </a>
+      <h1 class="text-2xl font-bold text-base-content">Reservas</h1>
+      <p class="text-sm text-base-content/60 mt-1">
         Aqui você pode visualizar e gerenciar suas reservas de quadras.
       </p>
     </div>
   </header>
 
-  <!-- ── Filters ── -->
-  <div class="flex flex-col gap-3 sm:flex-row">
-    <!-- Search -->
-    <label class="input input-bordered flex flex-1 items-center gap-2">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="h-4 w-4 shrink-0 opacity-50"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        aria-hidden="true"
-      >
-        <circle cx="11" cy="11" r="8" />
-        <path d="m21 21-4.3-4.3" />
-      </svg>
-      <input
-        type="search"
-        class="grow"
-        placeholder="Buscar por clube ou quadra…"
-        [formControl]="searchControl"
-        aria-label="Buscar reservas por clube ou quadra"
-      />
-    </label>
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-6" aria-labelledby="reservations-title">
+    
+    <div class="flex flex-col gap-3 sm:flex-row">
+      <label class="input input-bordered flex flex-1 items-center gap-2 w-full">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-4 shrink-0 opacity-50"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.3-4.3" />
+        </svg>
+        <input
+          type="search"
+          class="grow min-w-0"
+          placeholder="Buscar por clube ou quadra…"
+          [formControl]="searchControl"
+          aria-label="Buscar reservas por clube ou quadra"
+        />
+      </label>
 
-    <!-- Status filter -->
-    <label class="sr-only" for="status-filter">Filtrar por status</label>
-    <select
-      id="status-filter"
-      class="select select-bordered w-full sm:w-44"
-      [formControl]="filterControl"
-      aria-label="Filtrar por status da reserva"
-    >
-      <option value="all">Todos os status</option>
-      <option [value]="StatusEnum.Confirmada">Confirmadas</option>
-      <option [value]="StatusEnum.Cancelada">Canceladas</option>
-    </select>
+      <label class="sr-only" for="status-filter">Filtrar por status</label>
+      <select
+        id="status-filter"
+        class="select select-bordered w-full sm:w-44 shrink-0"
+        [formControl]="filterControl"
+        aria-label="Filtrar por status da reserva"
+      >
+        <option value="all">Todos os status</option>
+        <option [value]="StatusEnum.Confirmada">Confirmadas</option>
+        <option [value]="StatusEnum.Cancelada">Canceladas</option>
+      </select>
+    </div>
+
+    @if (isLoading()) {
+      <div class="space-y-3" aria-busy="true" aria-label="Carregando reservas">
+        @for (_ of [1, 2, 3, 4]; track $index) {
+          <div class="skeleton h-14 w-full rounded-lg"></div>
+        }
+      </div>
+    }
+
+    @else if (error()) {
+      <div role="alert" class="alert alert-error max-w-lg shadow-sm">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5 shrink-0"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="8" x2="12" y2="12" />
+          <line x1="12" y1="16" x2="12.01" y2="16" />
+        </svg>
+        <span class="text-sm sm:text-base">{{ error() }}</span>
+      </div>
+    }
+
+    @else {
+      <div class="border border-base-100 rounded-xl overflow-hidden bg-base-100">
+        <div class="overflow-x-auto w-full">
+          <table class="table table-zebra w-full min-w-[700px]" aria-label="Lista de reservas">
+            <thead>
+              <tr class="bg-base-100/50">
+                <th scope="col" class="whitespace-nowrap">Clube</th>
+                <th scope="col" class="whitespace-nowrap">Quadra</th>
+                <th scope="col" class="whitespace-nowrap">Data</th>
+                <th scope="col" class="whitespace-nowrap">Horário</th>
+                <th scope="col" class="whitespace-nowrap">Valor</th>
+                <th scope="col" class="whitespace-nowrap">Status</th>
+                <th scope="col" class="text-right whitespace-nowrap">Ações</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              @for (r of reservations(); track trackById($index, r)) {
+                <tr class="bg-base-100">
+                  <td class="font-medium whitespace-nowrap">{{ r.club }}</td>
+                  <td class="text-base-content/60 whitespace-nowrap">{{ r.court }}</td>
+                  <td class="whitespace-nowrap">{{ formatDate(r.date) }}</td>
+                  <td class="whitespace-nowrap">{{ r.time }}</td>
+                  <td class="font-medium whitespace-nowrap">{{ formatPrice(r.pricePerHour) }}</td>
+                  <td class="whitespace-nowrap">
+                    <span
+                      class="badge badge-outline"
+                      [class]="statusConfig[r.status].badgeClass"
+                      aria-label="Status: {{ statusConfig[r.status].label }}"
+                    >
+                      {{ statusConfig[r.status].label }}
+                    </span>
+                  </td>
+                  <td class="whitespace-nowrap">
+                    <div class="flex items-center justify-end gap-1">
+                      @if (r.status === StatusEnum.Confirmada) {
+                        <button
+                          type="button"
+                          class="btn btn-ghost btn-sm btn-square text-error"
+                          (click)="OpenModal(r.id)"
+                          [attr.aria-label]="'Cancelar reserva de ' + r.club"
+                          title="Cancelar"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-4 w-4"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            aria-hidden="true"
+                          >
+                            <path d="M18 6 6 18M6 6l12 12" />
+                          </svg>
+                        </button>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="7" class="py-12 text-center text-base-content/50 bg-base-100">
+                    <div class="flex flex-col items-center gap-2">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-8 w-8 opacity-30"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                      >
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                        <line x1="16" y1="2" x2="16" y2="6" />
+                        <line x1="8" y1="2" x2="8" y2="6" />
+                        <line x1="3" y1="10" x2="21" y2="10" />
+                      </svg>
+                      <span class="text-sm sm:text-base">Nenhuma reserva encontrada.</span>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4 p-4 border-t border-base-100 bg-base-100">
+          <div class="flex items-center gap-2 text-sm text-base-content/60 w-full md:w-auto justify-center md:justify-start">
+            <span>Itens por página:</span>
+            <select
+              class="select select-bordered select-sm"
+              [value]="pageSize()"
+              (change)="onPageSizeChange(+$any($event.target).value)"
+              aria-label="Itens por página"
+            >
+              @for (size of pageSizeOptions; track size) {
+                @if (size === pageSize()) {
+                  <option [value]="size" selected>{{ size }}</option>
+                } @else {
+                  <option [value]="size">{{ size }}</option>
+                }
+              }
+            </select>
+          </div>
+
+          <div class="join w-full md:w-auto justify-center">
+            <button
+              type="button"
+              class="join-item btn btn-sm"
+              [disabled]="page() === 1"
+              (click)="prevPage()"
+              aria-label="Página anterior"
+            >
+              «
+            </button>
+            <button type="button" class="join-item btn btn-sm pointer-events-none text-xs sm:text-sm">
+              Página {{ page() }} de {{ totalPages() }}
+            </button>
+            <button
+              type="button"
+              class="join-item btn btn-sm"
+              [disabled]="page() >= totalPages()"
+              (click)="nextPage()"
+              aria-label="Próxima página"
+            >
+              »
+            </button>
+          </div>
+        </div>
+      </div>
+    }
   </div>
 
-  <!-- ── Loading skeleton ── -->
-  @if (isLoading()) {
-    <div
-      class="card bg-base-100 shadow-sm border border-base-200 rounded-box p-6 space-y-3"
-      aria-busy="true"
-      aria-label="Carregando reservas"
-    >
-      @for (_ of [1, 2, 3, 4]; track $index) {
-        <div class="skeleton h-10 w-full"></div>
-      }
-    </div>
-  }
-
-  <!-- ── Error state ── -->
-  @else if (error()) {
-    <div role="alert" class="alert alert-error">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="h-5 w-5 shrink-0"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        aria-hidden="true"
-      >
-        <circle cx="12" cy="12" r="10" />
-        <line x1="12" y1="8" x2="12" y2="12" />
-        <line x1="12" y1="16" x2="12.01" y2="16" />
-      </svg>
-      <span>{{ error() }}</span>
-    </div>
-  }
-
-  <!-- ── Table card ── -->
-  @else {
-    <div class="card bg-base-100 shadow-sm border border-base-200 rounded-box">
-      <div class="overflow-x-auto">
-        <table class="table table-zebra w-full" aria-label="Lista de reservas">
-          <thead>
-            <tr>
-              <th scope="col">Clube</th>
-              <th scope="col">Quadra</th>
-              <th scope="col">Data</th>
-              <th scope="col">Horário</th>
-              <th scope="col">Valor</th>
-              <th scope="col">Status</th>
-              <th scope="col" class="text-right">Ações</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            @for (r of reservations(); track trackById($index, r)) {
-              <tr class="hover">
-                <td class="font-medium">{{ r.club }}</td>
-
-                <!-- Court -->
-                <td class="text-base-content/60">{{ r.court }}</td>
-
-                <!-- Date -->
-                <td>{{ formatDate(r.date) }}</td>
-
-                <!-- Time -->
-                <td>{{ r.time }}</td>
-
-                <!-- Price -->
-                <td class="font-medium">{{ formatPrice(r.pricePerHour) }}</td>
-
-                <!-- Status badge -->
-                <td>
-                  <span
-                    class="badge badge-outline"
-                    [class]="statusConfig[r.status].badgeClass"
-                    aria-label="Status: {{ statusConfig[r.status].label }}"
-                  >
-                    {{ statusConfig[r.status].label }}
-                  </span>
-                </td>
-
-                <!-- Actions -->
-                <td>
-                  <div class="flex items-center justify-end gap-1">
-                    @if (r.status === StatusEnum.Confirmada) {
-                      <!-- Cancel -->
-                      <button
-                        type="button"
-                        class="btn btn-ghost btn-sm btn-square text-error"
-                        (click)="OpenModal(r.id)"
-                        [attr.aria-label]="'Cancelar reserva de ' + r.club"
-                        title="Cancelar"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          class="h-4 w-4"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2.5"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          aria-hidden="true"
-                        >
-                          <path d="M18 6 6 18M6 6l12 12" />
-                        </svg>
-                      </button>
-                    }
-                  </div>
-                </td>
-              </tr>
-            } @empty {
-              <tr>
-                <td colspan="7" class="py-12 text-center text-base-content/50">
-                  <div class="flex flex-col items-center gap-2">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-8 w-8 opacity-30"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="1.5"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      aria-hidden="true"
-                    >
-                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                      <line x1="16" y1="2" x2="16" y2="6" />
-                      <line x1="8" y1="2" x2="8" y2="6" />
-                      <line x1="3" y1="10" x2="21" y2="10" />
-                    </svg>
-                    <span>Nenhuma reserva encontrada.</span>
-                  </div>
-                </td>
-              </tr>
-            }
-          </tbody>
-          <div class="flex items-center justify-between gap-3 p-4 border-t border-base-200">
-            <div class="flex items-center gap-2 text-sm text-base-content/60">
-              <span>Itens por página:</span>
-              <select
-                class="select select-bordered select-sm"
-                [value]="pageSize()"
-                (change)="onPageSizeChange(+$any($event.target).value)"
-                aria-label="Itens por página"
-              >
-                @for (size of pageSizeOptions; track size) {
-                  @if (size === pageSize()) {
-                    <option [value]="size" selected>{{ size }}</option>
-                  } @else {
-                    <option [value]="size">{{ size }}</option>
-                  }
-                }
-              </select>
-            </div>
-
-            <div class="join">
-              <button
-                type="button"
-                class="join-item btn btn-sm"
-                [disabled]="page() === 1"
-                (click)="prevPage()"
-                aria-label="Página anterior"
-              >
-                «
-              </button>
-              <button type="button" class="join-item btn btn-sm">
-                Página {{ page() }} de {{ totalPages() }}
-              </button>
-              <button
-                type="button"
-                class="join-item btn btn-sm"
-                [disabled]="page() >= totalPages()"
-                (click)="nextPage()"
-                aria-label="Próxima página"
-              >
-                »
-              </button>
-            </div>
-          </div>
-        </table>
-      </div>
-    </div>
-  }
   <dialog
     id="modal"
-    class="modal"
+    class="modal modal-bottom sm:modal-middle"
     [class.modal-open]="ModalOpen()"
     role="dialog"
     aria-modal="true"
     aria-labelledby="modal-title"
   >
-    <div class="modal-box rounded-3xl max-w-md">
+    <div class="modal-box sm:rounded-3xl max-w-md w-full">
       <h3 id="modal-title" class="font-bold text-xl text-base-content mb-4 text-center">
-        Cancelar reserva ?
+        Cancelar reserva?
       </h3>
 
-      <p class="text-base-content/60 text-center">
+      <p class="text-base-content/60 text-center text-sm sm:text-base">
         Tem certeza que deseja cancelar a reserva? Esta ação não pode ser desfeita.
       </p>
 
-      <div class="modal-action mt-6 flex gap-3">
+      <div class="modal-action mt-6 flex flex-col sm:flex-row gap-3">
         <button
-          class="btn btn-primary shadow-lg rounded-lg flex-1"
-          (click)="cancel(selectedReservationId()!)"
-          aria-label="Confirmar reserva"
+          class="btn btn-ghost w-full sm:flex-1"
+          (click)="closeModal()"
+          aria-label="Manter reserva"
         >
-          Sim, cancelar reserva
+          Não, manter
         </button>
         <button
-          class="btn btn-ghost shadow-lg rounded-lg flex-1"
-          (click)="closeModal()"
+          class="btn btn-primary w-full sm:flex-1 text-white"
+          (click)="cancel(selectedReservationId()!)"
           aria-label="Cancelar reserva"
         >
-          Não, manter reserva
+          Sim, cancelar
         </button>
       </div>
     </div>
   </dialog>
-</section>
+</div>

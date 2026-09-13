@@ -17,13 +17,14 @@ import { NgxMaskDirective } from 'ngx-mask';
 import { NgOptimizedImage } from '@angular/common';
 import { ToastAlert } from '../../../shared/components/toast-alert/toast-alert';
 import { OnlyLetters } from '../../../shared/directives/only-letters';
+import { RouterLink } from '@angular/router';
 
 type ToastType = 'success' | 'error' | 'warning' | 'info';
 
 @Component({
   selector: 'app-user-profile',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, NgxMaskDirective, NgOptimizedImage, ToastAlert, OnlyLetters],
+  imports: [ReactiveFormsModule, NgxMaskDirective, NgOptimizedImage, ToastAlert, OnlyLetters, RouterLink],
   templateUrl: './user-profile.html',
 })
 export class UserProfile implements OnInit, OnDestroy {

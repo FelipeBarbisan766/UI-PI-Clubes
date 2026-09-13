@@ -26,6 +26,7 @@ import { ServiceCourtAvailabilitySignalR } from '../services/service-court-avail
 import { ReserveAvailabilityChangedDTO } from '../models/model-reserve';
 import { SportDTO } from '../../../core/models/model-sport';
 import { ImageCarousel } from '../../../shared/components/image-carousel/image-carousel';
+import { Footer } from '../../../shared/footer/footer';
 
 const SURFACE_LABELS: Record<SurfaceEnum, string> = {
   [SurfaceEnum.None]: 'Outro',
@@ -112,7 +113,7 @@ export interface TimeSlot {
 
 @Component({
   selector: 'app-clubs-detail',
-  imports: [RouterLink, NgClass, ImageCarousel],
+  imports: [RouterLink, NgClass, ImageCarousel, Footer],
   templateUrl: './clubs-details.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
