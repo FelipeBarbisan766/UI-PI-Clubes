@@ -11,51 +11,54 @@ import { Router } from '@angular/router';
 import { debounceTime, skip, switchMap, take } from 'rxjs';
 import { ServiceClub } from '../services/service-club';
 import { ClubQueryDTO, ResponseClubDTO } from '../models/model-club';
-import { ImageCarousel } from "../../../shared/components/image-carousel/image-carousel";
-import { SearchFilters } from "../../../shared/components/search-filters/search-filters";
+import { ImageCarousel } from '../../../shared/components/image-carousel/image-carousel';
+import { SearchFilters } from '../../../shared/components/search-filters/search-filters';
+import { NgClass } from '@angular/common';
 
 const PAGE_SIZE = 10;
 
 @Component({
   selector: 'app-clubs-list',
-  imports: [ImageCarousel, SearchFilters],
+  imports: [ImageCarousel, SearchFilters, NgClass],
   templateUrl: './clubs-list.html',
   styleUrl: './clubs-list.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ClubsList {
   private readonly clubService = inject(ServiceClub);
-  private readonly router      = inject(Router);
-  private readonly destroyRef  = inject(DestroyRef);
+  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
 
-  readonly clubs       = this.clubService.clubs;
-  readonly loading     = this.clubService.loading;
-  readonly error       = this.clubService.error;
-  readonly isEmpty     = this.clubService.isEmpty;
-  readonly clubsCount  = this.clubService.clubsCount;
-  readonly totalPages  = this.clubService.totalPages;
+  readonly clubs = this.clubService.clubs;
+  readonly loading = this.clubService.loading;
+  readonly error = this.clubService.error;
+  readonly isEmpty = this.clubService.isEmpty;
+  readonly clubsCount = this.clubService.clubsCount;
+  readonly totalPages = this.clubService.totalPages;
 
-  readonly searchTerm      = signal('');
-  readonly cityFilter      = signal('');
+  readonly isMobileFilterOpen = signal(false);
+
+  readonly searchTerm = signal('');
+  readonly cityFilter = signal('');
   readonly selectedSportIds = signal<string[]>([]);
-  readonly currentPage     = signal(1);
+  readonly currentPage = signal(1);
 
-  readonly detectedCity  = signal<string | null>(null);
+  readonly detectedCity = signal<string | null>(null);
 
   private readonly query = computed<ClubQueryDTO>(() => ({
-    name:     this.searchTerm() || undefined,
-    city:     this.cityFilter() || undefined,
+    name: this.searchTerm() || undefined,
+    city: this.cityFilter() || undefined,
     sportIds: this.selectedSportIds().length > 0 ? this.selectedSportIds() : undefined,
-    page:     this.currentPage(),
+    page: this.currentPage(),
     pageSize: PAGE_SIZE,
   }));
 
   readonly visiblePages = computed<(number | '...')[]>(() => {
-    const total   = this.totalPages();
+    const total = this.totalPages();
     const current = this.currentPage();
     if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
     const around = new Set(
-      [1, total, current - 1, current, current + 1].filter(p => p >= 1 && p <= total),
+      [1, total, current - 1, current, current + 1].filter((p) => p >= 1 && p <= total),
     );
     const sorted = [...around].sort((a, b) => a - b);
     const result: (number | '...')[] = [];
@@ -67,29 +70,29 @@ export class ClubsList {
   });
 
   constructor() {
-  toObservable(this.query)
-    .pipe(
-      skip(1),
-      debounceTime(400),
-      switchMap(query => this.clubService.getAll(query)),
-      takeUntilDestroyed(this.destroyRef),
-    )
-    .subscribe();
+    toObservable(this.query)
+      .pipe(
+        skip(1),
+        debounceTime(400),
+        switchMap((query) => this.clubService.getAll(query)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe();
 
-  this.clubService
-    .getAll(this.query())
-    .pipe(take(1), takeUntilDestroyed(this.destroyRef))
-    .subscribe();
+    this.clubService
+      .getAll(this.query())
+      .pipe(take(1), takeUntilDestroyed(this.destroyRef))
+      .subscribe();
 
-  this.resolveInitialCity().then(city => {
-    if (!city) return;
-    this.cityFilter.set(city);
-    this.detectedCity.set(city);
-  });
-}
+    this.resolveInitialCity().then((city) => {
+      if (!city) return;
+      this.cityFilter.set(city);
+      this.detectedCity.set(city);
+    });
+  }
 
   private resolveInitialCity(): Promise<string | null> {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       if (!navigator?.geolocation) return resolve(null);
 
       const timer = setTimeout(() => resolve(null), 4000);
@@ -104,7 +107,10 @@ export class ClubsList {
             resolve(null);
           }
         },
-        () => { clearTimeout(timer); resolve(null); },
+        () => {
+          clearTimeout(timer);
+          resolve(null);
+        },
         { timeout: 4000, maximumAge: 5 * 60 * 1000 },
       );
     });
@@ -112,16 +118,18 @@ export class ClubsList {
 
   private async reverseGeocode(lat: number, lng: number): Promise<string | null> {
     const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`;
-    const res  = await fetch(url, {
+    const res = await fetch(url, {
       headers: { 'Accept-Language': 'pt-BR', 'User-Agent': 'SeuAppNome/1.0' },
     });
     if (!res.ok) return null;
     const data = await res.json();
-    return data.address?.city
-        ?? data.address?.town
-        ?? data.address?.municipality
-        ?? data.address?.village
-        ?? null;
+    return (
+      data.address?.city ??
+      data.address?.town ??
+      data.address?.municipality ??
+      data.address?.village ??
+      null
+    );
   }
 
   clearDetectedCity(): void {
@@ -146,7 +154,7 @@ export class ClubsList {
   toggleSport(id: string): void {
     const current = this.selectedSportIds();
     this.selectedSportIds.set(
-      current.includes(id) ? current.filter(s => s !== id) : [...current, id],
+      current.includes(id) ? current.filter((s) => s !== id) : [...current, id],
     );
     this.currentPage.set(1);
   }

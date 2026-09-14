@@ -12,45 +12,60 @@
       </div>
 
       <div class="flex items-center gap-2 self-start sm:self-auto">
-        <button class="btn btn-sm btn-outline rounded-md lg:hidden" aria-label="Abrir filtros">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="size-4"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75"
-            />
-          </svg>
-          Filtrar
-        </button>
-      </div>
+  <button 
+    (click)="isMobileFilterOpen.set(true)" 
+    class="btn btn-sm btn-outline rounded-md lg:hidden" 
+    aria-label="Abrir filtros"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
+    </svg>
+    Filtrar
+  </button>
+</div>
     </div>
   </div>
 
   <!-- Conteúdo principal -->
   <div class="flex-1 py-6">
     <div class="container mx-auto max-w-6xl px-4 flex gap-4 xl:gap-6">
-      <!-- Sidebar de filtros (desktop) -->
-      <aside class="hidden lg:block w-[260px] shrink-0" aria-label="Filtros de busca">
-        <app-search-filters
-          [searchTerm]="searchTerm()"
-          searchPlaceholder="Nome do clube..."
-          [cityFilter]="cityFilter()"
-          [detectedCity]="detectedCity()"
-          [selectedSportIds]="selectedSportIds()"
-          (searchTermChange)="onSearchChange($event)"
-          (cityFilterChange)="onCityChange($event)"
-          (clearDetectedCity)="clearDetectedCity()"
-          (toggleSport)="toggleSport($event)"
-          (clearSports)="clearSports()"
-        />
-      </aside>
+      <aside 
+      class="lg:block lg:static lg:w-[260px] lg:shrink-0 lg:h-auto lg:p-0 lg:bg-transparent"
+      [ngClass]="isMobileFilterOpen() ? 'fixed inset-0 z-50 flex flex-col w-full h-full p-4 bg-base-100 overflow-y-auto' : 'hidden'" 
+      aria-label="Filtros de busca"
+    >
+      
+      @if (isMobileFilterOpen()) {
+        <div class="flex justify-between items-center mb-6 lg:hidden">
+          <h2 class="text-xl font-bold">Filtros</h2>
+          <button (click)="isMobileFilterOpen.set(false)" class="btn btn-sm btn-ghost btn-circle" aria-label="Fechar filtros">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      }
+
+      <app-search-filters
+        [searchTerm]="searchTerm()"
+        searchPlaceholder="Nome do clube..."
+        [cityFilter]="cityFilter()"
+        [detectedCity]="detectedCity()"
+        [selectedSportIds]="selectedSportIds()"
+        (searchTermChange)="onSearchChange($event)"
+        (cityFilterChange)="onCityChange($event)"
+        (clearDetectedCity)="clearDetectedCity()"
+        (toggleSport)="toggleSport($event)"
+        (clearSports)="clearSports()"
+      />
+      
+      @if (isMobileFilterOpen()) {
+        <div class="mt-8 lg:hidden flex-shrink-0 pb-4">
+          <button (click)="isMobileFilterOpen.set(false)" class="btn btn-primary w-full">Ver Resultados</button>
+        </div>
+      }
+
+    </aside>
 
       <!-- Lista de clubes -->
       <div class="flex-1 min-w-0">
@@ -103,7 +118,12 @@
                 <div
                   class="relative w-full h-48 sm:w-48 sm:h-48 shrink-0 rounded-md overflow-hidden bg-base-300"
                 >
-                  <app-image-carousel [images]="club.images" [alt]="club.name" size="thumb" [priority]="true" />
+                  <app-image-carousel
+                    [images]="club.images"
+                    [alt]="club.name"
+                    size="thumb"
+                    [priority]="true"
+                  />
                 </div>
 
                 <div class="flex flex-col sm:flex-row flex-1 gap-4 min-w-0">
@@ -127,9 +147,7 @@
 
                     <div class="mt-2 flex flex-wrap gap-1">
                       @for (sport of club.sports; track sport.id) {
-                        <span
-                          class="badge badge-outline badge-sm text-[10px] text-base-content/70"
-                        >
+                        <span class="badge badge-outline badge-sm text-[10px] text-base-content/70">
                           {{ sport.name }}
                         </span>
                       }
