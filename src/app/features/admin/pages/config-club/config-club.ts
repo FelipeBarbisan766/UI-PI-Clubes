@@ -27,7 +27,7 @@ import { ViaCepService } from '../../../../core/services/via-cep';
 import { NgxMaskDirective } from 'ngx-mask';
 import { ToastAlert } from '../../../../shared/components/toast-alert/toast-alert';
 import { NgOptimizedImage } from '@angular/common';
-import { ExistingPhoto, NewPhoto, ImageDTO } from '../../models/model-club';
+import { ExistingPhoto, NewPhoto, ImageDTO, CountryEnum } from '../../models/model-club';
 import { forkJoin, Observable } from 'rxjs';
 
 type ToastType = 'success' | 'error' | 'warning' | 'info';
@@ -49,6 +49,8 @@ export class ConfigClub implements OnInit {
 
   protected readonly deleteConfirmOpen = signal(false);
   protected readonly isSubmitting = signal(false);
+
+protected readonly countryOptions = Object.values(CountryEnum);
 
   protected readonly MAX_PHOTOS = 5;
 

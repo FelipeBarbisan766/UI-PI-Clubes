@@ -488,15 +488,18 @@
             >
               País
             </label>
-            <input
-              id="country"
-              type="text"
-              formControlName="country"
-              class="input input-bordered input-sm rounded-lg w-full"
-              [class.input-error]="fieldInvalid('country')"
-              [attr.aria-invalid]="fieldInvalid('country')"
-              [attr.aria-describedby]="fieldInvalid('country') ? 'country-error' : null"
-            />
+           <select
+                id="country"
+                formControlName="country"
+                class="select select-bordered select-sm w-full"
+                [class.select-error]="fieldInvalid('country')"
+                [attr.aria-invalid]="fieldInvalid('country')"
+                [attr.aria-describedby]="fieldInvalid('country') ? 'country-error' : null"
+              >
+                @for (option of countryOptions; track option) {
+                  <option [value]="option">{{ option }}</option>
+                }
+              </select>
             @if (fieldInvalid('country')) {
               <span id="country-error" role="alert" class="text-error text-[11px] font-medium px-1">
                 Obrigatório
