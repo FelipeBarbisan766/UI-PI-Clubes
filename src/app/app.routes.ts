@@ -22,6 +22,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/home-page/home-page').then((m) => m.HomePage),
       },
       {
+        path: 'terms',
+        loadComponent: () => import('./shared/components/termspgae/termspgae').then((m) => m.Termspgae)
+      },
+      {
         path: 'clubs',
         loadComponent: () =>
           import('./features/clubs/clubs-list/clubs-list').then((m) => m.ClubsList),

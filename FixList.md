@@ -61,7 +61,7 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 
 ### Detalhes clubes
 * ~~reorganizar lugar dos elementos~~
-* trocar google maps por outra api (talvez deixar a do maps mesmo)
+* ~~trocar google maps por outra api (talvez deixar a do maps mesmo)~~
 * separar arquivo em componentes
 
 ### Verificar Email
@@ -77,10 +77,21 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 * Ajustar cores/contraste de elementos
 
 ### Cadastro
-* Ajustar telefone
+* ~~Ajustar telefone~~
+* reload apos completar cadastro
 
 ### Reservas
 * ~~resolver erros console <span style="background-color: #FFCCCC; color: red; padding: 4px;">WEB</span>~~
+### Admin
+* Criar limites
+* ~~Form criar clube mudar pais por dropwdown brasil padrão~~
+
+### User profile
+* Adicionar troca de senha
+* excluir conta
+
+### Futuro
+* sistema de avaliação
 
 ---
 
