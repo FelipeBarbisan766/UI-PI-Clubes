@@ -18,6 +18,7 @@ import { Modal } from '../../../../shared/components/modal/modal';
 import { ViaCepService } from '../../../../core/services/via-cep'; 
 import { NgxMaskDirective } from 'ngx-mask';
 import { NgOptimizedImage } from '@angular/common';
+import { CountryEnum } from '../../models/model-club';
 
 type FormMode = 'create' | 'edit' | null;
 
@@ -36,6 +37,8 @@ export class Clubs implements OnInit {
 
   private readonly me = this.authService.me;
   
+  protected readonly countryOptions = Object.values(CountryEnum);
+
   readonly avatarUrl = computed(() => this.me()?.avatarUrl);
   readonly displayName = computed(() => this.me()?.name?.trim() || 'Usuário');
   readonly initials = computed(() => {
@@ -144,7 +147,7 @@ export class Clubs implements OnInit {
       complement: '',
       city: '',
       state: '',
-      country: '',
+      country: CountryEnum.Brasil,
     });
     this.selectedFiles.set([]);
     this.formMode.set('create');

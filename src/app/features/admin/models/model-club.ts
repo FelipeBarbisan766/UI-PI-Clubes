@@ -94,3 +94,19 @@ export interface NewPhoto {
   file: File;
   previewUrl: string;
 }
+
+export enum CountryEnum {
+  Brasil = 'Brasil',
+  Argentina = 'Argentina',
+  Chile = 'Chile',
+  Uruguai = 'Uruguai',
+  Paraguai = 'Paraguai',
+  Bolivia = 'Bolívia',
+  Peru = 'Peru',
+  Equador = 'Equador',
+  Colombia = 'Colômbia',
+  Venezuela = 'Venezuela',
+  Guiana = 'Guiana',
+  Suriname = 'Suriname',
+  GuianaFrancesa = 'Guiana Francesa',
+}
