@@ -107,10 +107,15 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/admin/pages/subscriptions/subscriptions').then((m) => m.Subscriptions),
       },
+      // {
+      //   path: 'user-profile',
+      //   loadComponent: () =>
+      //     import('./features/user/user-profile/user-profile').then((m) => m.UserProfile),
+      // },
       {
-        path: 'user-profile',
+        path: 'user-config',
         loadComponent: () =>
-          import('./features/user/user-profile/user-profile').then((m) => m.UserProfile),
+          import('./features/user/user-config/user-config').then((m) => m.UserConfig),
       },
       {
         path: 'user-reserves',

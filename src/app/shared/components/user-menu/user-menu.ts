@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { AuthService } from '../../../core/services/auth-service';
 import { Router } from '@angular/router';
 import { take } from 'rxjs';
-import { UserProfileService } from '../../../features/user/services/service-user';
+import { UserConfigService } from '../../../features/user/services/service-user';
 import { ThemeService } from '../themeselector/theme-service';
 
 interface ThemeColor {
@@ -18,13 +18,13 @@ interface ThemeColor {
   styleUrl: './user-menu.css',
 })
 export class UserMenu {
-  private readonly profileService = inject(UserProfileService);
+  private readonly configService = inject(UserConfigService);
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
 
   readonly themeService = inject(ThemeService);
 
-  readonly user = this.profileService.user;
+  readonly user = this.configService.user;
   readonly me = this.authService.me;
   readonly isAuthenticated = this.authService.isAuthenticated;
 
@@ -50,7 +50,7 @@ export class UserMenu {
   }
 
   goToAccount(): void {
-    void this.router.navigate(['/user-profile']);
+    void this.router.navigate(['/user-config']);
   }
 
   goToReserves(): void {
