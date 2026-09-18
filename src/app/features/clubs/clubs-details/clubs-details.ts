@@ -13,7 +13,7 @@ import {
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { NgOptimizedImage, NgClass, ViewportScroller } from '@angular/common';
-import { EMPTY, catchError, distinctUntilChanged, map, switchMap } from 'rxjs';
+import { EMPTY, catchError, distinctUntilChanged, finalize, map, switchMap } from 'rxjs';
 import { SurfaceEnum, ResponseCourtDTO } from '../models/model-court';
 import { ResponseClubByIdDTO } from '../models/model-club';
 import { ServiceClub } from '../services/service-club';
@@ -27,6 +27,7 @@ import { ReserveAvailabilityChangedDTO } from '../models/model-reserve';
 import { SportDTO } from '../../../core/models/model-sport';
 import { ImageCarousel } from '../../../shared/components/image-carousel/image-carousel';
 import { Footer } from '../../../shared/footer/footer';
+import { AuthRequiredModalService } from '../../../shared/components/auth-required-modal/auth-required-modal-service';
 
 const SURFACE_LABELS: Record<SurfaceEnum, string> = {
   [SurfaceEnum.None]: 'Outro',
@@ -102,6 +103,13 @@ function mapAvailabilityToSlots(dtos: ScheduleAvailabilityDTO[], date: string): 
     available: dto.isAvailable,
   }));
 }
+function starFillPercent(rating: number | undefined | null, starIndex: number): number {
+  const value = rating ?? 0;
+  const diff = value - starIndex;
+  if (diff >= 1) return 100;
+  if (diff <= 0) return 0;
+  return diff * 100;
+}
 
 export interface TimeSlot {
   id: string;
@@ -129,6 +137,9 @@ export class ClubsDetail {
   private readonly injector = inject(Injector);
   private readonly viewportScroller = inject(ViewportScroller);
   private readonly courtAvailabilitySignalR = inject(ServiceCourtAvailabilitySignalR);
+  private readonly authRequiredModal = inject(AuthRequiredModalService);
+
+  readonly starIndexes = [0, 1, 2, 3, 4] as const;
 
   private readonly routeClubId = toSignal(
     this.route.paramMap.pipe(
@@ -162,6 +173,13 @@ export class ClubsDetail {
   readonly slotsForDate = signal<TimeSlot[]>([]);
   readonly bookingSlot = signal<TimeSlot | null>(null);
   readonly bookingModalOpen = signal(false);
+  readonly isCheckingReview = signal(false);
+  readonly isSubmittingReview = signal(false);
+  readonly reviewError = signal<string | null>(null);
+  readonly selectedRatingValue = signal(0);
+  readonly ratingModalOpen = signal(false);
+  readonly blockedModalOpen = signal(false);
+  readonly blockedModalMessage = signal('');
 
   // ── Estado do fluxo de confirmação ──
   readonly isConfirming = signal(false);
@@ -179,6 +197,8 @@ export class ClubsDetail {
     }
     return [...unique.values()];
   });
+
+  readonly starFillPercent = starFillPercent;
 
   private readonly courtAndDate = computed(() => ({
     court: this.selectedCourt(),
@@ -319,11 +339,13 @@ export class ClubsDetail {
   }
 
   confirmBooking(): void {
+   
     if (!this.authService.isAuthenticated()) {
       this.closeBookingModal();
-      this.router.navigate(['/login'], {
-        queryParams: { returnUrl: this.router.url },
-      });
+      this.authRequiredModal.show(
+        'Você precisa estar logado para fazer reservas neste clube.',
+        this.router.url,
+      );
       return;
     }
 
@@ -368,6 +390,91 @@ export class ClubsDetail {
     this.slotsForDate.update((slots) =>
       slots.map((s) => (s.id === scheduleId ? { ...s, available: false } : s)),
     );
+  }
+
+  openRateFlow(): void {
+    if (this.isCheckingReview()) return;
+
+    if (!this.authService.isAuthenticated()) {
+      this.authRequiredModal.show(
+        'Você precisa estar logado para avaliar este clube.',
+        this.router.url,
+      );
+      return;
+    }
+
+    const clubId = this.routeClubId();
+    if (!clubId) return;
+
+    this.isCheckingReview.set(true);
+
+    this.clubService
+      .hasReviewed(clubId)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.isCheckingReview.set(false)),
+      )
+      .subscribe({
+        next: (alreadyReviewed) => {
+          if (alreadyReviewed) {
+            this.openBlockedModal(
+              'Você já avaliou este clube. Cada jogador pode avaliar apenas uma vez.',
+            );
+            return;
+          }
+          this.openRatingModal();
+        },
+        error: () => {
+          this.openBlockedModal('Não foi possível verificar sua avaliação agora. Tente novamente.');
+        },
+      });
+  }
+  
+  openRatingModal(): void {
+    this.selectedRatingValue.set(0);
+    this.reviewError.set(null);
+    this.ratingModalOpen.set(true);
+  }
+
+  closeRatingModal(): void {
+    if (this.isSubmittingReview()) return;
+    this.ratingModalOpen.set(false);
+  }
+
+  setRatingValue(value: number): void {
+    this.selectedRatingValue.set(value);
+  }
+
+  submitReview(): void {
+    const clubId = this.routeClubId();
+    const rating = this.selectedRatingValue();
+    if (!clubId || rating <= 0 || this.isSubmittingReview()) return;
+
+    this.isSubmittingReview.set(true);
+    this.reviewError.set(null);
+
+    this.clubService
+      .rate(clubId, rating)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.isSubmittingReview.set(false)),
+      )
+      .subscribe({
+        next: (summary) => {
+          this.clubService.applyReviewSummary(summary);
+          this.ratingModalOpen.set(false);
+        },
+        error: (err: Error) => this.reviewError.set(err.message),
+      });
+  }
+
+  private openBlockedModal(message: string): void {
+    this.blockedModalMessage.set(message);
+    this.blockedModalOpen.set(true);
+  }
+
+  closeBlockedModal(): void {
+    this.blockedModalOpen.set(false);
   }
 
   // ── Helpers expostos ao template ─────────────────────────────────────────

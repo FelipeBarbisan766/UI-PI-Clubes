@@ -4,10 +4,11 @@ import { Navbar } from '../../shared/navbar/navbar';
 import { Footer } from '../../shared/footer/footer';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs';
+import { AuthRequiredModal } from '../../shared/components/auth-required-modal/auth-required-modal';
 
 @Component({
   selector: 'app-main-layout',
-  imports: [RouterOutlet, Navbar, Footer],
+  imports: [RouterOutlet, Navbar, Footer, AuthRequiredModal],
   templateUrl: './main-layout.html',
   styleUrl: './main-layout.css',
 })

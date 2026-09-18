@@ -27,9 +27,7 @@
     <section class="py-12 px-4 bg-base-200">
       <div class="container mx-auto max-w-6xl text-center">
         <h2 class="font-destaque text-3xl font-bold mb-3 text-base-900">Cadastre-se e aproveite</h2>
-        <p class="text-base-500 mb-8 font-light">
-          Crie sua conta e comece a reservar.
-        </p>
+        <p class="text-base-500 mb-8 font-light">Crie sua conta e comece a reservar.</p>
 
         <button
           [routerLink]="['/sign-up']"
@@ -177,6 +175,50 @@
               [routerLink]="['/clubs', club.id]"
               class="card bg-base shadow-sm border border-base-100 overflow-hidden hover:shadow-lg transition-all cursor-pointer group"
             >
+              <div
+                class="absolute top-2 right-2 z-10 flex items-center gap-1 bg-base-100/90 backdrop-blur-sm rounded-full px-2 py-1 shadow-sm border border-base-300/50"
+                [attr.aria-label]="
+                  'Avaliação: ' +
+                  (club.averageRating || 0).toFixed(1) +
+                  ' de 5, ' +
+                  club.totalReviews +
+                  ' avaliações'
+                "
+              >
+                <div class="flex items-center gap-0.5" aria-hidden="true">
+                  @for (i of starIndexes; track i) {
+                    <span class="relative inline-block size-3.5 shrink-0">
+                      <svg
+                        class="absolute inset-0 size-3.5 text-base-300"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          d="M10 1.5l2.6 5.27 5.82.85-4.21 4.1.99 5.79L10 14.9l-5.2 2.61.99-5.79-4.21-4.1 5.82-.85L10 1.5z"
+                        />
+                      </svg>
+                      <span
+                        class="absolute inset-0 overflow-hidden"
+                        [style.width.%]="starFillPercent(club.averageRating, i)"
+                      >
+                        <svg class="size-3.5 text-warning" viewBox="0 0 20 20" fill="currentColor">
+                          <path
+                            d="M10 1.5l2.6 5.27 5.82.85-4.21 4.1.99 5.79L10 14.9l-5.2 2.61.99-5.79-4.21-4.1 5.82-.85L10 1.5z"
+                          />
+                        </svg>
+                      </span>
+                    </span>
+                  }
+                </div>
+
+                <span class="text-[11px] font-semibold text-base-content/70">
+                  {{ (club.averageRating || 0).toFixed(1) }}
+                </span>
+
+                @if (club.totalReviews) {
+                  <span class="text-[10px] text-base-content/40">({{ club.totalReviews }})</span>
+                }
+              </div>
               <figure class="h-56 w-full bg-base-200 relative overflow-hidden">
                 <app-image-carousel [images]="club.images" [alt]="club.name" size="thumb" />
               </figure>
@@ -213,8 +255,35 @@
           @for (club of featuredClubs(); track club.id) {
             <div
               [routerLink]="['/clubs', club.id]"
-              class="card bg-base-100 shadow-sm border border-base-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group"
+              class="card bg-base-100 shadow-sm border border-base-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group relative"
             >
+            <div
+  class="absolute top-2 right-2 z-10 flex items-center gap-1 bg-base-100/90 backdrop-blur-sm rounded-full px-2 py-1 shadow-sm border border-base-300/50"
+  [attr.aria-label]="'Avaliação: ' + (club.averageRating || 0).toFixed(1) + ' de 5, ' + club.totalReviews + ' avaliações'"
+>
+  <div class="flex items-center gap-0.5" aria-hidden="true">
+    @for (i of starIndexes; track i) {
+      <span class="relative inline-block size-3.5 shrink-0">
+        <svg class="absolute inset-0 size-3.5 text-base-300" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M10 1.5l2.6 5.27 5.82.85-4.21 4.1.99 5.79L10 14.9l-5.2 2.61.99-5.79-4.21-4.1 5.82-.85L10 1.5z" />
+        </svg>
+        <span class="absolute inset-0 overflow-hidden" [style.width.%]="starFillPercent(club.averageRating, i)">
+          <svg class="size-3.5 text-warning" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M10 1.5l2.6 5.27 5.82.85-4.21 4.1.99 5.79L10 14.9l-5.2 2.61.99-5.79-4.21-4.1 5.82-.85L10 1.5z" />
+          </svg>
+        </span>
+      </span>
+    }
+  </div>
+
+  <span class="text-[11px] font-semibold text-base-content/70">
+    {{ (club.averageRating || 0).toFixed(1) }}
+  </span>
+
+  @if (club.totalReviews) {
+    <span class="text-[10px] text-base-content/40">({{ club.totalReviews }})</span>
+  }
+</div>
               <figure class="h-56 w-full bg-base-200 relative overflow-hidden">
                 <app-image-carousel [images]="club.images" [alt]="club.name" size="thumb" />
               </figure>
