@@ -1,0 +1,51 @@
+<dialog
+  id="auth-required-modal"
+  class="modal"
+  [class.modal-open]="modalService.isOpen()"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="auth-required-modal-title"
+>
+  <div class="modal-box rounded-3xl max-w-sm text-center">
+    <div class="flex justify-center mb-4" aria-hidden="true">
+      <div class="bg-primary/10 rounded-full p-4">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-8 w-8 text-primary"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M16 11V7a4 4 0 10-8 0v4M5 11h14a1 1 0 011 1v8a1 1 0 01-1 1H5a1 1 0 01-1-1v-8a1 1 0 011-1z"
+          />
+        </svg>
+      </div>
+    </div>
+
+    <h3 id="auth-required-modal-title" class="font-bold text-lg text-base-content mb-2">
+      Faça login para continuar
+    </h3>
+    <p class="text-sm text-base-content/60 mb-6">{{ modalService.message() }}</p>
+
+    <div class="flex gap-3">
+      <button type="button" class="btn btn-ghost rounded-lg flex-1" (click)="close()">
+        Agora não
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary text-white rounded-lg flex-1"
+        (click)="goToLogin()"
+      >
+        Entrar
+      </button>
+    </div>
+  </div>
+
+  <form method="dialog" class="modal-backdrop">
+    <button (click)="close()" aria-label="Fechar janela">Fechar</button>
+  </form>
+</dialog>

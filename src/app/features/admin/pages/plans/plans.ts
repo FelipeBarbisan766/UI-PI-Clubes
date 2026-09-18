@@ -11,6 +11,7 @@ import { catchError, finalize, map, of, switchMap, take } from 'rxjs';
 import { Plan, ServiceSubscription } from '../../services/service-subscription';
 import { AuthService } from '../../../../core/services/auth-service';
 import { AdminService } from '../../../../core/services/admin-service';
+import { AuthRequiredModalService } from '../../../../shared/components/auth-required-modal/auth-required-modal-service';
 
 @Component({
   selector: 'app-plans',
@@ -22,6 +23,7 @@ export class Plans implements OnInit {
   readonly authService = inject(AuthService);
   private readonly adminService = inject(AdminService);
   private readonly subscriptionService = inject(ServiceSubscription);
+   private readonly authRequiredModal = inject(AuthRequiredModalService);
 
   readonly plans = signal<Plan[]>([]);
   readonly isLoading = signal(true);
@@ -59,7 +61,10 @@ export class Plans implements OnInit {
   selectPlan(planId: string): void {
     const userId = this.currentUserId();
     if (!userId) {
-      this.errorMessage.set('Sessão inválida. Faça login novamente.');
+      this.authRequiredModal.show(
+        'Você precisa estar logado para assinar um plano.',
+        this.router.url,
+      );
       return;
     }
     var turnAdmin = this.beAdmin();
@@ -88,9 +93,13 @@ export class Plans implements OnInit {
   beAdmin(): boolean {
     const userId = this.currentUserId();
     if (!userId) {
-      this.errorMessage.set('Sessão inválida. Faça login novamente.');
+      this.authRequiredModal.show(
+        'Você precisa estar logado para assinar um plano.',
+        this.router.url,
+      );
       return false;
     }
+    
 
     this.isLoading.set(true);
     this.errorMessage.set('');

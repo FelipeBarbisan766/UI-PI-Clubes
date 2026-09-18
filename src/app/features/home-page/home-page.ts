@@ -15,8 +15,8 @@ import { ServiceClub } from '../clubs/services/service-club';
 import { ResponseClubDTO } from '../clubs/models/model-club';
 import { SearchHome } from '../../shared/components/search-home/search-home';
 import { AuthService } from '../../core/services/auth-service';
-import { ProfileAlertModal } from "../../shared/components/profile-alert-modal/profile-alert-modal";
-import { ImageCarousel } from "../../shared/components/image-carousel/image-carousel"; // Ajuste o caminho conforme seu projeto
+import { ProfileAlertModal } from '../../shared/components/profile-alert-modal/profile-alert-modal';
+import { ImageCarousel } from '../../shared/components/image-carousel/image-carousel'; // Ajuste o caminho conforme seu projeto
 
 @Component({
   selector: 'app-home-page',
@@ -39,6 +39,8 @@ export class HomePage implements OnInit {
 
     return fullName ? fullName.split(' ')[0] : 'Jogador';
   });
+
+  readonly starIndexes = [0, 1, 2, 3, 4] as const;
 
   readonly detectedCity = signal<string | null>(null);
   readonly localClubs = signal<ResponseClubDTO[]>([]);
@@ -85,6 +87,14 @@ export class HomePage implements OnInit {
   }
 
   // --- Funções Auxiliares para o Template ---
+
+  starFillPercent(rating: number | undefined | null, starIndex: number): number {
+    const value = rating ?? 0;
+    const diff = value - starIndex;
+    if (diff >= 1) return 100;
+    if (diff <= 0) return 0;
+    return diff * 100;
+  }
 
   getCoverImage(club: ResponseClubDTO): string {
     return club.images && club.images.length > 0

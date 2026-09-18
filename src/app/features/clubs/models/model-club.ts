@@ -19,6 +19,8 @@ export interface ResponseClubDTO {
   courtCount: number;
   sports: SportDTO[];
   images: ImageDTO[];
+  averageRating: number;
+  totalReviews: number;
 }
 
 export interface ResponseClubByIdDTO {
@@ -35,6 +37,8 @@ export interface ResponseClubByIdDTO {
   country: string;
   images: ImageDTO[];
   courts: import('./model-court').ResponseCourtDTO[];
+  averageRating: number;
+  totalReviews: number;
 }
 
 export interface ClubQueryDTO {
@@ -51,4 +55,12 @@ export interface PagedResultDTO<T> {
   page: number;
   pageSize: number;
   totalPages: number;
+}
+export interface CreateClubReviewDTO {
+  rating: number;
+}
+
+export interface ResponseClubReviewSummaryDTO {
+  averageRating: number;
+  totalReviews: number;
 }

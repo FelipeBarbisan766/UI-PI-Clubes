@@ -43,6 +43,8 @@ export class ClubsList {
   readonly selectedSportIds = signal<string[]>([]);
   readonly currentPage = signal(1);
 
+  readonly starIndexes = [0, 1, 2, 3, 4] as const;
+
   readonly detectedCity = signal<string | null>(null);
 
   private readonly query = computed<ClubQueryDTO>(() => ({
@@ -139,6 +141,14 @@ export class ClubsList {
   }
 
   // --- Handlers de filtro ---
+
+  starFillPercent(rating: number | undefined | null, starIndex: number): number {
+    const value = rating ?? 0;
+    const diff = value - starIndex;
+    if (diff >= 1) return 100;
+    if (diff <= 0) return 0;
+    return diff * 100;
+  }
 
   onSearchChange(value: string): void {
     this.searchTerm.set(value);

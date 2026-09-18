@@ -27,8 +27,8 @@
 
   @if (club() && !loading()) {
     <div class="container mx-auto max-w-7xl px-4 mt-6 space-y-8">
-      
-      <div class="flex flex-col gap-4 pb-4 border-b border-base-200">
+      <div class="relative flex flex-col gap-4 pb-4 border-b border-base-200">
+        
         <a
           [routerLink]="['/clubs']"
           class="inline-flex items-center gap-1.5 text-sm text-base-content/60 hover:text-base-content transition-colors w-fit"
@@ -110,10 +110,11 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 items-stretch">
-        
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 items-stretch relative">
         @if (club()!.images.length) {
-          <div class="lg:col-span-3 w-full min-h-[250px] lg:min-h-0 lg:h-full rounded-2xl overflow-hidden relative shadow-sm border border-base-200">
+          <div
+            class="lg:col-span-3 w-full min-h-[250px] lg:min-h-0 lg:h-full rounded-2xl overflow-hidden relative shadow-sm border border-base-200"
+          >
             <app-image-carousel
               [images]="club()!.images"
               [alt]="club()!.name"
@@ -124,11 +125,76 @@
           </div>
         }
 
-        <aside class="lg:col-span-2 rounded-2xl border border-base-200 bg-base-100 p-5 shadow-sm flex flex-col h-full" aria-label="Informações do clube">
+        <aside
+          class="lg:col-span-2 rounded-2xl border border-base-200 bg-base-100 p-5 shadow-sm flex flex-col h-full"
+          aria-label="Informações do clube relative"
+        >
           <h2 class="font-semibold text-base-content mb-1">Sobre</h2>
           <p class="text-sm text-base-content/70 leading-relaxed">{{ club()!.description }}</p>
 
-          <div class="divider my-3"></div>
+         <div class="absolute top-2 right-3 flex flex-col items-center group">
+          <button
+            type="button"
+            class="relative flex items-center gap-1.5 rounded-full bg-base-100 border border-base-300 px-3 py-1.5 shadow-sm hover:border-primary/40 transition-colors overflow-hidden disabled:cursor-wait"
+            (click)="openRateFlow()"
+            [disabled]="isCheckingReview()"
+            [attr.aria-label]="
+              'Avaliação média ' +
+              (club()!.averageRating || 0).toFixed(1) +
+              ' de 5, ' +
+              club()!.totalReviews +
+              ' avaliações. Clique para avaliar.'
+            "
+          >
+            <span class="flex items-center gap-0.5" aria-hidden="true">
+              @for (i of starIndexes; track i) {
+                <span class="relative inline-block size-4 shrink-0">
+                  <svg
+                    class="absolute inset-0 size-4 text-base-300"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      d="M10 1.5l2.6 5.27 5.82.85-4.21 4.1.99 5.79L10 14.9l-5.2 2.61.99-5.79-4.21-4.1 5.82-.85L10 1.5z"
+                    />
+                  </svg>
+                  <span
+                    class="absolute inset-0 overflow-hidden"
+                    [style.width.%]="starFillPercent(club()!.averageRating, i)"
+                  >
+                    <svg class="size-4 text-warning" viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        d="M10 1.5l2.6 5.27 5.82.85-4.21 4.1.99 5.79L10 14.9l-5.2 2.61.99-5.79-4.21-4.1 5.82-.85L10 1.5z"
+                      />
+                    </svg>
+                  </span>
+                </span>
+              }
+            </span>
+
+            <span class="text-sm font-semibold text-base-content/70">
+              {{ (club()!.averageRating || 0).toFixed(1) }}
+            </span>
+
+            <!-- overlay que aparece no hover -->
+            <span
+              class="absolute inset-0 flex items-center justify-center gap-1.5 bg-primary text-primary-content text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity"
+              aria-hidden="true"
+            >
+              @if (isCheckingReview()) {
+                <span class="loading loading-spinner loading-xs"></span>
+              } @else {
+                Avalie
+              }
+            </span>
+          </button>
+
+          @if (club()!.totalReviews) {
+            <p class="mt-1 text-[11px] text-base-content/40">
+              {{ club()!.totalReviews }} avaliaç{{ club()!.totalReviews === 1 ? 'ão' : 'ões' }}
+            </p>
+          }
+        </div> <div class="divider  my-3"></div>
 
           <div class="flex justify-between items-start gap-4">
             <div>
@@ -143,7 +209,7 @@
                 <p>CEP {{ club()!.zipCode }}</p>
               </address>
             </div>
-            
+
             @if (club()!.courts.length) {
               <div class="text-right">
                 <h3 class="text-sm font-semibold text-base-content mb-2">Modalidades</h3>
@@ -159,10 +225,12 @@
           </div>
 
           @if (mapUrl()) {
-            <div class="mt-4 rounded-lg overflow-hidden border border-base-300 w-full flex-grow min-h-[160px] max-h-[220px]">
+            <div
+              class="mt-4 rounded-lg overflow-hidden border border-base-300 w-full flex-grow min-h-[160px] max-h-[220px]"
+            >
               <iframe
                 class="w-full h-full"
-                style="border: 0;"
+                style="border: 0"
                 loading="lazy"
                 allowfullscreen
                 [src]="mapUrl()"
@@ -209,7 +277,8 @@
                 </div>
 
                 <p class="mt-3 font-bold text-primary text-base">
-                  {{ formatPrice(court.pricePerHour) }}<span class="text-xs font-normal text-base-content/50">/hora</span>
+                  {{ formatPrice(court.pricePerHour)
+                  }}<span class="text-xs font-normal text-base-content/50">/hora</span>
                 </p>
               </button>
             }
@@ -435,3 +504,139 @@
     </form>
   </dialog>
 </div>
+<!-- Modal de avaliação -->
+<dialog
+  id="rating-modal"
+  class="modal"
+  [class.modal-open]="ratingModalOpen()"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="rating-modal-title"
+>
+  <div class="modal-box rounded-3xl max-w-md text-center">
+    <h3 id="rating-modal-title" class="font-bold text-xl text-base-content mb-2">
+      Avaliar {{ club()?.name }}
+    </h3>
+    <p class="text-sm text-base-content/60 mb-6">
+      Toque nas estrelas para escolher sua nota, de 0 a 5.
+    </p>
+
+    <div
+      class="flex justify-center gap-1 mb-3"
+      role="radiogroup"
+      aria-label="Nota de 0 a 5 estrelas"
+    >
+      @for (i of starIndexes; track i) {
+        <span class="relative inline-block size-9">
+          <svg
+            class="absolute inset-0 size-9 text-base-300"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              d="M10 1.5l2.6 5.27 5.82.85-4.21 4.1.99 5.79L10 14.9l-5.2 2.61.99-5.79-4.21-4.1 5.82-.85L10 1.5z"
+            />
+          </svg>
+          <span
+            class="absolute inset-0 overflow-hidden"
+            [style.width.%]="starFillPercent(selectedRatingValue(), i)"
+            aria-hidden="true"
+          >
+            <svg class="size-9 text-warning" viewBox="0 0 20 20" fill="currentColor">
+              <path
+                d="M10 1.5l2.6 5.27 5.82.85-4.21 4.1.99 5.79L10 14.9l-5.2 2.61.99-5.79-4.21-4.1 5.82-.85L10 1.5z"
+              />
+            </svg>
+          </span>
+          <button
+            type="button"
+            class="absolute inset-y-0 left-0 w-1/2"
+            (click)="setRatingValue(i + 0.5)"
+            [attr.aria-label]="'Avaliar com ' + (i + 0.5) + ' estrelas'"
+          ></button>
+          <button
+            type="button"
+            class="absolute inset-y-0 right-0 w-1/2"
+            (click)="setRatingValue(i + 1)"
+            [attr.aria-label]="'Avaliar com ' + (i + 1) + ' estrelas'"
+          ></button>
+        </span>
+      }
+    </div>
+
+    <p class="text-2xl font-bold text-primary mb-6">{{ selectedRatingValue().toFixed(1) }}</p>
+
+    @if (reviewError()) {
+      <div
+        role="alert"
+        aria-live="assertive"
+        class="alert alert-soft alert-error rounded-2xl text-sm mb-4 text-left"
+      >
+        <span>{{ reviewError() }}</span>
+      </div>
+    }
+
+    <div class="flex gap-3">
+      <button
+        type="button"
+        class="btn btn-ghost rounded-lg flex-1"
+        (click)="closeRatingModal()"
+        [disabled]="isSubmittingReview()"
+      >
+        Cancelar
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary text-white rounded-lg flex-1"
+        (click)="submitReview()"
+        [disabled]="selectedRatingValue() <= 0 || isSubmittingReview()"
+        [attr.aria-busy]="isSubmittingReview()"
+      >
+        @if (isSubmittingReview()) {
+          <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+          Enviando...
+        } @else {
+          Enviar avaliação
+        }
+      </button>
+    </div>
+
+    <p class="text-xs text-base-content/40 mt-4">
+      Esta avaliação é única — depois de enviada, não pode ser desfeita ou alterada.
+    </p>
+  </div>
+
+  <form method="dialog" class="modal-backdrop">
+    <button
+      (click)="closeRatingModal()"
+      [disabled]="isSubmittingReview()"
+      aria-label="Fechar janela"
+    >
+      Fechar
+    </button>
+  </form>
+</dialog>
+
+<!-- Modal de bloqueio — TEMPORÁRIO, trocar pelo componente compartilhado quando ele existir -->
+<dialog
+  id="rating-blocked-modal"
+  class="modal"
+  [class.modal-open]="blockedModalOpen()"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="rating-blocked-title"
+>
+  <div class="modal-box rounded-3xl max-w-sm text-center">
+    <h3 id="rating-blocked-title" class="font-bold text-lg text-base-content mb-2">
+      Não foi possível avaliar
+    </h3>
+    <p class="text-sm text-base-content/60 mb-6">{{ blockedModalMessage() }}</p>
+    <button class="btn btn-primary rounded-full w-full" (click)="closeBlockedModal()">
+      Entendi
+    </button>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button (click)="closeBlockedModal()" aria-label="Fechar janela">Fechar</button>
+  </form>
+</dialog>
