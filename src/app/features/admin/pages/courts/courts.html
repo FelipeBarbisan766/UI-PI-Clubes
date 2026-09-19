@@ -324,7 +324,7 @@
                 class="flex items-center gap-2 cursor-pointer rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors"
                 [class.border-primary]="isSportSelected(sport.id)"
                 [class.bg-primary]="isSportSelected(sport.id)"
-                [class.text-primary-content]="isSportSelected(sport.id)"
+                [class.text-white]="isSportSelected(sport.id)"
                 [class.border-base-300]="!isSportSelected(sport.id)"
                 [class.text-base-content]="!isSportSelected(sport.id)"
               >
@@ -366,7 +366,7 @@
 
       @if (!isEditing()) {
         <div class="flex flex-col w-full mt-1">
-          <label class="py-1 font-medium text-xs text-base-content" for="images"
+          <label class="py-1 font-medium text-xs text-base-content " for="images"
             >Imagens da Quadra</label
           >
           <input
@@ -375,14 +375,14 @@
             multiple
             accept="image/*"
             (change)="onFilesSelected($event)"
-            class="file-input file-input-bordered file-input-primary file-input-sm w-full"
+            class="file-input file-input-bordered file-input-primary file-input-sm file:text-white w-full"
           />
 
           @if (selectedFiles().length > 0) {
             <ul class="flex flex-wrap gap-2 mt-2" aria-label="Imagens selecionadas">
               @for (file of selectedFiles(); track file.name; let i = $index) {
                 <li
-                  class="badge badge-primary badge-sm text-primary-content gap-1 p-3 text-xs font-semibold"
+                  class="badge badge-primary badge-sm text-white gap-1 p-3 text-xs font-semibold"
                 >
                   <span class="truncate max-w-[120px]">{{ file.name }}</span>
                   <button
@@ -404,7 +404,7 @@
         <button type="button" class="btn btn-ghost btn-sm" (click)="closeForm()">Cancelar</button>
         <button
           type="submit"
-          class="btn btn-primary btn-sm text-primary-content px-6"
+          class="btn btn-primary btn-sm text-white px-6"
           [disabled]="!isSubmitEnabled() || courtService.loading()"
         >
           @if (courtService.loading()) {
