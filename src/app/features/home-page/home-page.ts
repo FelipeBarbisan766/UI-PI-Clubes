@@ -17,6 +17,9 @@ import { SearchHome } from '../../shared/components/search-home/search-home';
 import { AuthService } from '../../core/services/auth-service';
 import { ProfileAlertModal } from '../../shared/components/profile-alert-modal/profile-alert-modal';
 import { ImageCarousel } from '../../shared/components/image-carousel/image-carousel'; // Ajuste o caminho conforme seu projeto
+import { PlayerService } from '../../core/services/player-service';
+import { SportDTO } from '../../core/models/model-sport';
+import { catchError, of } from 'rxjs';
 
 @Component({
   selector: 'app-home-page',
@@ -30,6 +33,7 @@ export class HomePage implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly playerService = inject(PlayerService);
 
   readonly isLoggedIn = this.authService.isAuthenticated;
 
@@ -45,6 +49,7 @@ export class HomePage implements OnInit {
   readonly detectedCity = signal<string | null>(null);
   readonly localClubs = signal<ResponseClubDTO[]>([]);
   readonly featuredClubs = signal<ResponseClubDTO[]>([]);
+  readonly recommendedSportName = signal<string | null>(null);
 
   ngOnInit(): void {
     this.authService
@@ -53,10 +58,11 @@ export class HomePage implements OnInit {
       .subscribe((user) => {
         if (user) {
           this.initAuthenticatedArea();
+          this.loadRecommendedClubs();
+        } else {
+          this.loadFeaturedClubs();
         }
       });
-
-    this.loadFeaturedClubs();
   }
 
   private initAuthenticatedArea(): void {
@@ -67,6 +73,47 @@ export class HomePage implements OnInit {
       }
     });
   }
+  private loadRecommendedClubs(): void {
+    this.playerService
+      .getFavoriteSports()
+      .pipe(
+        catchError(() => of([] as SportDTO[])), // erro na chamada → fallback genérico
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((sports) => {
+        if (sports.length === 0) {
+          // usuário sem esportes favoritos → fallback genérico
+          this.recommendedSportName.set(null);
+          this.loadFeaturedClubs();
+          return;
+        }
+
+        this.tryLoadBySport(this.shuffle(sports), 0);
+      });
+  }
+  private tryLoadBySport(sports: SportDTO[], index: number): void {
+    if (index >= sports.length) {
+      this.recommendedSportName.set(null);
+      this.loadFeaturedClubs();
+      return;
+    }
+
+    const sport = sports[index];
+
+    this.clubService
+      .getAll({ pageSize: 3, sportIds: [sport.id] })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((response) => {
+        const clubs = response.data ?? (response as any);
+
+        if (clubs.length > 0) {
+          this.recommendedSportName.set(sport.name);
+          this.featuredClubs.set(clubs);
+        } else {
+          this.tryLoadBySport(sports, index + 1);
+        }
+      });
+  }
 
   private loadFeaturedClubs(): void {
     this.clubService
@@ -75,6 +122,15 @@ export class HomePage implements OnInit {
       .subscribe((response) => {
         this.featuredClubs.set(response.data || (response as any));
       });
+  }
+
+  private shuffle<T>(items: T[]): T[] {
+    const copy = [...items];
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
   }
 
   private loadLocalClubs(city: string): void {

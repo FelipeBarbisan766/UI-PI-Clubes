@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { Observable, catchError, throwError } from 'rxjs';
+import { SportDTO } from '../models/model-sport';
 
 export interface CreatePlayerRequest {
   userName: string;
@@ -24,5 +25,14 @@ export class PlayerService {
         return throwError(() => new Error('Não foi possível salvar o perfil de jogador.'));
       })
     );
+  }
+  getFavoriteSports(): Observable<SportDTO[]> {
+    return this.http
+      .get<SportDTO[]>(`${this.baseUrl}/favorite-sports`, { withCredentials: true })
+      .pipe(catchError((err) => this.handleError(err)));
+  }
+
+  private handleError(err: unknown): Observable<never> {
+    return throwError(() => err);
   }
 }
