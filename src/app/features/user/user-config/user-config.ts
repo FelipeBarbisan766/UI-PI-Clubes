@@ -25,7 +25,14 @@ type ToastType = 'success' | 'error' | 'warning' | 'info';
 @Component({
   selector: 'app-user-config',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, NgxMaskDirective, NgOptimizedImage, ToastAlert, OnlyLetters, RouterLink],
+  imports: [
+    ReactiveFormsModule,
+    NgxMaskDirective,
+    NgOptimizedImage,
+    ToastAlert,
+    OnlyLetters,
+    RouterLink,
+  ],
   templateUrl: './user-config.html',
 })
 export class UserConfig implements OnInit, OnDestroy {
@@ -45,7 +52,7 @@ export class UserConfig implements OnInit, OnDestroy {
       .split(' ')
       .filter(Boolean)
       .slice(0, 2)
-      .map(part => part[0].toUpperCase())
+      .map((part) => part[0].toUpperCase())
       .join('');
   });
 
@@ -58,7 +65,7 @@ export class UserConfig implements OnInit, OnDestroy {
   });
 
   readonly form = this.fb.group({
-    name: ['', [Validators.required, Validators.minLength(2),]],
+    name: ['', [Validators.required, Validators.minLength(2)]],
     email: this.fb.control({ value: '', disabled: true }),
     phoneNumber: [''],
   });
@@ -96,7 +103,7 @@ export class UserConfig implements OnInit, OnDestroy {
     this.configService
       .getById(userId)
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(user => {
+      .subscribe((user) => {
         user.avatarUrl;
         this.form.patchValue({
           name: user.name,
@@ -106,22 +113,13 @@ export class UserConfig implements OnInit, OnDestroy {
         this.form.markAsPristine();
       });
 
-    this.sportService
-      .getAll()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe();
+    this.sportService.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
 
-    this.authService
-      .getPlayerMe()
+    this.configService
+      .getFavoriteSports()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: player => {
-          this.playerId = player.id;
-          this.configService
-            .getFavoriteSports(player.id)
-            .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe();
-        },
+        next: () => {},
         error: (err: unknown) => console.error('Erro ao carregar esportes favoritos:', err),
       });
   }
@@ -141,7 +139,7 @@ export class UserConfig implements OnInit, OnDestroy {
       .update(dto)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
-        finalize(() => this.isSubmitting.set(false))
+        finalize(() => this.isSubmitting.set(false)),
       )
       .subscribe({
         next: () => {
@@ -196,7 +194,7 @@ export class UserConfig implements OnInit, OnDestroy {
       .updateAvatar(userId, file)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
-        finalize(() => this.avatarUploading.set(false))
+        finalize(() => this.avatarUploading.set(false)),
       )
       .subscribe({
         next: () => {
@@ -239,7 +237,7 @@ export class UserConfig implements OnInit, OnDestroy {
   // ── Ações: esportes favoritos ─────────────────────────────────────────────
 
   openFavoritesEditor(): void {
-    this.selectedFavorites.set(this.favoriteSports().map(s => s.id));
+    this.selectedFavorites.set(this.favoriteSports().map((s) => s.id));
     this.favoritesError.set(null);
     this.editingFavorites.set(true);
   }
@@ -250,8 +248,8 @@ export class UserConfig implements OnInit, OnDestroy {
   }
 
   toggleFavoriteSport(sportId: string): void {
-    this.selectedFavorites.update(current =>
-      current.includes(sportId) ? current.filter(id => id !== sportId) : [...current, sportId],
+    this.selectedFavorites.update((current) =>
+      current.includes(sportId) ? current.filter((id) => id !== sportId) : [...current, sportId],
     );
   }
 
@@ -266,7 +264,7 @@ export class UserConfig implements OnInit, OnDestroy {
     this.favoritesError.set(null);
 
     this.configService
-      .updateFavoriteSports(this.playerId, this.selectedFavorites())
+      .updateFavoriteSports(this.selectedFavorites())
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.savingFavorites.set(false)),

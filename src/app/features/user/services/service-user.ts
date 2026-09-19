@@ -75,12 +75,12 @@ export class UserConfigService {
 
   // --- Esportes favoritos ---
 
-  getFavoriteSports(playerId: string): Observable<SportDTO[]> {
+  getFavoriteSports(): Observable<SportDTO[]> {
     this._favoriteSportsLoading.set(true);
     this._favoriteSportsError.set(null);
 
     return this.http
-      .get<SportDTO[]>(`${environment.apiUrl}/Player/${playerId}/favorite-sports`, {
+      .get<SportDTO[]>(`${environment.apiUrl}/Player/favorite-sports`, {
         withCredentials: true,
       })
       .pipe(
@@ -92,7 +92,7 @@ export class UserConfigService {
       );
   }
 
-  updateFavoriteSports(playerId: string, sportIds: string[]): Observable<SportDTO[]> {
+  updateFavoriteSports( sportIds: string[]): Observable<SportDTO[]> {
     this._favoriteSportsLoading.set(true);
     this._favoriteSportsError.set(null);
 
@@ -100,7 +100,7 @@ export class UserConfigService {
 
     return this.http
       .put<SportDTO[]>(
-        `${environment.apiUrl}/Player/${playerId}/favorite-sports`,
+        `${environment.apiUrl}/Player/favorite-sports`,
         payload, 
         { withCredentials: true },
       )
