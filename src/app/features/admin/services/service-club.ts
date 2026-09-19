@@ -10,6 +10,7 @@ import {
   ReorderImageDTO,
 } from '../models/model-club';
 import { environment } from '../../../../environments/environment';
+import { getApiErrorMessage } from '../../../core/utils/api-error';
 
 export interface ClubState {
   clubs: ResponseClubDTO[];
@@ -177,8 +178,7 @@ export class ServiceClub {
   }
 
   private handleError(err: unknown): Observable<never> {
-    const message = err instanceof Error ? err.message : 'Ocorreu um erro inesperado.';
-    this._error.set(message);
+    this._error.set(getApiErrorMessage(err));
     this._loading.set(false);
     return throwError(() => err);
   }

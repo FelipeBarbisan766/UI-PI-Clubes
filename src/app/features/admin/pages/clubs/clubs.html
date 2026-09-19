@@ -27,27 +27,57 @@
         </div>
       </div>
 
-      <button type="button" class="btn btn-primary text-white" (click)="openCreate()">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-5 w-5 mr-1"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          aria-hidden="true"
+      <div class="flex flex-col items-start md:items-end gap-2">
+        <div
+          class="tooltip-left"
+          [class.tooltip]="!canCreateClub()"
+          [attr.data-tip]="canCreateClub() ? null : 'Limite de clubes do plano atingido'"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 4v16m8-8H4"
-          />
-        </svg>
-        Novo Clube
-      </button>
+          <button
+            type="button"
+            class="btn btn-primary text-white"
+            [disabled]="!canCreateClub()"
+            aria-describedby="club-limit-info"
+            (click)="openCreate()"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 mr-1"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+            Novo Clube
+          </button>
+        </div>
+
+        @if (clubsUsage(); as usage) {
+          <p id="club-limit-info" class="text-xs text-base-content/60">
+            {{ usage.used }} de {{ usage.limit }} clubes usados
+            @if (planName()) {
+              · Plano {{ planName() }}
+            }
+          </p>
+        }
+      </div>
     </div>
 
     <!-- Alertas -->
+    @if (!canCreateClub()) {
+      <div role="alert" class="alert alert-warning alert-soft mb-6">
+        <span>Você atingiu o limite de clubes do seu plano. Faça upgrade para cadastrar mais.</span>
+        <a class="btn btn-sm" routerLink="/plans">Ver planos</a>
+      </div>
+    }
+
     @if (clubService.error()) {
       <div role="alert" class="alert alert-error mb-6">
         <svg
@@ -427,14 +457,14 @@
             multiple
             accept="image/*"
             (change)="onFilesSelected($event)"
-            class="file-input file-input-bordered file-input-primary file-input-sm w-full"
+            class="file-input file-input-bordered file-input-primary file-input-sm file:text-white w-full"
           />
 
           @if (selectedFiles().length > 0) {
             <ul class="flex flex-wrap gap-2 mt-2" aria-label="Imagens selecionadas">
               @for (file of selectedFiles(); track file.name; let i = $index) {
                 <li
-                  class="badge badge-primary badge-sm text-primary-content gap-1 p-3 text-xs font-semibold"
+                  class="badge badge-primary badge-sm text-white gap-1 p-3 text-xs font-semibold"
                 >
                   <span class="truncate max-w-[120px]">{{ file.name }}</span>
                   <button
@@ -455,7 +485,7 @@
           <button type="button" class="btn btn-ghost btn-sm" (click)="closeForm()">Cancelar</button>
           <button
             type="submit"
-            class="btn btn-primary btn-sm text-primary-content px-6"
+            class="btn btn-primary btn-sm text-white px-6"
             [disabled]="!isSubmitEnabled() || clubService.loading()"
           >
             @if (clubService.loading()) {
@@ -467,4 +497,8 @@
       </form>
     </div>
   </app-modal>
+}
+
+@if (toast(); as t) {
+  <app-toast-alert [message]="t.message" [type]="t.type" (dismiss)="dismissToast()" />
 }

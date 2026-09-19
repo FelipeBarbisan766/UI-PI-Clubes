@@ -3,6 +3,7 @@ import { Injectable, inject, signal, computed } from '@angular/core';
 import { Observable, tap, catchError, throwError } from 'rxjs';
 import { ResponseCourtDTO, CreateCourtDTO, UpdateCourtDTO } from '../models/model-court';
 import { environment } from '../../../../environments/environment';
+import { getApiErrorMessage } from '../../../core/utils/api-error';
 
 export interface CourtState {
   courts: ResponseCourtDTO[];
@@ -129,9 +130,7 @@ export class ServiceCourt {
   }
 
   private handleError(err: unknown): Observable<never> {
-    const message =
-      err instanceof Error ? err.message : 'Ocorreu um erro inesperado.';
-    this._error.set(message);
+    this._error.set(getApiErrorMessage(err));
     this._loading.set(false);
     return throwError(() => err);
   }

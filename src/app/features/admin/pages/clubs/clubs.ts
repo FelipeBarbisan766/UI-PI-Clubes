@@ -8,7 +8,7 @@ import {
   signal,
 } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { debounceTime, distinctUntilChanged, filter, map, switchMap } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -19,12 +19,16 @@ import { ViaCepService } from '../../../../core/services/via-cep';
 import { NgxMaskDirective } from 'ngx-mask';
 import { NgOptimizedImage } from '@angular/common';
 import { CountryEnum } from '../../models/model-club';
+import { ToastAlert } from '../../../../shared/components/toast-alert/toast-alert';
+import { ServiceSubscriptionUsage } from '../../services/service-subscription-usage';
+import { getApiErrorMessage, isLimitExceededError } from '../../../../core/utils/api-error';
 
 type FormMode = 'create' | 'edit' | null;
+type ToastState = { message: string; type: 'success' | 'error' | 'warning' | 'info' };
 
 @Component({
   selector: 'app-club',
-  imports: [ReactiveFormsModule, Modal, NgxMaskDirective, NgOptimizedImage],
+  imports: [ReactiveFormsModule, Modal, NgxMaskDirective, NgOptimizedImage, RouterLink, ToastAlert],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './clubs.html',
 })
@@ -34,6 +38,29 @@ export class Clubs implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly viaCepService = inject(ViaCepService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly usageService = inject(ServiceSubscriptionUsage);
+
+  // --- Limite do plano ---
+  protected readonly planName = this.usageService.planName;
+  protected readonly clubsUsage = this.usageService.clubsUsage;
+  protected readonly canCreateClub = this.usageService.canCreateClub;
+
+  // --- Toast ---
+  protected readonly toast = signal<ToastState | null>(null);
+
+  protected dismissToast(): void {
+    this.toast.set(null);
+  }
+
+  private showLimitToast(message?: string): void {
+    const usage = this.clubsUsage();
+    this.toast.set({
+      message:
+        message ??
+        `Você atingiu o limite de ${usage?.limit ?? ''} clube(s) do seu plano. Faça upgrade para adicionar mais.`,
+      type: 'warning',
+    });
+  }
 
   private readonly me = this.authService.me;
   
@@ -88,6 +115,8 @@ export class Clubs implements OnInit {
   });
 
   ngOnInit(): void {
+    this.usageService.refresh();
+
     this.authService.getAdminMe().subscribe({
       next: (admin) => {
         this.adminId = admin.id;
@@ -136,6 +165,11 @@ export class Clubs implements OnInit {
   // --- Form actions ---
 
   protected openCreate(): void {
+    if (!this.canCreateClub()) {
+      this.showLimitToast();
+      return;
+    }
+
     this.form.reset({
       name: '',
       phoneNumber: '',
@@ -223,9 +257,18 @@ export class Clubs implements OnInit {
         next: () => {
           this.closeForm();
           this.clubService.getAllByAdminId(adminId).subscribe();
+          this.usageService.refresh();
         },
         error: (err: unknown) => {
+          if (isLimitExceededError(err)) {
+            this.closeForm();
+            this.clubService.clearError();
+            this.showLimitToast(getApiErrorMessage(err));
+            this.usageService.refresh();
+            return;
+          }
           console.error('Erro ao criar clube', err);
+          this.toast.set({ message: getApiErrorMessage(err), type: 'error' });
         },
       });
   }

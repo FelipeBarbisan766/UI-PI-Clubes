@@ -1,5 +1,5 @@
 <div class="flex flex-col bg-base-200 text-base-content min-h-screen">
-  <div class="bg-base-100 border-b mt-1 border-base-300">
+  <div class="bg-base-100 border-b border-base-300">
     <div
       class="container mx-auto max-w-6xl py-4 px-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
     >
@@ -135,7 +135,7 @@
           <div class="space-y-4">
             @for (club of clubs(); track club.id) {
               <article
-                class="relative flex flex-col sm:flex-row gap-4 p-4 rounded-lg border border-base-300 bg-base-100 transition-all hover:bg-base-200/30 cursor-pointer group"
+                class="relative flex flex-col sm:flex-row gap-4 p-4 rounded-lg border border-base-300 bg-base-100 transition-all hover:bg-base-300 cursor-pointer group"
                 (click)="selectClub(club)"
                 (keydown.enter)="selectClub(club)"
                 tabindex="0"
