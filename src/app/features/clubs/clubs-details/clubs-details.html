@@ -300,6 +300,7 @@
                 <button
                   class="btn btn-sm rounded-full shrink-0 snap-start"
                   [class.btn-primary]="selectedDate() === date"
+                  [class.text-white]="selectedDate() === date"
                   [class.btn-ghost]="selectedDate() !== date"
                   (click)="selectDate(date)"
                   [attr.aria-pressed]="selectedDate() === date"

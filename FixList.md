@@ -83,7 +83,7 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 ### Reservas
 * ~~resolver erros console <span style="background-color: #FFCCCC; color: red; padding: 4px;">WEB</span>~~
 ### Admin
-* Criar limites
+* ~~Criar limites~~
 * ~~Form criar clube mudar pais por dropwdown brasil padrão~~
 
 ### User profile

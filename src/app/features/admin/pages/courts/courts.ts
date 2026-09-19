@@ -7,18 +7,22 @@ import {
   computed,
 } from '@angular/core';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ServiceCourt } from '../../services/service-court';
 import { SurfaceEnum, ResponseCourtDTO } from '../../models/model-court';
 import { ServiceSport } from '../../../../core/services/service-sport';
 import { Modal } from '../../../../shared/components/modal/modal';
+import { ToastAlert } from '../../../../shared/components/toast-alert/toast-alert';
+import { ServiceSubscriptionUsage } from '../../services/service-subscription-usage';
+import { getApiErrorMessage, isLimitExceededError } from '../../../../core/utils/api-error';
 
 type FormMode = 'create' | 'edit' | null;
+type ToastState = { message: string; type: 'success' | 'error' | 'warning' | 'info' };
 
 @Component({
   selector: 'app-court',
-  imports: [ReactiveFormsModule, Modal],
+  imports: [ReactiveFormsModule, Modal, RouterLink, ToastAlert],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './courts.html',
 })
@@ -30,6 +34,38 @@ export class Courts implements OnInit {
   private readonly route = inject(ActivatedRoute); // Injeção da rota para pegar o ID
 
   private currentClubId: string = '';
+
+  // --- Limite do plano ---
+  private readonly usageService = inject(ServiceSubscriptionUsage);
+
+  protected readonly planName = this.usageService.planName;
+
+  protected readonly courtUsage = computed(() =>
+    this.usageService.courtUsageFor(this.currentClubId),
+  );
+
+  // fail-open: sem dados carregados não bloqueia (o backend valida de qualquer forma)
+  protected readonly canCreateCourt = computed(() => {
+    const usage = this.courtUsage();
+    return usage === null || usage.used < usage.limit;
+  });
+
+  // --- Toast ---
+  protected readonly toast = signal<ToastState | null>(null);
+
+  protected dismissToast(): void {
+    this.toast.set(null);
+  }
+
+  private showLimitToast(message?: string): void {
+    const usage = this.courtUsage();
+    this.toast.set({
+      message:
+        message ??
+        `Você atingiu o limite de ${usage?.limit ?? ''} quadra(s) do seu plano. Faça upgrade para adicionar mais.`,
+      type: 'warning',
+    });
+  }
 
   // --- Enum options for selects ---
   protected readonly surfaceOptions = Object.entries(SurfaceEnum)
@@ -86,6 +122,7 @@ export class Courts implements OnInit {
 
     this.loadCourts();
     this.sportService.getAll().subscribe();
+    this.usageService.refresh();
   }
 
   private loadCourts(): void {
@@ -95,6 +132,11 @@ export class Courts implements OnInit {
   // --- Form actions ---
 
   protected openCreate(): void {
+    if (!this.canCreateCourt()) {
+      this.showLimitToast();
+      return;
+    }
+
     this.form.reset({
       name: '',
       surface: null,
@@ -182,9 +224,19 @@ export class Courts implements OnInit {
           next: () => {
             this.closeForm();
             this.loadCourts();
+            this.usageService.refresh();
           },
           error: (err: unknown) => {
+            if (isLimitExceededError(err)) {
+              // Estourou o limite (outra aba, plano alterado, etc.): fecha o modal e sincroniza
+              this.closeForm();
+              this.courtService.clearError();
+              this.showLimitToast(getApiErrorMessage(err));
+              this.usageService.refresh();
+              return;
+            }
             console.error('Erro ao criar quadra', err);
+            this.toast.set({ message: getApiErrorMessage(err), type: 'error' });
           },
         });
     } else {
@@ -222,6 +274,7 @@ export class Courts implements OnInit {
       next: () => {
         this.deleteConfirmId.set(null);
         this.loadCourts();
+        this.usageService.refresh();
       },
     });
   }

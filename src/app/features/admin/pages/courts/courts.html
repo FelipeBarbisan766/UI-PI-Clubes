@@ -4,20 +4,56 @@
       <h1 class="text-3xl font-bold text-base-content">Gestão de Quadras</h1>
       <p class="text-base-content/60 mt-1">Gerencie as quadras do seu clube.</p>
     </div>
-    <button class="btn btn-primary text-primary-content" (click)="openCreate()">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="h-5 w-5 mr-1"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        aria-hidden="true"
+    <div class="flex flex-col items-start md:items-end gap-2">
+      <div
+        class="tooltip-left"
+        [class.tooltip]="!canCreateCourt()"
+        [attr.data-tip]="canCreateCourt() ? null : 'Limite de quadras do plano atingido'"
       >
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-      </svg>
-      Nova Quadra
-    </button>
+        <button
+          class="btn btn-primary text-white"
+          [disabled]="!canCreateCourt()"
+          aria-describedby="court-limit-info"
+          (click)="openCreate()"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 mr-1"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 4v16m8-8H4"
+            />
+          </svg>
+          Nova Quadra
+        </button>
+      </div>
+
+      @if (courtUsage(); as usage) {
+        <p id="court-limit-info" class="text-xs text-base-content/60">
+          {{ usage.used }} de {{ usage.limit }} quadras usadas
+          @if (planName()) {
+            · Plano {{ planName() }}
+          }
+        </p>
+      }
+    </div>
   </div>
+
+  @if (!canCreateCourt()) {
+    <div role="alert" class="alert alert-warning alert-soft mb-6">
+      <span>
+        Você atingiu o limite de quadras do seu plano. Faça upgrade para cadastrar mais quadras.
+      </span>
+      <a class="btn btn-sm" routerLink="/plans">Ver planos</a>
+    </div>
+  }
 
   @if (courtService.error()) {
     <div role="alert" class="alert alert-error mb-6">
@@ -288,7 +324,7 @@
                 class="flex items-center gap-2 cursor-pointer rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors"
                 [class.border-primary]="isSportSelected(sport.id)"
                 [class.bg-primary]="isSportSelected(sport.id)"
-                [class.text-primary-content]="isSportSelected(sport.id)"
+                [class.text-white]="isSportSelected(sport.id)"
                 [class.border-base-300]="!isSportSelected(sport.id)"
                 [class.text-base-content]="!isSportSelected(sport.id)"
               >
@@ -330,7 +366,7 @@
 
       @if (!isEditing()) {
         <div class="flex flex-col w-full mt-1">
-          <label class="py-1 font-medium text-xs text-base-content" for="images"
+          <label class="py-1 font-medium text-xs text-base-content " for="images"
             >Imagens da Quadra</label
           >
           <input
@@ -339,14 +375,14 @@
             multiple
             accept="image/*"
             (change)="onFilesSelected($event)"
-            class="file-input file-input-bordered file-input-primary file-input-sm w-full"
+            class="file-input file-input-bordered file-input-primary file-input-sm file:text-white w-full"
           />
 
           @if (selectedFiles().length > 0) {
             <ul class="flex flex-wrap gap-2 mt-2" aria-label="Imagens selecionadas">
               @for (file of selectedFiles(); track file.name; let i = $index) {
                 <li
-                  class="badge badge-primary badge-sm text-primary-content gap-1 p-3 text-xs font-semibold"
+                  class="badge badge-primary badge-sm text-white gap-1 p-3 text-xs font-semibold"
                 >
                   <span class="truncate max-w-[120px]">{{ file.name }}</span>
                   <button
@@ -368,7 +404,7 @@
         <button type="button" class="btn btn-ghost btn-sm" (click)="closeForm()">Cancelar</button>
         <button
           type="submit"
-          class="btn btn-primary btn-sm text-primary-content px-6"
+          class="btn btn-primary btn-sm text-white px-6"
           [disabled]="!isSubmitEnabled() || courtService.loading()"
         >
           @if (courtService.loading()) {
@@ -379,4 +415,8 @@
       </div>
     </form>
   </app-modal>
+}
+
+@if (toast(); as t) {
+  <app-toast-alert [message]="t.message" [type]="t.type" (dismiss)="dismissToast()" />
 }
