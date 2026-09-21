@@ -63,6 +63,7 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 * ~~reorganizar lugar dos elementos~~
 * ~~trocar google maps por outra api (talvez deixar a do maps mesmo)~~
 * separar arquivo em componentes
+* Horários em modal
 
 ### Verificar Email
 * ~~Criar botão de enviar novamente~~
@@ -71,12 +72,12 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 * ~~Ajustar responsividade~~
 
 ### Termos e Privacidade
-* Criar documento de termos de uso e privacidade de usuário
+* ~~Criar documento de termos de uso e privacidade de usuário~~
 
 ### Tema Claro / Escuro
 * Ajustar cores/contraste de elementos
 
-### Cadastro
+### Completar Cadastro
 * ~~Ajustar telefone~~
 * reload apos completar cadastro
 
@@ -90,8 +91,26 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 * Adicionar troca de senha
 * excluir conta
 
+### Criar quadras
+* Remover validações não utilizadas
+
 ### Futuro
-* sistema de avaliação
+* ~~sistema de avaliação~~
+
+### Inputs
+* Verificar todos inputs e suas "travas"
+
+- [x] Tela de login 
+- [ ] Tela de criar conta
+- [ ] Tela de recuperar senha
+- [ ] Componente de filtrar
+- [ ] Tela de criar clube
+- [ ] Tela de criar quadra
+- [ ] Tela de editar quadra
+- [ ] Tela de criar horario unico
+- [ ] Tela de criar horario em massa
+- [ ] Tela de configurar clube
+- [ ] Tela de configurar usuario   
 
 ---
 
