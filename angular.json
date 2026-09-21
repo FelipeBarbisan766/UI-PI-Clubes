@@ -7,7 +7,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "angularteste": {
+    "ui-clubes": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -63,10 +63,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "angularteste:build:production"
+              "buildTarget": "ui-clubes:build:production"
             },
             "development": {
-              "buildTarget": "angularteste:build:development"
+              "buildTarget": "ui-clubes:build:development"
             }
           },
           "defaultConfiguration": "development"
