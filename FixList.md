@@ -88,7 +88,7 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 * ~~Form criar clube mudar pais por dropwdown brasil padrão~~
 
 ### User profile
-* Adicionar troca de senha
+* ~~Adicionar troca de senha~~
 * excluir conta
 
 ### Criar quadras
@@ -110,7 +110,10 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 - [ ] Tela de criar horario unico
 - [ ] Tela de criar horario em massa
 - [ ] Tela de configurar clube
-- [ ] Tela de configurar usuario   
+- [ ] Tela de configurar usuario  
+
+#### Alertas
+* Colocar alertas de sucesso / erro no toast
 
 ---
 

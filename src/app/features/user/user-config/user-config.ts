@@ -19,6 +19,7 @@ import { ToastAlert } from '../../../shared/components/toast-alert/toast-alert';
 import { OnlyLetters } from '../../../shared/directives/only-letters';
 import { RouterLink } from '@angular/router';
 import { ServiceSport } from '../../../core/services/service-sport';
+import { ChangePasswordModal } from '../../../shared/components/change-password-modal/change-password-modal';
 
 type ToastType = 'success' | 'error' | 'warning' | 'info';
 
@@ -32,6 +33,7 @@ type ToastType = 'success' | 'error' | 'warning' | 'info';
     ToastAlert,
     OnlyLetters,
     RouterLink,
+    ChangePasswordModal,
   ],
   templateUrl: './user-config.html',
 })
@@ -83,6 +85,8 @@ export class UserConfig implements OnInit, OnDestroy {
   readonly avatarPreviewUrl = signal<string | null>(null);
   readonly avatarUploading = signal(false);
   readonly avatarError = signal<string | null>(null);
+
+  
 
   // ── Esportes favoritos ────────────────────────────────────────────────────
   private playerId: string | null = null;

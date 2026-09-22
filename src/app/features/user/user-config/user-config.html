@@ -169,6 +169,22 @@
               <div class="flex items-center gap-2 text-sm text-base-content/70">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
+                  class="h-4 w-4 text-primary flex-shrink-0"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  aria-hidden="true"
+                >
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+                <span class="truncate">{{ user()?.name || 'Usuário' }}</span>
+              </div>
+
+              <div class="flex items-center gap-2 text-sm text-base-content/70">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
                   class="h-4 w-4 text-success flex-shrink-0"
                   viewBox="0 0 24 24"
                   fill="none"
@@ -183,19 +199,14 @@
               </div>
 
               <div class="flex items-center gap-2 text-sm text-base-content/70">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-4 w-4 text-primary flex-shrink-0"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  aria-hidden="true"
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lock preview-icon text-primary h-4 w-4 flex-shrink-0"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <button
+                  type="button"
+                  class="link link-hover hover:link-primary"
+                  (click)="passwordModal.open()"
                 >
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                  <circle cx="12" cy="7" r="4" />
-                </svg>
-                <span class="truncate">{{ user()?.name || 'Usuário' }}</span>
+                  Alterar Senha
+                </button>
               </div>
             </div>
           </div>
@@ -291,7 +302,7 @@
                   </button>
                   <button
                     type="button"
-                    class="btn btn-primary btn-xs"
+                    class="btn btn-primary btn-xs text-white"
                     [disabled]="savingFavorites()"
                     (click)="saveFavoriteSports()"
                   >
@@ -556,4 +567,10 @@
       </div>
     </div>
   </dialog>
+
+  <app-change-password-modal
+    #passwordModal
+    (success)="toast.set({ message: $event, type: 'success' })"
+    (failed)="toast.set({ message: $event, type: 'error' })"
+  />
 </div>
