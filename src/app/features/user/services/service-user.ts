@@ -10,6 +10,7 @@ export interface ResponseUserDTO {
   email: string;
   avatarUrl: string;
   phoneNumber: string;
+  hasPassword: boolean;
 }
 
 export interface UpdateConfigDTO {

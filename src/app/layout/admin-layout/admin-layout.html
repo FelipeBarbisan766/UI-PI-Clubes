@@ -7,7 +7,7 @@
       <label for="admin-drawer" aria-label="Abrir menu" class="btn btn-square btn-ghost">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
           fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-          aria-hidden="true">
+          aria-hidden="true" class="text-white">
           <path d="M4 5h16"/><path d="M4 12h16"/><path d="M4 19h16"/>
         </svg>
       </label>
@@ -28,9 +28,9 @@
   <div class="drawer-side z-40 top-16 h-[calc(100vh-4rem)] lg:top-0 lg:h-full">
     <label for="admin-drawer" aria-label="Fechar menu" class="drawer-overlay"></label>
 
-    <aside class="bg-base-200 border-r border-base-200 h-full min-h-full w-72 sm:w-64 flex flex-col overflow-hidden">
+    <aside class="bg-neutral-900 border-r border-white/10 h-full min-h-full w-72 sm:w-64 flex flex-col overflow-hidden">
 
-      <div class="p-4 border-b border-base-200 shrink-0">
+      <div class="p-4 border-b border-white/10 shrink-0">
         <div class="flex items-center gap-3 p-3 rounded-xl bg-primary/10">
           <div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center shrink-0">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
@@ -44,13 +44,13 @@
           </div>
           <div class="min-w-0">
             <p class="font-semibold text-sm text-primary truncate leading-tight">{{ clubName() }}</p>
-            <p class="text-xs text-base-content/60 truncate">{{ clubCity() }}</p>
+            <p class="text-xs text-white/50 truncate">{{ clubCity() }}</p>
           </div>
         </div>
 
         <button
           type="button"
-          class="btn btn-ghost btn-sm w-full mt-2 gap-2 justify-start text-base-content/70 bg-base-100"
+          class="btn btn-ghost btn-sm w-full mt-2 gap-2 justify-start text-white/70 border-none shadow-none hover:bg-white/10 hover:text-white hover:border-none hover:shadow-none"
           (click)="goToSwitchClub()">
           <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -62,17 +62,17 @@
       </div>
 
       <nav class="flex-1 p-3 overflow-hidden" aria-label="Painel administrativo">
-        <p class="text-xs font-semibold text-base-content/40 uppercase tracking-wider px-3 mb-2">Painel</p>
-        <ul class="menu menu-sm gap-0.5 p-0 w-full">
+        <p class="text-xs font-semibold text-white/40 uppercase tracking-wider px-3 mb-2">Painel</p>
+        <ul class="menu menu-md gap-1 p-0 w-full">
 
           <li>
             <button
               type="button"
-              [class.menu-active]="isActive('overview')"
+              [class]="isActive('overview') ? 'bg-primary text-white' : 'text-white/70 hover:bg-white/10 hover:text-white'"
               [attr.aria-current]="isActive('overview') ? 'page' : null"
               (click)="goToOverview(); closeDrawerOnMobile()"
-              class="rounded-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+              class="rounded-none">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                 aria-hidden="true">
                 <rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/>
@@ -85,11 +85,11 @@
           <li>
             <button
               type="button"
-              [class.menu-active]="isActive('courts')"
+              [class]="isActive('courts') ? 'bg-primary text-white' : 'text-white/70 hover:bg-white/10 hover:text-white'"
               [attr.aria-current]="isActive('courts') ? 'page' : null"
               (click)="goToCourts(); closeDrawerOnMobile()"
-              class="rounded-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+              class="rounded-none">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                 aria-hidden="true">
                 <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
@@ -102,11 +102,11 @@
           <li>
             <button
               type="button"
-              [class.menu-active]="isActive('reserves')"
+              [class]="isActive('reserves') ? 'bg-primary text-white' : 'text-white/70 hover:bg-white/10 hover:text-white'"
               [attr.aria-current]="isActive('reserves') ? 'page' : null"
               (click)="goToReserves(); closeDrawerOnMobile()"
-              class="rounded-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+              class="rounded-none">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                 aria-hidden="true">
                 <path d="M8 2v4"/><path d="M16 2v4"/>
@@ -120,11 +120,11 @@
           <li>
             <button
               type="button"
-              [class.menu-active]="isActive('config')"
+              [class]="isActive('config') ? 'bg-primary text-white' : 'text-white/70 hover:bg-white/10 hover:text-white'"
               [attr.aria-current]="isActive('config') ? 'page' : null"
               (click)="goToConfig(); closeDrawerOnMobile()"
-              class="rounded-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+              class="rounded-none">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                 aria-hidden="true">
                 <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
