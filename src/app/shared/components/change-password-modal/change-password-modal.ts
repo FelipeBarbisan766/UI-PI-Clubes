@@ -44,7 +44,7 @@ export class ChangePasswordModal {
 
   private readonly dialog = viewChild<ElementRef<HTMLDialogElement>>('passwordDialog');
 
-  readonly hasPassword = computed(() => this.userConfigService.user()?.hasPassword ?? true);
+  readonly hasPassword = computed(() => this.userConfigService.user()?.hasPassword ?? false);
 
   readonly form = this.fb.group(
     {
