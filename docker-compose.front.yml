@@ -1,0 +1,12 @@
+version: "3.9"
+
+services:
+  frontend-clubes:
+    image: nginx:alpine
+    container_name: front-clubes
+    restart: unless-stopped
+    ports:
+      - "5050:80"
+    volumes:
+      - ./dist/ui-clubes/browser:/usr/share/nginx/html:ro
+      - ./default.conf:/etc/nginx/conf.d/default.conf:ro
