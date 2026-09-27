@@ -24,5 +24,5 @@ jobs:
       - name: Build Angular
         run: npx ng build --configuration production
 
-      - name: Up nginx container
-        run: docker compose -f docker-compose.front.yml up -d
+      - name: Restart nginx to pick up new build
+        run: docker compose -f docker-compose.front.yml up -d --force-recreate
