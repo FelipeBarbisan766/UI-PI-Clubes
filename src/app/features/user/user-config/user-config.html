@@ -243,7 +243,12 @@
                   </button>
                 }
               </div>
-
+              @if (!isPlayer()) {
+                <p class="text-xs text-base-content/50">
+                  Apenas jogadores podem selecionar esportes favoritos.
+                  Porfavor Termine o cadastro para selecionar seus esportes favoritos.
+                </p>
+              }
               @if (!editingFavorites()) {
                 <!-- ── Visualização (somente leitura) ─────────────────────────── -->
                 @if (favoriteSports().length > 0) {

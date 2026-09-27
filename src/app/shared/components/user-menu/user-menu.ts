@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { NgOptimizedImage } from '@angular/common';
 import { AuthService } from '../../../core/services/auth-service';
 import { Router } from '@angular/router';
 import { take } from 'rxjs';
@@ -13,7 +14,7 @@ interface ThemeColor {
 @Component({
   selector: 'app-user-menu',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [],
+  imports: [NgOptimizedImage],
   templateUrl: './user-menu.html',
   styleUrl: './user-menu.css',
 })
@@ -36,6 +37,8 @@ export class UserMenu {
       .join('')
       .slice(0, 2)
   );
+
+  readonly avatarUrl = computed(() => this.me()?.avatarUrl || null);
 
   readonly isAdmin = computed(() => {
     const role = this.me()?.role?.trim().toLowerCase();
@@ -60,5 +63,4 @@ export class UserMenu {
   goToAdmin(): void {
     void this.router.navigate(['/admin/clubs']);
   }
-
 }

@@ -241,6 +241,7 @@ export class UserConfig implements OnInit, OnDestroy {
   // ── Ações: esportes favoritos ─────────────────────────────────────────────
 
   openFavoritesEditor(): void {
+    
     this.selectedFavorites.set(this.favoriteSports().map((s) => s.id));
     this.favoritesError.set(null);
     this.editingFavorites.set(true);
@@ -262,8 +263,6 @@ export class UserConfig implements OnInit, OnDestroy {
   }
 
   saveFavoriteSports(): void {
-    if (!this.playerId || this.savingFavorites()) return;
-
     this.savingFavorites.set(true);
     this.favoritesError.set(null);
 
@@ -298,5 +297,10 @@ export class UserConfig implements OnInit, OnDestroy {
       URL.revokeObjectURL(current);
     }
     this.avatarPreviewUrl.set(null);
+  }
+
+  isPlayer(): boolean {
+    const role = this.authService.me()?.role?.trim().toLowerCase();
+    return role === 'player';
   }
 }
