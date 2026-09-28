@@ -20,7 +20,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { ChangePasswordDTO, ChangePasswordService } from '../../../features/user/services/service-change-password';
-import { UserConfigService } from '../../../features/user/services/service-user'; 
+import { AuthService } from '../../../core/services/auth-service';
 
 function passwordsMatchValidator(control: AbstractControl): ValidationErrors | null {
   const newPassword = control.get('newPassword')?.value;
@@ -38,13 +38,13 @@ function passwordsMatchValidator(control: AbstractControl): ValidationErrors | n
 })
 export class ChangePasswordModal {
   private readonly changePasswordService = inject(ChangePasswordService);
-  private readonly userConfigService = inject(UserConfigService);
+  private readonly authService = inject(AuthService);
   private readonly fb = inject(NonNullableFormBuilder);
   private readonly destroyRef = inject(DestroyRef);
 
   private readonly dialog = viewChild<ElementRef<HTMLDialogElement>>('passwordDialog');
 
-  readonly hasPassword = computed(() => this.userConfigService.user()?.hasPassword ?? false);
+  readonly hasPassword = computed(() => this.authService.me()?.hasPassword);
 
   readonly form = this.fb.group(
     {

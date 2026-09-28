@@ -121,7 +121,7 @@ export interface TimeSlot {
 
 @Component({
   selector: 'app-clubs-detail',
-  imports: [RouterLink, NgClass, ImageCarousel, Footer],
+  imports: [RouterLink, NgClass, ImageCarousel],
   templateUrl: './clubs-details.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

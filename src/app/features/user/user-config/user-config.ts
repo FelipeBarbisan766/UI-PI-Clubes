@@ -47,6 +47,7 @@ export class UserConfig implements OnInit, OnDestroy {
   readonly user = this.configService.user;
   readonly loading = this.configService.loading;
   readonly error = this.configService.error;
+  readonly me = this.authService.me;
 
   readonly initials = computed(() => {
     const name = this.user()?.name ?? '';
@@ -70,6 +71,11 @@ export class UserConfig implements OnInit, OnDestroy {
     name: ['', [Validators.required, Validators.minLength(2)]],
     email: this.fb.control({ value: '', disabled: true }),
     phoneNumber: [''],
+  });
+
+  readonly isAdmin = computed(() => {
+    const role = this.me()?.role?.trim().toLowerCase();
+    return role === 'admin';
   });
 
   readonly nameControl = this.form.controls.name;

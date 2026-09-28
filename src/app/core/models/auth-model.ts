@@ -15,6 +15,7 @@ export interface MeResponse {
   role: string;
   phoneNumber?: string;
   avatarUrl?: string;
+  hasPassword?: boolean;
 }
 
 export interface AdminMeResponse {
