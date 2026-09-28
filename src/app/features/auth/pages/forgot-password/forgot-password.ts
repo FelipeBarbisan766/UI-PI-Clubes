@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { take } from 'rxjs';
 import { ServiceForgotPassword } from '../../services/service-forgotpassword';
+import { EmailDirective } from '../../../../shared/directives/email-directive';
 
 type ForgotPasswordStep =
   | 'request-email'
@@ -20,7 +21,7 @@ function passwordMatchValidator(control: AbstractControl): ValidationErrors | nu
 
 @Component({
   selector: 'app-forgot-password',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, EmailDirective],
   templateUrl: './forgot-password.html',
   changeDetection: ChangeDetectionStrategy.OnPush , 
 })

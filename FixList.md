@@ -103,7 +103,7 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 - [x] Tela de login 
 - [ ] Tela de criar conta
 - [ ] Tela de recuperar senha
-- [ ] Componente de filtrar
+- [x] Componente de filtrar
 - [ ] Tela de criar clube
 - [ ] Tela de criar quadra
 - [ ] Tela de editar quadra
@@ -154,6 +154,8 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 
 - ~~deixar bonito~~
 - ~~nao redirecionar~~ 
+- arrumar verificação <span style="background-color: #FFCCCC; color: red; padding: 4px;">WEB</span>
+-  email cai no spam
 
 ### User 
 
@@ -167,5 +169,27 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 
 - erros no console 
 - (verificar se é erro do sistema ou do cliente/navegador/apis de terceiros)
+
+### Modal
+- ajustar tamanho da label
+
+### refresh
+- ajustar auto refresh
+
+### report
+- criar um sistema de aviso (se o jogador nao compareceu na reserva)
+
+### horario
+- não mostrar horarios que passou da hora atual (back)
+
+### cadastro
+- colocar dicas no espaço dos erros
+- verificar espaços e etc
+
+### editar e excluir
+- quadras
+
+### pagamento
+- arrumar pagamento
 
 --- 

@@ -1,9 +1,11 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, input, output } from '@angular/core';
 import { ServiceSport } from '../../../core/services/service-sport';
+import { TextDirective } from '../../directives/text-directive';
 
 @Component({
   selector: 'app-search-filters',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [TextDirective],
   templateUrl: './search-filters.html',
 })
 export class SearchFilters implements OnInit {

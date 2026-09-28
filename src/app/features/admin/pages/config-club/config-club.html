@@ -275,6 +275,7 @@
             [attr.aria-invalid]="fieldInvalid('description')"
             [attr.aria-describedby]="fieldInvalid('description') ? 'description-error' : null"
             placeholder="Descreva o clube, instalações e diferenciais..."
+            TextDirective
           ></textarea>
           @if (fieldInvalid('description')) {
             <span
@@ -361,6 +362,7 @@
               [class.input-error]="fieldInvalid('street')"
               [attr.aria-invalid]="fieldInvalid('street')"
               [attr.aria-describedby]="fieldInvalid('street') ? 'street-error' : null"
+              TextDirective
             />
             @if (fieldInvalid('street')) {
               <span id="street-error" role="alert" class="text-error text-[11px] font-medium px-1">

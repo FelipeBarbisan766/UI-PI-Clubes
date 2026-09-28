@@ -32,6 +32,7 @@
           class="input input-bordered input-sm w-full pl-9 rounded-md"
           [value]="searchTerm()"
           (input)="onSearchInput($event)"
+          TextDirective
         />
       </div>
     </div>
@@ -85,6 +86,7 @@
         class="input input-bordered input-sm w-full rounded-md"
         [value]="cityFilter()"
         (input)="onCityInput($event)"
+        TextDirective
       />
     </div>
 

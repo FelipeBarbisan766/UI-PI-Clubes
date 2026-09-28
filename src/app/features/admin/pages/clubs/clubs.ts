@@ -22,13 +22,14 @@ import { CountryEnum } from '../../models/model-club';
 import { ToastAlert } from '../../../../shared/components/toast-alert/toast-alert';
 import { ServiceSubscriptionUsage } from '../../services/service-subscription-usage';
 import { getApiErrorMessage, isLimitExceededError } from '../../../../core/utils/api-error';
+import { TextDirective } from '../../../../shared/directives/text-directive';
 
 type FormMode = 'create' | 'edit' | null;
 type ToastState = { message: string; type: 'success' | 'error' | 'warning' | 'info' };
 
 @Component({
   selector: 'app-club',
-  imports: [ReactiveFormsModule, Modal, NgxMaskDirective, NgOptimizedImage, RouterLink, ToastAlert],
+  imports: [ReactiveFormsModule, Modal, NgxMaskDirective, NgOptimizedImage, RouterLink, ToastAlert, TextDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './clubs.html',
 })
