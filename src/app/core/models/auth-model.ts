@@ -14,6 +14,7 @@ export interface MeResponse {
   email: string;
   role: string;
   phoneNumber?: string;
+  hasPassword: boolean;
   avatarUrl?: string;
   hasPassword?: boolean;
 }
