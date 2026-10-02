@@ -15,13 +15,31 @@ import {
   ResponseBulkScheduleDTO,
   ResponseScheduleDTO,
 } from '../../models/model-schedule';
+import { NgxMaskDirective } from 'ngx-mask';
 import { Modal } from '../../../../shared/components/modal/modal';
 
 type FormMode = 'create' | 'edit' | 'bulk' | null;
 
+const TIME_24H_PATTERN = /^([01]\d|2[0-3]):[0-5]\d$/;
+
+function normalizeTime(value: string | null | undefined): string {
+  if (!value) return '';
+  const match = value.trim().match(/^(\d{1,2}):(\d{2})(?::\d{2})?\s*(AM|PM)?$/i);
+  if (!match) return value;
+
+  let hours = Number(match[1]);
+  const minutes = match[2];
+  const meridiem = match[3]?.toUpperCase();
+
+  if (meridiem === 'PM' && hours < 12) hours += 12;
+  if (meridiem === 'AM' && hours === 12) hours = 0;
+
+  return `${String(hours).padStart(2, '0')}:${minutes}`;
+}
+
 @Component({
   selector: 'app-schedule',
-  imports: [ReactiveFormsModule, Modal],
+  imports: [ReactiveFormsModule, Modal, NgxMaskDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './schedules.html',
 })
@@ -55,13 +73,13 @@ export class Schedules implements OnInit {
 
   // --- Form ---
   protected readonly form = this.fb.group({
-    startTime: ['', Validators.required],
-    endTime: ['', Validators.required],
-    isBlocked: [false],
-    isReserved: [false],
-    isFixed: [false],
-    dayOfWeek: [null as DayOfWeek | null, Validators.required],
-  });
+  startTime: ['', [Validators.required, Validators.pattern(TIME_24H_PATTERN)]],
+  endTime: ['', [Validators.required, Validators.pattern(TIME_24H_PATTERN)]],
+  isBlocked: [false],
+  isReserved: [false],
+  isFixed: [false],
+  dayOfWeek: [null as DayOfWeek | null, Validators.required],
+});
 
   private readonly formStatus = toSignal(this.form.statusChanges, {
     initialValue: this.form.status,
@@ -83,14 +101,14 @@ export class Schedules implements OnInit {
         label: day.label,
         schedules: schedules
           .filter((s) => s.dayOfWeek === day.value)
-          .sort((a, b) => a.startTime.localeCompare(b.startTime)),
+          .sort((a, b) => normalizeTime(a.startTime).localeCompare(normalizeTime(b.startTime))),
       }))
       .filter((group) => group.schedules.length > 0);
   });
 
   protected readonly bulkForm = this.fb.group({
-    startTime: ['', Validators.required],
-    endTime: ['', Validators.required],
+    startTime: ['', [Validators.required, Validators.pattern(TIME_24H_PATTERN)]],
+    endTime: ['', [Validators.required, Validators.pattern(TIME_24H_PATTERN)]],
     slotDurationMinutes: [60, [Validators.required, Validators.min(15)]],
   });
 
@@ -129,8 +147,8 @@ export class Schedules implements OnInit {
     this.scheduleService
       .createBulk(this.courtId, {
         daysOfWeek: this.selectedDays(),
-        startTime: startTime!,
-        endTime: endTime!,
+        startTime: normalizeTime(startTime),
+        endTime: normalizeTime(endTime),
         slotDurationMinutes: slotDurationMinutes!,
         courtId: this.courtId,
       })
@@ -155,15 +173,15 @@ export class Schedules implements OnInit {
     this.formMode.set('create');
   }
 
-  protected openEdit(schedule: ResponseScheduleDTO): void {
-    this.form.reset({
-      startTime: schedule.startTime,
-      endTime: schedule.endTime,
-      dayOfWeek: schedule.dayOfWeek,
-    });
-    this.editingId.set(schedule.id);
-    this.formMode.set('edit');
-  }
+ protected openEdit(schedule: ResponseScheduleDTO): void {
+  this.form.reset({
+    startTime: normalizeTime(schedule.startTime),
+    endTime: normalizeTime(schedule.endTime),
+    dayOfWeek: schedule.dayOfWeek,
+  });
+  this.editingId.set(schedule.id);
+  this.formMode.set('edit');
+}
 
   protected closeForm(): void {
     this.formMode.set(null);
@@ -188,37 +206,37 @@ export class Schedules implements OnInit {
   }
 
   private _submitCreate(): void {
-    const { startTime, endTime, dayOfWeek } = this.form.getRawValue();
+  const { startTime, endTime, dayOfWeek } = this.form.getRawValue();
 
-    this.scheduleService
-      .create({
-        startTime: startTime!,
-        endTime: endTime!,
-        dayOfWeek: dayOfWeek!,
-        courtId: this.courtId,
-      })
-      .subscribe({
-        next: () => this.closeForm(),
-        error: (err: unknown) => {
-          console.error('Erro ao criar horário', err);
-        },
-      });
-  }
+  this.scheduleService
+    .create({
+      startTime: normalizeTime(startTime),
+      endTime: normalizeTime(endTime),
+      dayOfWeek: dayOfWeek!,
+      courtId: this.courtId,
+    })
+    .subscribe({
+      next: () => this.closeForm(),
+      error: (err: unknown) => {
+        console.error('Erro ao criar horário', err);
+      },
+    });
+}
 
-  private _submitUpdate(): void {
-    const id = this.editingId();
-    if (id === null) return;
+private _submitUpdate(): void {
+  const id = this.editingId();
+  if (id === null) return;
 
-    const { startTime, endTime, dayOfWeek } = this.form.getRawValue();
+  const { startTime, endTime, dayOfWeek } = this.form.getRawValue();
 
-    this.scheduleService
-      .update(id, {
-        startTime: startTime!,
-        endTime: endTime!,
-        dayOfWeek: dayOfWeek!,
-      })
-      .subscribe({ next: () => this.closeForm() });
-  }
+  this.scheduleService
+    .update(id, {
+      startTime: normalizeTime(startTime),
+      endTime: normalizeTime(endTime),
+      dayOfWeek: dayOfWeek!,
+    })
+    .subscribe({ next: () => this.closeForm() });
+}
 
   // --- Delete ---
 
@@ -237,6 +255,9 @@ export class Schedules implements OnInit {
   }
 
   // --- Helpers ---
+  protected formatTime(value: string): string {
+    return normalizeTime(value);
+  }
 
   protected getDayName(value: DayOfWeek): string {
     return this.dayOfWeekOptions.find((d) => d.value === value)?.label ?? 'Desconhecido';

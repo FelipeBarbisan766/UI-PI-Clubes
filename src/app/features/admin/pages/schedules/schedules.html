@@ -121,7 +121,7 @@
                       class="flex items-center gap-1 rounded-xl border border-base-200 bg-base-100 pl-3 pr-1 py-1 hover:border-primary/40 hover:shadow-sm transition-colors"
                     >
                       <span class="text-sm font-semibold text-base-content">
-                        {{ schedule.startTime }} – {{ schedule.endTime }}
+                        {{ formatTime(schedule.startTime) }} – {{ formatTime(schedule.endTime) }}
                       </span>
                       <button
                         class="btn btn-ghost btn-xs btn-square text-base-content/60 hover:text-primary"
@@ -232,11 +232,26 @@
             >
             <input
               id="bulkStartTime"
-              type="time"
+              type="text"
+              inputmode="numeric"
               formControlName="startTime"
+              mask="Hh:m0"
+              [dropSpecialCharacters]="false"
+              placeholder="08:00"
               class="input input-bordered input-sm w-full"
               [class.input-error]="bulkFieldInvalid('startTime')"
+              [attr.aria-invalid]="bulkFieldInvalid('startTime')"
+              [attr.aria-describedby]="bulkFieldInvalid('startTime') ? 'bulkStartTime-error' : null"
             />
+            @if (bulkFieldInvalid('startTime')) {
+              <span
+                id="bulkStartTime-error"
+                role="alert"
+                class="block text-error text-[11px] mt-1 font-medium px-1"
+              >
+                Use o formato 24h (ex: 14:30)
+              </span>
+            }
           </div>
 
           <div class="flex flex-col w-full">
@@ -245,11 +260,26 @@
             >
             <input
               id="bulkEndTime"
-              type="time"
+              type="text"
+              inputmode="numeric"
               formControlName="endTime"
+              mask="Hh:m0"
+              [dropSpecialCharacters]="false"
+              placeholder="18:00"
               class="input input-bordered input-sm w-full"
               [class.input-error]="bulkFieldInvalid('endTime')"
+              [attr.aria-invalid]="bulkFieldInvalid('endTime')"
+              [attr.aria-describedby]="bulkFieldInvalid('endTime') ? 'bulkEndTime-error' : null"
             />
+            @if (bulkFieldInvalid('endTime')) {
+              <span
+                id="bulkEndTime-error"
+                role="alert"
+                class="block text-error text-[11px] mt-1 font-medium px-1"
+              >
+                Use o formato 24h (ex: 18:00)
+              </span>
+            }
           </div>
 
           <div class="flex flex-col w-full">
@@ -337,15 +367,29 @@
             >
             <input
               id="startTime"
-              type="time"
+              type="text"
+              inputmode="numeric"
               formControlName="startTime"
+              mask="Hh:m0"
+              [dropSpecialCharacters]="false"
+              placeholder="08:00"
               class="input input-bordered input-sm w-full"
               [class.input-error]="fieldInvalid('startTime')"
+              [attr.aria-invalid]="fieldInvalid('startTime')"
+              [attr.aria-describedby]="fieldInvalid('startTime') ? 'startTime-error' : null"
             />
             @if (fieldInvalid('startTime')) {
-              <span role="alert" class="block text-error text-[11px] mt-1 font-medium px-1"
-                >Obrigatório</span
+              <span
+                id="startTime-error"
+                role="alert"
+                class="block text-error text-[11px] mt-1 font-medium px-1"
               >
+                @if (form.controls.startTime.hasError('required')) {
+                  Obrigatório
+                } @else {
+                  Use o formato 24h (ex: 14:30)
+                }
+              </span>
             }
           </div>
 
@@ -355,15 +399,29 @@
             >
             <input
               id="endTime"
-              type="time"
+              type="text"
+              inputmode="numeric"
               formControlName="endTime"
+              mask="Hh:m0"
+              [dropSpecialCharacters]="false"
+              placeholder="18:00"
               class="input input-bordered input-sm w-full"
               [class.input-error]="fieldInvalid('endTime')"
+              [attr.aria-invalid]="fieldInvalid('endTime')"
+              [attr.aria-describedby]="fieldInvalid('endTime') ? 'endTime-error' : null"
             />
             @if (fieldInvalid('endTime')) {
-              <span role="alert" class="block text-error text-[11px] mt-1 font-medium px-1"
-                >Obrigatório</span
+              <span
+                id="endTime-error"
+                role="alert"
+                class="block text-error text-[11px] mt-1 font-medium px-1"
               >
+                @if (form.controls.endTime.hasError('required')) {
+                  Obrigatório
+                } @else {
+                  Use o formato 24h (ex: 18:00)
+                }
+              </span>
             }
           </div>
 

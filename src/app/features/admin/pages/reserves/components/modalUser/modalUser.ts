@@ -55,7 +55,7 @@ export class ModalUserComponent implements OnInit {
       .pipe(
         switchMap((id) => {
           this.loading.set(true);
-          return this.userService.getById(id);
+          return this.userService.getByUserId(id);
         }),
         finalize(() => this.loading.set(false)),
         catchError(() => {
