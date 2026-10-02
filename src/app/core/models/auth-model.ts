@@ -16,7 +16,6 @@ export interface MeResponse {
   phoneNumber?: string;
   hasPassword: boolean;
   avatarUrl?: string;
-  hasPassword?: boolean;
 }
 
 export interface AdminMeResponse {
