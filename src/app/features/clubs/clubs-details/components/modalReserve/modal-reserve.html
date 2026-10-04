@@ -1,0 +1,268 @@
+<dialog
+  #dialog
+  class="modal"
+  aria-labelledby="reserve-modal-title"
+  (cancel)="onDialogCancel($event)"
+  (close)="onDialogClosed()"
+>
+  <!-- Tamanho fixo: não muda ao selecionar horário ou confirmar -->
+  <div class="modal-box rounded-3xl w-11/12 max-w-5xl h-[44rem] max-h-[90vh] p-0 flex flex-col overflow-hidden">
+    <!-- Cabeçalho -->
+    <header class="flex items-start justify-between gap-4 px-6 pt-6 pb-4 border-b border-base-200 shrink-0">
+      <div class="min-w-0">
+        <h3 id="reserve-modal-title" class="font-bold text-xl text-base-content truncate">
+          Horários — {{ court().name }}
+        </h3>
+        <p class="text-sm text-base-content/60 truncate">{{ club().name }}</p>
+      </div>
+      <button
+        type="button"
+        class="btn btn-sm btn-circle btn-ghost shrink-0"
+        (click)="requestClose()"
+        [disabled]="isConfirming()"
+        aria-label="Fechar janela"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="size-5"
+          aria-hidden="true"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </header>
+
+    <!-- Corpo: no mobile rola inteiro; no desktop cada coluna rola sozinha -->
+    <div class="flex-1 min-h-0 overflow-y-auto lg:overflow-hidden px-6 py-5">
+      <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:h-full">
+        <!-- Datas e horários -->
+        <section
+          aria-label="Escolha de data e horário"
+          class="min-w-0 lg:min-h-0 lg:overflow-y-auto lg:pr-1"
+        >
+          <div
+            class="flex gap-2 overflow-x-auto pb-2 snap-x"
+            role="group"
+            aria-label="Selecione uma data"
+          >
+            @for (date of availableDates; track date) {
+              <button
+                type="button"
+                class="btn btn-sm rounded-full shrink-0 snap-start"
+                [class.btn-primary]="selectedDate() === date"
+                [class.text-white]="selectedDate() === date"
+                [class.btn-ghost]="selectedDate() !== date"
+                (click)="selectDate(date)"
+                [disabled]="isConfirming()"
+                [attr.aria-pressed]="selectedDate() === date"
+                [attr.aria-label]="'Ver horários de ' + formatDate(date)"
+              >
+                {{ formatDate(date) }}
+              </button>
+            }
+          </div>
+
+          @if (slotsLoading()) {
+            <div class="mt-4 flex justify-center py-8" aria-live="polite" aria-busy="true">
+              <span
+                class="loading loading-spinner loading-md text-primary"
+                aria-hidden="true"
+              ></span>
+            </div>
+          } @else if (slotsError()) {
+            <div
+              role="alert"
+              aria-live="assertive"
+              class="mt-4 alert alert-soft alert-error rounded-2xl text-sm"
+            >
+              <p>{{ slotsError() }}</p>
+            </div>
+          } @else if (slotsForDate().length) {
+            <div
+              class="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-4"
+              role="group"
+              aria-label="Horários"
+            >
+              @for (slot of slotsForDate(); track slot.id) {
+                <button
+                  type="button"
+                  class="rounded-xl px-3 py-2 text-center text-sm font-medium transition-colors border"
+                  [class]="slotClass(slot)"
+                  [disabled]="!slot.available || isConfirming() || bookingSuccess()"
+                  (click)="selectSlot(slot)"
+                  [attr.aria-pressed]="selectedSlotId() === slot.id"
+                  [attr.aria-label]="
+                    slot.startTime +
+                    ' - ' +
+                    slot.endTime +
+                    (slot.available ? ' disponível' : ' indisponível')
+                  "
+                >
+                  {{ slot.startTime }} - {{ slot.endTime }}
+                  <div class="text-[10px] uppercase tracking-wider mt-0.5 opacity-80 font-normal">
+                    {{
+                      selectedSlotId() === slot.id
+                        ? 'selecionado'
+                        : slot.available
+                          ? 'disponível'
+                          : 'indisponível'
+                    }}
+                  </div>
+                </button>
+              }
+            </div>
+          } @else {
+            <div
+              class="mt-4 p-8 text-center rounded-2xl border border-dashed border-base-200 text-base-content/50 text-sm"
+            >
+              Nenhum horário disponível para esta data.
+            </div>
+          }
+        </section>
+
+        <!-- Dados da reserva: sempre visível, preenche ao selecionar um horário -->
+        <aside
+          class="rounded-2xl border border-base-200 bg-base-100 p-5 flex flex-col lg:min-h-0 lg:overflow-y-auto"
+          aria-label="Dados da reserva"
+          aria-live="polite"
+        >
+          @if (bookingSuccess()) {
+            <div class="flex flex-1 flex-col items-center justify-center gap-4 py-4 text-center">
+              <div class="flex items-center justify-center size-16 rounded-full bg-success/10">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="size-8 text-success"
+                  aria-hidden="true"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                </svg>
+              </div>
+              <div>
+                <h4 class="text-lg font-bold text-base-content">Reserva confirmada!</h4>
+                <p class="mt-1 text-sm text-base-content/60">
+                  Sua quadra foi reservada com sucesso.
+                </p>
+              </div>
+              <button
+                type="button"
+                class="btn btn-primary text-white rounded-full w-full"
+                (click)="requestClose()"
+              >
+                Fechar
+              </button>
+            </div>
+          } @else {
+            @let slot = selectedSlot();
+
+            <h4 class="font-bold text-base-content mb-4">Resumo da reserva</h4>
+
+            <div class="space-y-3 text-sm text-base-content/80">
+              <p class="flex justify-between gap-4">
+                <span class="font-medium text-base-content/60">Clube</span>
+                <span class="font-semibold text-right">{{ club().name }}</span>
+              </p>
+              <p class="flex justify-between gap-4">
+                <span class="font-medium text-base-content/60">Quadra</span>
+                <span class="font-semibold text-right">{{ court().name }}</span>
+              </p>
+              <p class="flex justify-between items-center gap-4">
+                <span class="font-medium text-base-content/60">Data</span>
+                @if (slot) {
+                  <span class="font-semibold text-right">{{ formatDate(slot.date) }}</span>
+                } @else {
+                  <span class="skeleton h-4 w-24" aria-hidden="true"></span>
+                }
+              </p>
+              <p class="flex justify-between items-center gap-4">
+                <span class="font-medium text-base-content/60">Horário</span>
+                @if (slot) {
+                  <span class="font-semibold text-right"
+                    >{{ slot.startTime }} — {{ slot.endTime }}</span
+                  >
+                } @else {
+                  <span class="skeleton h-4 w-28" aria-hidden="true"></span>
+                }
+              </p>
+
+              <div class="divider my-2"></div>
+
+              <p class="flex justify-between items-center">
+                <span class="font-medium text-base-content/60">Total</span>
+                @if (slot) {
+                  <span class="text-2xl font-bold text-primary">{{
+                    formatPrice(court().pricePerHour)
+                  }}</span>
+                } @else {
+                  <span class="skeleton h-7 w-24" aria-hidden="true"></span>
+                }
+              </p>
+            </div>
+
+            @if (!slot) {
+              <p class="mt-4 text-xs text-base-content/50">
+                Selecione um horário para ver os dados da reserva.
+              </p>
+            }
+
+            @if (selectedSlotTaken()) {
+              <div
+                role="alert"
+                aria-live="assertive"
+                class="mt-4 alert alert-soft alert-warning rounded-2xl text-sm"
+              >
+                <span>Este horário acabou de ser reservado. Escolha outro horário.</span>
+              </div>
+            }
+
+            @if (bookingError()) {
+              <div
+                role="alert"
+                aria-live="assertive"
+                class="mt-4 alert alert-soft alert-error rounded-2xl text-sm"
+              >
+                <span>{{ bookingError() }}</span>
+              </div>
+            }
+
+            <div class="mt-auto pt-6 flex gap-3">
+              <button
+                type="button"
+                class="btn btn-ghost rounded-lg flex-1"
+                (click)="requestClose()"
+                [disabled]="isConfirming()"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary text-white rounded-lg flex-1"
+                (click)="confirmBooking()"
+                [disabled]="!canConfirm()"
+                [attr.aria-busy]="isConfirming()"
+              >
+                @if (isConfirming()) {
+                  <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+                  Confirmando...
+                } @else {
+                  Confirmar
+                }
+              </button>
+            </div>
+          }
+        </aside>
+      </div>
+    </div>
+  </div>
+
+  <form method="dialog" class="modal-backdrop">
+    <button [disabled]="isConfirming()" aria-label="Fechar janela">Fechar</button>
+  </form>
+</dialog>
