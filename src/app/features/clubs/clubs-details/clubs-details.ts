@@ -22,6 +22,7 @@ import { SportDTO } from '../../../core/models/model-sport';
 import { ImageCarousel } from '../../../shared/components/image-carousel/image-carousel';
 import { AuthRequiredModalService } from '../../../shared/components/auth-required-modal/auth-required-modal-service';
 import { ModalReserve } from './components/modalReserve/modal-reserve';
+import { Footer } from '../../../shared/footer/footer';
 
 
 const SURFACE_LABELS: Record<SurfaceEnum, string> = {
@@ -74,7 +75,7 @@ function starFillPercent(rating: number | undefined | null, starIndex: number): 
 
 @Component({
   selector: 'app-clubs-detail',
-  imports: [RouterLink, ImageCarousel, ModalReserve, ModalReserve],
+  imports: [RouterLink, ImageCarousel, ModalReserve, ModalReserve, Footer],
   templateUrl: './clubs-details.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
