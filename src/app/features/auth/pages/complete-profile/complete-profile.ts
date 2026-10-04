@@ -33,6 +33,8 @@ export class CompleteProfile {
   });
 
   onSubmit(): void {
+    if (this.isSubmitting()) return;
+
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -59,9 +61,9 @@ export class CompleteProfile {
         error: (error: unknown) => this.errorMessage.set(this.extractErrorMessage(error)),
       });
   }
-  
+
   dismiss(): void {
-    this.router.navigateByUrl('/clubs')
+    this.router.navigateByUrl('/clubs');
   }
 
   private extractErrorMessage(error: unknown): string {

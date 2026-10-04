@@ -122,22 +122,22 @@
         </div>
 
         <div class="mt-2 pt-2 flex justify-between">
-            <button class="btn btn-ghost" (click)="dismiss()">Depois</button>
-            <button
+          <button type="button" class="btn btn-ghost" (click)="dismiss()">Depois</button>
+          <button
             type="submit"
             class="btn btn-primary rounded-lg font-semibold text-white shadow-lg hover:shadow-primary/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             [disabled]="form.invalid || isSubmitting()"
             [attr.aria-busy]="isSubmitting()"
           >
             @if (isSubmitting()) {
-                <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
-                <span class="sr-only">Carregando...</span>
+              <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+              <span class="sr-only">Carregando...</span>
             } @else {
-                Concluir cadastro
+              Concluir cadastro
             }
-        </button>
+          </button>
+        </div>
+      </form>
     </div>
-</form>
-</div>
   </div>
 </div>
