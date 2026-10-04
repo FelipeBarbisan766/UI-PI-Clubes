@@ -1,0 +1,72 @@
+<h3 id="modal-title" class="font-bold text-xl text-base-content mb-1 text-center">
+  Ações da reserva
+</h3>
+<p class="text-base-content/60 text-center mb-5">
+  {{ reservation().name }} · {{ reservation().court }}
+</p>
+
+<div class="flex flex-col gap-3">
+  @if (reservation().status === StatusEnum.Confirmada) {
+    <button
+      type="button"
+      class="flex items-start gap-3 p-4 rounded-box border border-base-300 text-left cursor-pointer hover:bg-base-200 focus-visible:outline-2 focus-visible:outline-offset-2"
+      (click)="cancelReserve.emit()"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-5 w-5 mt-0.5 shrink-0 text-error"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M18 6 6 18M6 6l12 12" />
+      </svg>
+      <span class="flex flex-col">
+        <span class="font-medium">Cancelar reserva</span>
+        <span class="text-sm text-base-content/60">Libera o horário da quadra.</span>
+      </span>
+    </button>
+  }
+
+  <button
+    type="button"
+    class="flex items-start gap-3 p-4 rounded-box border border-base-300 text-left cursor-pointer enabled:hover:bg-base-200 focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+    [disabled]="isReported()"
+    (click)="reportUser.emit()"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="h-5 w-5 mt-0.5 shrink-0 text-warning"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
+      <line x1="4" x2="4" y1="22" y2="15" />
+    </svg>
+    <span class="flex flex-col">
+      <span class="font-medium">Reportar usuário</span>
+      <span class="text-sm text-base-content/60">
+        @if (isReported()) {
+          Este usuário já foi reportado nesta reserva.
+        } @else {
+          Registra uma ocorrência no histórico do jogador.
+        }
+      </span>
+    </span>
+  </button>
+</div>
+
+<div class="modal-action mt-6">
+  <button type="button" class="btn btn-primary shadow-lg rounded-lg flex-1" (click)="close.emit()">
+    Fechar
+  </button>
+</div>

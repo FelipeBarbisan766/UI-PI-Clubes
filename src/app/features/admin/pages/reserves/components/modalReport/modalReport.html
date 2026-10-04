@@ -1,0 +1,94 @@
+<h3 id="modal-title" class="font-bold text-xl text-base-content mb-1 text-center">
+  Reportar usuário
+</h3>
+@if (userName()) {
+  <p class="text-base-content/60 text-center mb-4">{{ userName() }}</p>
+}
+
+@if (success()) {
+  <div role="status" class="alert alert-success">
+    <span>Usuário reportado com sucesso.</span>
+  </div>
+
+  <div class="modal-action mt-6">
+    <button type="button" class="btn btn-ghost shadow-lg rounded-lg flex-1" (click)="close.emit()">
+      Fechar
+    </button>
+  </div>
+} @else if (loadingFlags()) {
+  <div class="space-y-3" aria-busy="true" aria-label="Carregando motivos">
+    @for (_ of [1, 2, 3, 4]; track $index) {
+      <div class="skeleton h-16 w-full"></div>
+    }
+  </div>
+} @else if (loadError()) {
+  <div role="alert" class="alert alert-error">
+    <span>{{ loadError() }}</span>
+  </div>
+
+  <div class="modal-action mt-6">
+    <button type="button" class="btn btn-ghost shadow-lg rounded-lg flex-1" (click)="close.emit()">
+      Fechar
+    </button>
+  </div>
+} @else {
+  <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-4">
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Motivo do report</legend>
+
+      <div class="flex flex-col gap-2 max-h-72 overflow-y-auto pr-1">
+        @for (flag of flags(); track flag.id) {
+          <label
+            class="flex items-start gap-3 p-3 rounded-box border border-base-300 cursor-pointer hover:bg-base-200 has-checked:border-primary has-checked:bg-base-200 has-focus-visible:outline-2 has-focus-visible:outline-offset-2"
+          >
+            <input type="radio" class="radio mt-1" formControlName="flagId" [value]="flag.id" />
+            <span class="flex flex-col">
+              <span class="font-medium">{{ flag.name }}</span>
+              <span class="text-sm text-base-content/60">{{ flag.description }}</span>
+            </span>
+          </label>
+        }
+      </div>
+
+      @if (form.controls.flagId.touched && form.controls.flagId.hasError('required')) {
+        <p class="text-error text-sm mt-1" role="alert">Selecione um motivo.</p>
+      }
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <legend class="fieldset-legend">Observações (opcional)</legend>
+      <textarea
+        class="textarea w-full"
+        rows="3"
+        maxlength="500"
+        formControlName="notes"
+        placeholder="Descreva o que aconteceu…"
+        aria-label="Observações sobre o report"
+      ></textarea>
+      <p class="label">{{ form.controls.notes.value.length }}/500</p>
+    </fieldset>
+
+    @if (submitError()) {
+      <div role="alert" class="alert alert-error">
+        <span>{{ submitError() }}</span>
+      </div>
+    }
+
+    <div class="modal-action mt-2 flex gap-3">
+      <button type="submit" class="btn btn-primary shadow-lg rounded-lg flex-1" [disabled]="submitting()">
+        @if (submitting()) {
+          <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+        }
+        Reportar
+      </button>
+      <button
+        type="button"
+        class="btn btn-ghost shadow-lg rounded-lg flex-1"
+        [disabled]="submitting()"
+        (click)="close.emit()"
+      >
+        Cancelar
+      </button>
+    </div>
+  </form>
+}

@@ -1,44 +1,68 @@
 <h3 id="modal-title" class="font-bold text-xl text-base-content mb-4 text-center">
-          Informações do jogador
-        </h3>
+  Informações do jogador
+</h3>
 
-        <div class="flex justify-center mb-5">
-        <div class="avatar avatar-placeholder">
-          <div class="w-28 h-28 rounded-full bg-neutral text-neutral-content ring ring-base-300 ring-offset-2 ring-offset-base-100 overflow-hidden relative">
-            
-             @if (displayAvatarUrl(); as avatarUrl) {
-              <img
-                [ngSrc]="avatarUrl"
-                fill
-                [alt]="(user()?.name ?? '') + ' Avatar atual'"
-                class="object-cover"
-              />
-            } @else {
-              <span class="text-2xl font-semibold flex items-center justify-center w-full h-full">
-                {{ initials() }}
-              </span>
-            }
-          </div>
-        </div>
-      </div>
-        <div class="flex flex-col gap-2">
-          <p class="text-base-content/60 text-center">
-            Nome: {{ user()?.name }}
-          </p>
-          <p class="text-base-content/60 text-center">
-            Email: {{ user()?.email }}
-          </p>
-          <p class="text-base-content/60 text-center">
-            Telefone: {{ user()?.phoneNumber ?? 'Não informado' }}
-          </p>
+<div class="flex justify-center mb-5">
+  <div class="avatar avatar-placeholder">
+    <div class="w-28 h-28 rounded-full bg-neutral text-neutral-content ring ring-base-300 ring-offset-2 ring-offset-base-100 overflow-hidden relative">
+      @if (displayAvatarUrl(); as avatarUrl) {
+        <img
+          [ngSrc]="avatarUrl"
+          fill
+          [alt]="(user()?.name ?? '') + ' Avatar atual'"
+          class="object-cover"
+        />
+      } @else {
+        <span class="text-2xl font-semibold flex items-center justify-center w-full h-full">
+          {{ initials() }}
+        </span>
+      }
+    </div>
+  </div>
+</div>
 
-        <div class="modal-action mt-6 flex gap-3">
-         
-          <button
-            class="btn btn-ghost shadow-lg rounded-lg flex-1"
-            (click)="close.emit()"
-            aria-label="Cancelar reserva"
-          >
-            Fechar
-          </button>
+<div class="flex flex-col gap-2">
+  <p class="text-base-content/60 text-center">Nome: {{ user()?.name }}</p>
+  <p class="text-base-content/60 text-center">Email: {{ user()?.email }}</p>
+  <p class="text-base-content/60 text-center">Telefone: {{ user()?.phoneNumber ?? 'Não informado' }}</p>
+</div>
+
+<div class="divider">Reports</div>
+
+@if (flagsLoading()) {
+  <div class="space-y-2" aria-busy="true" aria-label="Carregando reports">
+    <div class="skeleton h-12 w-full"></div>
+    <div class="skeleton h-12 w-full"></div>
+  </div>
+} @else if (flagsError()) {
+  <div role="alert" class="alert alert-error">
+    <span>{{ flagsError() }}</span>
+  </div>
+} @else {
+  <ul class="flex flex-col gap-2 max-h-48 overflow-y-auto" aria-label="Reports do jogador">
+    @for (f of flags(); track f.id) {
+      <li class="p-3 rounded-box border border-base-300">
+        <div class="flex items-center justify-between gap-2">
+          <span class="badge badge-outline badge-warning">{{ f.flagName }}</span>
+          <span class="text-xs text-base-content/60">{{ f.createdAt | date: 'dd/MM/yyyy' }}</span>
         </div>
+        @if (f.notes) {
+          <p class="text-sm text-base-content/60 mt-2">{{ f.notes }}</p>
+        }
+      </li>
+    } @empty {
+      <li class="text-center text-base-content/50 py-2">Nenhum report para este jogador.</li>
+    }
+  </ul>
+}
+
+<div class="modal-action mt-6 flex gap-3">
+  <button
+    type="button"
+    class="btn btn-ghost shadow-lg rounded-lg flex-1"
+    (click)="close.emit()"
+    aria-label="Fechar"
+  >
+    Fechar
+  </button>
+</div>

@@ -150,42 +150,48 @@
 
                 <!-- Status badge -->
                 <td>
-                  <span
-                    class="badge badge-outline"
-                    [class]="statusConfig[r.status].badgeClass"
-                    aria-label="Status: {{ statusConfig[r.status].label }}"
-                  >
-                    {{ statusConfig[r.status].label }}
-                  </span>
+                  @if (isReported(r.id)) {
+                    <span class="badge badge-outline badge-warning" aria-label="Status: Reportado">
+                      Reportado
+                    </span>
+                  } @else {
+                    <span
+                      class="badge badge-outline"
+                      [class]="statusConfig[r.status].badgeClass"
+                      aria-label="Status: {{ statusConfig[r.status].label }}"
+                    >
+                      {{ statusConfig[r.status].label }}
+                    </span>
+                  }
                 </td>
 
                 <!-- Actions -->
                 <td>
-                  <div class="flex items-center justify-end gap-1">
-                    @if (r.status === StatusEnum.Confirmada) {
-                      <!-- Cancel -->
-                      <button
-                        type="button"
-                        class="btn btn-ghost btn-sm btn-square text-error"
-                        (click)="openAlertModal(r.id)"
-                        [attr.aria-label]="'Cancelar reserva de ' + r.name"
-                        title="Cancelar"
+                  <div class="flex items-center justify-end">
+                    <button
+                      type="button"
+                      class="btn btn-ghost btn-sm btn-square"
+                      (click)="openActionsModal(r)"
+                      aria-haspopup="dialog"
+                      [attr.aria-label]="'Abrir ações da reserva de ' + r.name"
+                      title="Ações"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-4 w-4"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          class="h-4 w-4"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2.5"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          aria-hidden="true"
-                        >
-                          <path d="M18 6 6 18M6 6l12 12" />
-                        </svg>
-                      </button>
-                    }
+                        <circle cx="12" cy="5" r="1" />
+                        <circle cx="12" cy="12" r="1" />
+                        <circle cx="12" cy="19" r="1" />
+                      </svg>
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -273,15 +279,28 @@
   >
     <div class="modal-box rounded-3xl max-w-md">
       @if (selectedUserId()) {
-        <app-modal-user
-          [userId]="selectedUserId()!"
-          (close)="closeModal()"
-        ></app-modal-user>
+        <app-modal-user [userId]="selectedUserId()!" (close)="closeModal()"></app-modal-user>
       } @else if (selectedReservationId()) {
         <app-modal-alert
           [reservationId]="selectedReservationId()!"
           (close)="closeModal()"
         ></app-modal-alert>
+      } @else if (selectedReport(); as report) {
+        <app-modal-report
+          [userId]="report.userId"
+          [reserveId]="report.reserveId"
+          [userName]="report.userName"
+          (reported)="onReported(report.reserveId)"
+          (close)="closeModal()"
+        ></app-modal-report>
+      } @else if (selectedActions(); as reservation) {
+        <app-modal-actions
+          [reservation]="reservation"
+          [isReported]="selectedActionsReported()"
+          (cancelReserve)="openAlertModal(reservation.id)"
+          (reportUser)="openReportModal(reservation)"
+          (close)="closeModal()"
+        ></app-modal-actions>
       }
     </div>
   </dialog>
