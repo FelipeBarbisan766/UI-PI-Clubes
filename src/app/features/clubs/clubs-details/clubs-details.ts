@@ -12,7 +12,7 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { NgOptimizedImage, NgClass, ViewportScroller } from '@angular/common';
+import { NgOptimizedImage, NgClass, ViewportScroller,Location } from '@angular/common';
 import { EMPTY, catchError, distinctUntilChanged, finalize, map, switchMap } from 'rxjs';
 import { SurfaceEnum, ResponseCourtDTO } from '../models/model-court';
 import { ResponseClubByIdDTO } from '../models/model-club';
@@ -138,6 +138,8 @@ export class ClubsDetail {
   private readonly viewportScroller = inject(ViewportScroller);
   private readonly courtAvailabilitySignalR = inject(ServiceCourtAvailabilitySignalR);
   private readonly authRequiredModal = inject(AuthRequiredModalService);
+private readonly location = inject(Location);
+
 
   readonly starIndexes = [0, 1, 2, 3, 4] as const;
 
@@ -309,7 +311,12 @@ export class ClubsDetail {
   });
 
   // ── Ações ────────────────────────────────────────────────────────────────
-
+goBack(event: Event): void {
+  if ((window.history.state?.navigationId ?? 0) > 1) {
+    event.preventDefault();
+    this.location.back();
+  }
+}
   loadClub(id?: string): void {
     const clubId = id ?? this.routeClubId();
     if (!clubId) return;

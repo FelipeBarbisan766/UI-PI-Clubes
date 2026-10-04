@@ -30,7 +30,8 @@
       <div class="relative flex flex-col gap-4 pb-4 border-b border-base-200">
         
         <a
-          [routerLink]="['/clubs']"
+            [routerLink]="['/clubs']"
+  (click)="goBack($event)"
           class="inline-flex items-center gap-1.5 text-sm text-base-content/60 hover:text-base-content transition-colors w-fit"
           aria-label="Voltar para lista de clubes"
         >

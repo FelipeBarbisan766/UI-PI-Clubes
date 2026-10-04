@@ -43,42 +43,31 @@
         Destino / Cidade
       </label>
 
-      @if (detectedCity()) {
-        <div
-          class="flex items-center gap-1 mb-2 text-xs text-success bg-success/10 border border-success/30 rounded px-2 py-1"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="size-3 shrink-0"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="2"
-            stroke="currentColor"
-            aria-hidden="true"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-            />
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"
-            />
-          </svg>
-          <span class="truncate">Localização detectada</span>
-          <button
-            class="ml-auto shrink-0 text-success/70 hover:text-error transition-colors"
-            (click)="clearDetectedCity.emit()"
-            type="button"
-            aria-label="Remover filtro de localização"
-          >
-            ✕
-          </button>
-        </div>
-      }
-
+     @if (suggestedCity(); as city) {
+  <div
+    role="status"
+    class="flex items-center gap-2 mb-2 rounded-md border border-primary/30 bg-primary/10 px-2 py-1.5 text-xs"
+  >
+    <span class="min-w-0 flex-1 truncate">
+      Ver clubes em <strong>{{ city }}</strong>?
+    </span>
+    <button
+      type="button"
+      class="btn btn-xs btn-primary text-white"
+      (click)="acceptSuggestedCity.emit()"
+    >
+      Ver
+    </button>
+    <button
+      type="button"
+      class="btn btn-xs btn-ghost btn-square"
+      aria-label="Dispensar sugestão"
+      (click)="dismissSuggestedCity.emit()"
+    >
+      ✕
+    </button>
+  </div>
+}
       <input
         id="city-input"
         type="text"

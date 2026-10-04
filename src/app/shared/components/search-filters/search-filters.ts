@@ -16,7 +16,10 @@ export class SearchFilters implements OnInit {
   readonly cityFilter = input<string>('');
   readonly detectedCity = input<string | null>(null);
   readonly selectedSportIds = input<readonly string[]>([]);
+readonly suggestedCity = input<string | null>(null);
 
+readonly acceptSuggestedCity = output<void>();
+readonly dismissSuggestedCity = output<void>();
   readonly searchTermChange = output<string>();
   readonly cityFilterChange = output<string>();
   readonly clearDetectedCity = output<void>();

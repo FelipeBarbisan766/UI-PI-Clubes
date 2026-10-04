@@ -7,56 +7,67 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { Router } from '@angular/router';
-import { debounceTime, skip, switchMap, take } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { NgClass } from '@angular/common';
+import { catchError, EMPTY, map, of, switchMap, tap, timer } from 'rxjs';
 import { ServiceCourt } from '../services/service-court';
 import { CourtQueryDTO, ResponseCourtDTO } from '../models/model-court';
-import { ImageCarousel } from "../../../shared/components/image-carousel/image-carousel";
-import { SearchFilters } from "../../../shared/components/search-filters/search-filters";
+import { ImageCarousel } from '../../../shared/components/image-carousel/image-carousel';
+import { SearchFilters } from '../../../shared/components/search-filters/search-filters';
+import { ServiceGeolocation } from '../../../core/services/service-geolocation';
 
 const PAGE_SIZE = 10;
 
+function parsePage(value: string | null): number {
+  const page = Number(value);
+  return Number.isInteger(page) && page >= 1 ? page : 1;
+}
+
 @Component({
   selector: 'app-courts-list',
-  imports: [ImageCarousel, SearchFilters],
+  imports: [ImageCarousel, SearchFilters, NgClass],
   templateUrl: './courts-list.html',
   styleUrl: './courts-list.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CourtsList {
   private readonly courtService = inject(ServiceCourt);
-  private readonly router      = inject(Router);
-  private readonly destroyRef  = inject(DestroyRef);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly geo = inject(ServiceGeolocation);
+  private readonly urlParams = this.route.snapshot.queryParamMap;
 
-  readonly courts       = this.courtService.courts;
-  readonly loading     = this.courtService.loading;
-  readonly error       = this.courtService.error;
-  readonly isEmpty     = this.courtService.isEmpty;
-  readonly courtsCount  = this.courtService.courtsCount;
-  readonly totalPages  = this.courtService.totalPages;
+  readonly courts = this.courtService.courts;
+  readonly loading = this.courtService.loading;
+  readonly error = this.courtService.error;
+  readonly isEmpty = this.courtService.isEmpty;
+  readonly courtsCount = this.courtService.courtsCount;
+  readonly totalPages = this.courtService.totalPages;
 
-  readonly searchTerm      = signal('');
-  readonly cityFilter      = signal('');
-  readonly selectedSportIds = signal<string[]>([]);
-  readonly currentPage     = signal(1);
+  readonly searchTerm = signal(this.urlParams.get('name') ?? '');
+  readonly cityFilter = signal(this.urlParams.get('city') ?? '');
+  readonly selectedSportIds = signal<string[]>(this.urlParams.getAll('sports'));
+  readonly currentPage = signal(parsePage(this.urlParams.get('page')));
 
-  // Indica se a localização foi detectada automaticamente (para mostrar badge)
-  readonly detectedCity  = signal<string | null>(null);
+  readonly detectedCity = signal<string | null>(null);
+  readonly suggestedCity = signal<string | null>(null);
+  readonly isMobileFilterOpen = signal(false);
 
   private readonly query = computed<CourtQueryDTO>(() => ({
-    name:     this.searchTerm() || undefined,
-    city:     this.cityFilter() || undefined,
+    name: this.searchTerm() || undefined,
+    city: this.cityFilter() || undefined,
     sportIds: this.selectedSportIds().length > 0 ? this.selectedSportIds() : undefined,
-    page:     this.currentPage(),
+    page: this.currentPage(),
     pageSize: PAGE_SIZE,
   }));
 
   readonly visiblePages = computed<(number | '...')[]>(() => {
-    const total   = this.totalPages();
+    const total = this.totalPages();
     const current = this.currentPage();
     if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
     const around = new Set(
-      [1, total, current - 1, current, current + 1].filter(p => p >= 1 && p <= total),
+      [1, total, current - 1, current, current + 1].filter((p) => p >= 1 && p <= total),
     );
     const sorted = [...around].sort((a, b) => a - b);
     const result: (number | '...')[] = [];
@@ -68,62 +79,51 @@ export class CourtsList {
   });
 
   constructor() {
-  // Recargas reativas (debounced)
-  toObservable(this.query)
-    .pipe(
-      skip(1),
-      debounceTime(400),
-      switchMap(query => this.courtService.getAll(query)),
-      takeUntilDestroyed(this.destroyRef),
-    )
-    .subscribe();
+    toObservable(this.query)
+      .pipe(
+        switchMap((query, index) => (index === 0 ? of(query) : timer(400).pipe(map(() => query)))),
+        tap((query) => this.syncUrl(query)),
+        switchMap((query) => this.courtService.getAll(query).pipe(catchError(() => EMPTY))),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe();
 
-  this.courtService
-    .getAll(this.query())
-    .pipe(take(1), takeUntilDestroyed(this.destroyRef))
-    .subscribe();
+    void this.loadCitySuggestion();
+  }
 
-  this.resolveInitialCity().then(city => {
-    if (!city) return; // permissão negada/timeout → não faz nada
-    this.cityFilter.set(city);
-    this.detectedCity.set(city);
-  });
-}
+  /** Só sugere. Nunca altera filtros nem dispara GET. */
+  private async loadCitySuggestion(): Promise<void> {
+    if (this.cityFilter()) return;
+    if ((await this.geo.getPermissionState()) === 'denied') return;
 
-  private resolveInitialCity(): Promise<string | null> {
-    return new Promise(resolve => {
-      if (!navigator?.geolocation) return resolve(null);
+    const city = await this.geo.resolveCity();
+    if (city && !this.cityFilter()) this.suggestedCity.set(city);
+  }
 
-      const timer = setTimeout(() => resolve(null), 4000);
-
-      navigator.geolocation.getCurrentPosition(
-        async ({ coords }) => {
-          clearTimeout(timer);
-          try {
-            const city = await this.reverseGeocode(coords.latitude, coords.longitude);
-            resolve(city);
-          } catch {
-            resolve(null);
-          }
-        },
-        () => { clearTimeout(timer); resolve(null); },
-        { timeout: 4000, maximumAge: 5 * 60 * 1000 }, // cache de 5 min
-      );
+  private syncUrl(query: CourtQueryDTO): void {
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        name: query.name ?? null,
+        city: query.city ?? null,
+        sports: query.sportIds ?? null,
+        page: query.page && query.page > 1 ? query.page : null,
+      },
+      replaceUrl: true,
     });
   }
 
-  private async reverseGeocode(lat: number, lng: number): Promise<string | null> {
-    const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`;
-    const res  = await fetch(url, {
-      headers: { 'Accept-Language': 'pt-BR', 'User-Agent': 'SeuAppNome/1.0' },
-    });
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data.address?.city
-        ?? data.address?.town
-        ?? data.address?.municipality
-        ?? data.address?.village
-        ?? null;
+  acceptSuggestedCity(): void {
+    const city = this.suggestedCity();
+    if (!city) return;
+    this.cityFilter.set(city);
+    this.detectedCity.set(city);
+    this.suggestedCity.set(null);
+    this.currentPage.set(1);
+  }
+
+  dismissSuggestedCity(): void {
+    this.suggestedCity.set(null);
   }
 
   clearDetectedCity(): void {
@@ -142,13 +142,14 @@ export class CourtsList {
   onCityChange(value: string): void {
     this.cityFilter.set(value);
     this.detectedCity.set(null);
+    this.suggestedCity.set(null);
     this.currentPage.set(1);
   }
 
   toggleSport(id: string): void {
     const current = this.selectedSportIds();
     this.selectedSportIds.set(
-      current.includes(id) ? current.filter(s => s !== id) : [...current, id],
+      current.includes(id) ? current.filter((s) => s !== id) : [...current, id],
     );
     this.currentPage.set(1);
   }
@@ -160,13 +161,12 @@ export class CourtsList {
 
   goToPage(page: number | '...'): void {
     if (typeof page !== 'number') return;
-    const total = this.totalPages();
-    if (page < 1 || page > total) return;
+    if (page < 1 || page > this.totalPages()) return;
     this.currentPage.set(page);
   }
 
   selectCourt(court: ResponseCourtDTO): void {
-    this.router.navigate(['clubs', court.clubId, 'court', court.id]);
+    void this.router.navigate(['clubs', court.clubId, 'court', court.id]);
   }
 
   formatPrice(price: number): string {

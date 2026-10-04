@@ -307,6 +307,6 @@ export class UserConfig implements OnInit, OnDestroy {
 
   isPlayer(): boolean {
     const role = this.authService.me()?.role?.trim().toLowerCase();
-    return role === 'player';
+    return role === 'player' || role === 'admin';
   }
 }
