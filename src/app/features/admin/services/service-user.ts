@@ -25,7 +25,7 @@ export class UserService {
     this._error.set(null);
 
     return this.http
-      .get<User>(`${this.baseUrl}/user/${id}`, { withCredentials: true })
+      .get<User>(`${this.baseUrl}/${id}`, { withCredentials: true })
       .pipe(
         tap(user => this._user.set(user)),
         catchError(err => this.handleError('Não foi possível carregar o perfil.', err)),
