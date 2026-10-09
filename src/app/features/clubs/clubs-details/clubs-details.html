@@ -28,10 +28,9 @@
   @if (club() && !loading()) {
     <div class="container mx-auto max-w-7xl px-4 mt-6 space-y-8">
       <div class="relative flex flex-col gap-4 pb-4 border-b border-base-200">
-        
         <a
-            [routerLink]="['/clubs']"
-  (click)="goBack($event)"
+          [routerLink]="['/clubs']"
+          (click)="goBack($event)"
           class="inline-flex items-center gap-1.5 text-sm text-base-content/60 hover:text-base-content transition-colors w-fit"
           aria-label="Voltar para lista de clubes"
         >
@@ -124,8 +123,7 @@
               [priority]="true"
             />
           </div>
-        }
-        @else {
+        } @else {
           <div
             class="lg:col-span-3 w-full min-h-[250px] lg:min-h-0 lg:h-full rounded-2xl overflow-hidden relative shadow-sm border border-base-200 flex items-center justify-center bg-base-200 text-base-content/50"
           >
@@ -140,69 +138,70 @@
           <h2 class="font-semibold text-base-content mb-1">Sobre</h2>
           <p class="text-sm text-base-content/70 leading-relaxed">{{ club()!.description }}</p>
 
-         <div class="absolute top-2 right-3 flex flex-col items-center group">
-          <button
-            type="button"
-            class="relative flex items-center gap-1.5 rounded-full bg-base-100 border border-base-300 px-3 py-1.5 shadow-sm hover:border-primary/40 transition-colors overflow-hidden disabled:cursor-wait"
-            (click)="openRateFlow()"
-            [disabled]="isCheckingReview()"
-            [attr.aria-label]="
-              'Avaliação média ' +
-              (club()!.averageRating || 0).toFixed(1) +
-              ' de 5, ' +
-              club()!.totalReviews +
-              ' avaliações. Clique para avaliar.'
-            "
-          >
-            <span class="flex items-center gap-0.5" aria-hidden="true">
-              @for (i of starIndexes; track i) {
-                <span class="relative inline-block size-4 shrink-0">
-                  <svg
-                    class="absolute inset-0 size-4 text-base-300"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      d="M10 1.5l2.6 5.27 5.82.85-4.21 4.1.99 5.79L10 14.9l-5.2 2.61.99-5.79-4.21-4.1 5.82-.85L10 1.5z"
-                    />
-                  </svg>
-                  <span
-                    class="absolute inset-0 overflow-hidden"
-                    [style.width.%]="starFillPercent(club()!.averageRating, i)"
-                  >
-                    <svg class="size-4 text-warning" viewBox="0 0 20 20" fill="currentColor">
+          <div class="absolute top-2 right-3 flex flex-col items-center group">
+            <button
+              type="button"
+              class="relative flex items-center gap-1.5 rounded-full bg-base-100 border border-base-300 px-3 py-1.5 shadow-sm hover:border-primary/40 transition-colors overflow-hidden disabled:cursor-wait"
+              (click)="openRateFlow()"
+              [disabled]="isCheckingReview()"
+              [attr.aria-label]="
+                'Avaliação média ' +
+                (club()!.averageRating || 0).toFixed(1) +
+                ' de 5, ' +
+                club()!.totalReviews +
+                ' avaliações. Clique para avaliar.'
+              "
+            >
+              <span class="flex items-center gap-0.5" aria-hidden="true">
+                @for (i of starIndexes; track i) {
+                  <span class="relative inline-block size-4 shrink-0">
+                    <svg
+                      class="absolute inset-0 size-4 text-base-300"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
                       <path
                         d="M10 1.5l2.6 5.27 5.82.85-4.21 4.1.99 5.79L10 14.9l-5.2 2.61.99-5.79-4.21-4.1 5.82-.85L10 1.5z"
                       />
                     </svg>
+                    <span
+                      class="absolute inset-0 overflow-hidden"
+                      [style.width.%]="starFillPercent(club()!.averageRating, i)"
+                    >
+                      <svg class="size-4 text-warning" viewBox="0 0 20 20" fill="currentColor">
+                        <path
+                          d="M10 1.5l2.6 5.27 5.82.85-4.21 4.1.99 5.79L10 14.9l-5.2 2.61.99-5.79-4.21-4.1 5.82-.85L10 1.5z"
+                        />
+                      </svg>
+                    </span>
                   </span>
-                </span>
-              }
-            </span>
+                }
+              </span>
 
-            <span class="text-sm font-semibold text-base-content/70">
-              {{ (club()!.averageRating || 0).toFixed(1) }}
-            </span>
+              <span class="text-sm font-semibold text-base-content/70">
+                {{ (club()!.averageRating || 0).toFixed(1) }}
+              </span>
 
-            <!-- overlay que aparece no hover -->
-            <span
-              class="absolute inset-0 flex items-center justify-center gap-1.5 bg-primary text-primary-content text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity"
-              aria-hidden="true"
-            >
-              @if (isCheckingReview()) {
-                <span class="loading loading-spinner loading-xs"></span>
-              } @else {
-                Avalie
-              }
-            </span>
-          </button>
+              <!-- overlay que aparece no hover -->
+              <span
+                class="absolute inset-0 flex items-center justify-center gap-1.5 bg-primary text-primary-content text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity"
+                aria-hidden="true"
+              >
+                @if (isCheckingReview()) {
+                  <span class="loading loading-spinner loading-xs"></span>
+                } @else {
+                  Avalie
+                }
+              </span>
+            </button>
 
-          @if (club()!.totalReviews) {
-            <p class="mt-1 text-[11px] text-base-content/40">
-              {{ club()!.totalReviews }} avaliaç{{ club()!.totalReviews === 1 ? 'ão' : 'ões' }}
-            </p>
-          }
-        </div> <div class="divider  my-3"></div>
+            @if (club()!.totalReviews) {
+              <p class="mt-1 text-[11px] text-base-content/40">
+                {{ club()!.totalReviews }} avaliaç{{ club()!.totalReviews === 1 ? 'ão' : 'ões' }}
+              </p>
+            }
+          </div>
+          <div class="divider my-3"></div>
 
           <div class="flex justify-between items-start gap-4">
             <div>
@@ -300,7 +299,6 @@
       <app-modal-reserve [club]="club()!" [court]="court" (closed)="closeScheduleModal()" />
     }
   }
-
 </div>
 <!-- Modal de avaliação -->
 <dialog
@@ -315,94 +313,154 @@
     <h3 id="rating-modal-title" class="font-bold text-xl text-base-content mb-2">
       Avaliar {{ club()?.name }}
     </h3>
-    <p class="text-sm text-base-content/60 mb-6">
-      Toque nas estrelas para escolher sua nota, de 0 a 5.
-    </p>
 
-    <div
-      class="flex justify-center gap-1 mb-3"
-      role="radiogroup"
-      aria-label="Nota de 0 a 5 estrelas"
-    >
-      @for (i of starIndexes; track i) {
-        <span class="relative inline-block size-9">
-          <svg
-            class="absolute inset-0 size-9 text-base-300"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            aria-hidden="true"
-          >
-            <path
-              d="M10 1.5l2.6 5.27 5.82.85-4.21 4.1.99 5.79L10 14.9l-5.2 2.61.99-5.79-4.21-4.1 5.82-.85L10 1.5z"
-            />
-          </svg>
-          <span
-            class="absolute inset-0 overflow-hidden"
-            [style.width.%]="starFillPercent(selectedRatingValue(), i)"
-            aria-hidden="true"
-          >
-            <svg class="size-9 text-warning" viewBox="0 0 20 20" fill="currentColor">
+    @if (showCurrentReview()) {
+      <!-- Já avaliou: mostra a avaliação atual e pergunta se quer reavaliar -->
+      <p class="text-sm text-base-content/60 mb-6">
+        Você já avaliou este clube. Deseja avaliar novamente?
+      </p>
+
+      <div
+        class="flex justify-center gap-1 mb-3"
+        role="img"
+        [attr.aria-label]="'Sua avaliação atual: ' + myRating() + ' de 5 estrelas'"
+      >
+        @for (i of starIndexes; track i) {
+          <span class="relative inline-block size-9">
+            <svg
+              class="absolute inset-0 size-9 text-base-300"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              aria-hidden="true"
+            >
               <path
                 d="M10 1.5l2.6 5.27 5.82.85-4.21 4.1.99 5.79L10 14.9l-5.2 2.61.99-5.79-4.21-4.1 5.82-.85L10 1.5z"
               />
             </svg>
+            <span
+              class="absolute inset-0 overflow-hidden"
+              [style.width.%]="starFillPercent(myRating(), i)"
+              aria-hidden="true"
+            >
+              <svg class="size-9 text-warning" viewBox="0 0 20 20" fill="currentColor">
+                <path
+                  d="M10 1.5l2.6 5.27 5.82.85-4.21 4.1.99 5.79L10 14.9l-5.2 2.61.99-5.79-4.21-4.1 5.82-.85L10 1.5z"
+                />
+              </svg>
+            </span>
           </span>
-          <button
-            type="button"
-            class="absolute inset-y-0 left-0 w-1/2"
-            (click)="setRatingValue(i + 0.5)"
-            [attr.aria-label]="'Avaliar com ' + (i + 0.5) + ' estrelas'"
-          ></button>
-          <button
-            type="button"
-            class="absolute inset-y-0 right-0 w-1/2"
-            (click)="setRatingValue(i + 1)"
-            [attr.aria-label]="'Avaliar com ' + (i + 1) + ' estrelas'"
-          ></button>
-        </span>
-      }
-    </div>
-
-    <p class="text-2xl font-bold text-primary mb-6">{{ selectedRatingValue().toFixed(1) }}</p>
-
-    @if (reviewError()) {
-      <div
-        role="alert"
-        aria-live="assertive"
-        class="alert alert-soft alert-error rounded-2xl text-sm mb-4 text-left"
-      >
-        <span>{{ reviewError() }}</span>
-      </div>
-    }
-
-    <div class="flex gap-3">
-      <button
-        type="button"
-        class="btn btn-ghost rounded-lg flex-1"
-        (click)="closeRatingModal()"
-        [disabled]="isSubmittingReview()"
-      >
-        Cancelar
-      </button>
-      <button
-        type="button"
-        class="btn btn-primary text-white rounded-lg flex-1"
-        (click)="submitReview()"
-        [disabled]="selectedRatingValue() <= 0 || isSubmittingReview()"
-        [attr.aria-busy]="isSubmittingReview()"
-      >
-        @if (isSubmittingReview()) {
-          <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
-          Enviando...
-        } @else {
-          Enviar avaliação
         }
-      </button>
-    </div>
+      </div>
 
-    <p class="text-xs text-base-content/40 mt-4">
-      Esta avaliação é única — depois de enviada, não pode ser desfeita ou alterada.
-    </p>
+      <p class="text-sm text-base-content/60">Sua avaliação atual</p>
+      <p class="text-2xl font-bold text-primary mb-6">{{ (myRating() ?? 0).toFixed(1) }}</p>
+
+      <div class="flex gap-3">
+        <button type="button" class="btn btn-ghost rounded-lg flex-1" (click)="closeRatingModal()">
+          Manter
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary text-white rounded-lg flex-1"
+          (click)="startReevaluation()"
+        >
+          Avaliar novamente
+        </button>
+      </div>
+    } @else {
+      <p class="text-sm text-base-content/60 mb-6">
+        Toque nas estrelas para escolher sua nota, de 0 a 5.
+      </p>
+
+      <div
+        class="flex justify-center gap-1 mb-3"
+        role="radiogroup"
+        aria-label="Nota de 0 a 5 estrelas"
+      >
+        @for (i of starIndexes; track i) {
+          <span class="relative inline-block size-9">
+            <svg
+              class="absolute inset-0 size-9 text-base-300"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                d="M10 1.5l2.6 5.27 5.82.85-4.21 4.1.99 5.79L10 14.9l-5.2 2.61.99-5.79-4.21-4.1 5.82-.85L10 1.5z"
+              />
+            </svg>
+            <span
+              class="absolute inset-0 overflow-hidden"
+              [style.width.%]="starFillPercent(selectedRatingValue(), i)"
+              aria-hidden="true"
+            >
+              <svg class="size-9 text-warning" viewBox="0 0 20 20" fill="currentColor">
+                <path
+                  d="M10 1.5l2.6 5.27 5.82.85-4.21 4.1.99 5.79L10 14.9l-5.2 2.61.99-5.79-4.21-4.1 5.82-.85L10 1.5z"
+                />
+              </svg>
+            </span>
+            <button
+              type="button"
+              class="absolute inset-y-0 left-0 w-1/2"
+              (click)="setRatingValue(i + 0.5)"
+              [attr.aria-label]="'Avaliar com ' + (i + 0.5) + ' estrelas'"
+            ></button>
+            <button
+              type="button"
+              class="absolute inset-y-0 right-0 w-1/2"
+              (click)="setRatingValue(i + 1)"
+              [attr.aria-label]="'Avaliar com ' + (i + 1) + ' estrelas'"
+            ></button>
+          </span>
+        }
+      </div>
+
+      <p class="text-2xl font-bold text-primary mb-6">{{ selectedRatingValue().toFixed(1) }}</p>
+
+      @if (reviewError()) {
+        <div
+          role="alert"
+          aria-live="assertive"
+          class="alert alert-soft alert-error rounded-2xl text-sm mb-4 text-left"
+        >
+          <span>{{ reviewError() }}</span>
+        </div>
+      }
+
+      <div class="flex gap-3">
+        <button
+          type="button"
+          class="btn btn-ghost rounded-lg flex-1"
+          (click)="closeRatingModal()"
+          [disabled]="isSubmittingReview()"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary text-white rounded-lg flex-1 disabled:bg-base-300 disabled:text-base-content/50"
+          (click)="submitReview()"
+          [disabled]="!canSubmitReview()"
+          [attr.aria-busy]="isSubmittingReview()"
+        >
+          @if (isSubmittingReview()) {
+            <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+            Enviando...
+          } @else {
+            {{ hasReviewed() ? 'Atualizar avaliação' : 'Enviar avaliação' }}
+          }
+        </button>
+      </div>
+
+      <p class="text-xs text-base-content/40 mt-4">
+        @if (hasReviewed()) {
+          Sua avaliação anterior será substituída por esta.
+        } @else {
+          Você poderá alterar sua avaliação depois.
+        }
+      </p>
+    }
   </div>
 
   <form method="dialog" class="modal-backdrop">
@@ -416,7 +474,6 @@
   </form>
 </dialog>
 
-<!-- Modal de bloqueio — TEMPORÁRIO, trocar pelo componente compartilhado quando ele existir -->
 <dialog
   id="rating-blocked-modal"
   class="modal"

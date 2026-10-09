@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject, signal, computed } from '@angular/core';
-import { Observable, tap, catchError, throwError } from 'rxjs';
+import { Observable, tap, catchError, throwError, map } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import {
   ClubQueryDTO,
@@ -78,16 +78,28 @@ export class ServiceClub {
       catchError((err) => this.handleError(err)),
     );
   }
-  hasReviewed(clubId: string): Observable<boolean> {
+  getMyRating(clubId: string): Observable<number | null> {
     return this.http
-      .get<boolean>(`${this.apiUrl}/${clubId}/reviews/verify`, { withCredentials: true })
-      .pipe(catchError((err) => this.handleError(err)));
+      .get<number | null>(`${this.apiUrl}/${clubId}/reviews/verify`, { withCredentials: true })
+      .pipe(
+        map((rating) => (rating == null || rating <= 0 ? null : rating)),
+        catchError((err) => this.handleError(err)),
+      );
   }
 
   rate(clubId: string, rating: number): Observable<ResponseClubReviewSummaryDTO> {
     const dto: CreateClubReviewDTO = { rating };
     return this.http
       .post<ResponseClubReviewSummaryDTO>(`${this.apiUrl}/${clubId}/reviews`, dto, {
+        withCredentials: true,
+      })
+      .pipe(catchError((err) => this.handleError(err)));
+  }
+
+  updateRating(clubId: string, rating: number): Observable<ResponseClubReviewSummaryDTO> {
+    const dto: CreateClubReviewDTO = { rating };
+    return this.http
+      .put<ResponseClubReviewSummaryDTO>(`${this.apiUrl}/${clubId}/reviews`, dto, {
         withCredentials: true,
       })
       .pipe(catchError((err) => this.handleError(err)));

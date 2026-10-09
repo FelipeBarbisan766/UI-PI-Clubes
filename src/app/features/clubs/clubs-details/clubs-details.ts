@@ -24,7 +24,6 @@ import { AuthRequiredModalService } from '../../../shared/components/auth-requir
 import { ModalReserve } from './components/modalReserve/modal-reserve';
 import { Footer } from '../../../shared/footer/footer';
 
-
 const SURFACE_LABELS: Record<SurfaceEnum, string> = {
   [SurfaceEnum.None]: 'Outro',
   [SurfaceEnum.Saibro]: 'Saibro',
@@ -75,7 +74,7 @@ function starFillPercent(rating: number | undefined | null, starIndex: number): 
 
 @Component({
   selector: 'app-clubs-detail',
-  imports: [RouterLink, ImageCarousel, ModalReserve, ModalReserve, Footer],
+  imports: [RouterLink, ImageCarousel, ModalReserve, Footer],
   templateUrl: './clubs-details.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -126,7 +125,17 @@ export class ClubsDetail {
   readonly ratingModalOpen = signal(false);
   readonly blockedModalOpen = signal(false);
   readonly blockedModalMessage = signal('');
+  readonly myRating = signal<number | null>(null);
+  readonly reevaluating = signal(false);
 
+  readonly hasReviewed = computed(() => this.myRating() !== null);
+  readonly showCurrentReview = computed(() => this.hasReviewed() && !this.reevaluating());
+  readonly canSubmitReview = computed(
+    () =>
+      this.selectedRatingValue() > 0 &&
+      this.selectedRatingValue() !== this.myRating() &&
+      !this.isSubmittingReview(),
+  );
   /** Modalidades únicas de todas as quadras do clube (usado na sidebar). */
   readonly courtSports = computed<SportDTO[]>(() => {
     const courts = this.club()?.courts ?? [];
@@ -246,32 +255,31 @@ export class ClubsDetail {
     this.isCheckingReview.set(true);
 
     this.clubService
-      .hasReviewed(clubId)
+      .getMyRating(clubId)
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => this.isCheckingReview.set(false)),
       )
       .subscribe({
-        next: (alreadyReviewed) => {
-          if (alreadyReviewed) {
-            this.openBlockedModal(
-              'Você já avaliou este clube. Cada jogador pode avaliar apenas uma vez.',
-            );
-            return;
-          }
-          this.openRatingModal();
-        },
+        next: (current) => this.openRatingModal(current),
         error: () => {
           this.openBlockedModal('Não foi possível verificar sua avaliação agora. Tente novamente.');
         },
       });
   }
 
-  openRatingModal(): void {
-    this.selectedRatingValue.set(0);
-    this.reviewError.set(null);
-    this.ratingModalOpen.set(true);
-  }
+  openRatingModal(current: number | null = null): void {
+  this.myRating.set(current);
+  this.selectedRatingValue.set(current ?? 0);
+  this.reevaluating.set(false);
+  this.reviewError.set(null);
+  this.ratingModalOpen.set(true);
+}
+
+startReevaluation(): void {
+  this.selectedRatingValue.set(0);
+  this.reevaluating.set(true);
+}
 
   closeRatingModal(): void {
     if (this.isSubmittingReview()) return;
@@ -283,27 +291,32 @@ export class ClubsDetail {
   }
 
   submitReview(): void {
-    const clubId = this.routeClubId();
-    const rating = this.selectedRatingValue();
-    if (!clubId || rating <= 0 || this.isSubmittingReview()) return;
+  const clubId = this.routeClubId();
+  const rating = this.selectedRatingValue();
+  if (!clubId || rating <= 0 || this.isSubmittingReview()) return;
 
-    this.isSubmittingReview.set(true);
-    this.reviewError.set(null);
+  this.isSubmittingReview.set(true);
+  this.reviewError.set(null);
 
-    this.clubService
-      .rate(clubId, rating)
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        finalize(() => this.isSubmittingReview.set(false)),
-      )
-      .subscribe({
-        next: (summary) => {
-          this.clubService.applyReviewSummary(summary);
-          this.ratingModalOpen.set(false);
-        },
-        error: (err: Error) => this.reviewError.set(err.message),
-      });
-  }
+  const request$ = this.hasReviewed()
+    ? this.clubService.updateRating(clubId, rating)  // PUT
+    : this.clubService.rate(clubId, rating);         // POST
+
+  request$
+    .pipe(
+      takeUntilDestroyed(this.destroyRef),
+      finalize(() => this.isSubmittingReview.set(false)),
+    )
+    .subscribe({
+      next: (summary) => {
+        this.clubService.applyReviewSummary(summary);
+        this.myRating.set(rating);
+        this.reevaluating.set(false);
+        this.ratingModalOpen.set(false);
+      },
+      error: (err: Error) => this.reviewError.set(err.message),
+    });
+}
 
   private openBlockedModal(message: string): void {
     this.blockedModalMessage.set(message);
