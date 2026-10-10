@@ -14,6 +14,7 @@ import { AuthService } from '../../../core/services/auth-service';
 import { debounceTime, distinctUntilChanged, filter, merge, switchMap } from 'rxjs';
 import { computed } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { ToastAlert } from '../../../shared/components/toast-alert/toast-alert';
 
 interface StatusConfig {
   label: string;
@@ -25,13 +26,15 @@ const STATUS_CONFIG: Record<StatusEnum, StatusConfig> = {
   [StatusEnum.Cancelada]: { label: 'Cancelada', badgeClass: 'badge-error' },
 };
 
+type ToastType = 'success' | 'error' | 'warning' | 'info';
+
 const PAGE_SIZE_OPTIONS = [5, 10, 20, 50] as const;
 
 @Component({
   selector: 'app-reserve',
   templateUrl: './user-reserves.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, ToastAlert],
 })
 export class UserReserve implements OnInit {
   private readonly reserveService = inject(UserReserveService);
@@ -45,15 +48,17 @@ export class UserReserve implements OnInit {
   protected readonly statusConfig = STATUS_CONFIG;
   protected readonly StatusEnum = StatusEnum;
   protected readonly pageSizeOptions = PAGE_SIZE_OPTIONS;
-
+  protected readonly isCancelling = this.reserveService.isCancelling;
   // ── Filtros / paginação ───────────────────────────────────────────────────
   protected readonly searchControl = new FormControl('', { nonNullable: true });
   protected readonly filterControl = new FormControl<'all' | StatusEnum>('all', {
     nonNullable: true,
   });
 
+  protected readonly toast = signal<{ message: string; type: ToastType } | null>(null);
+  private readonly refresh = signal(0);
   readonly ModalOpen = signal(false);
-  readonly selectedReservationId = signal<string | null>(null); 
+  readonly selectedReservationId = signal<string | null>(null);
   private readonly playerId = signal<string | null>(null);
   protected readonly page = signal(1);
   protected readonly pageSize = signal<number>(PAGE_SIZE_OPTIONS[0]);
@@ -68,14 +73,15 @@ export class UserReserve implements OnInit {
 
   protected readonly reservations = this.reserveService.reservations;
 
+private readonly queryState = computed(() => ({
+  playerId: this.playerId(),
+  page: this.page(),
+  pageSize: this.pageSize(),
+  name: this.search$(),
+  status: this.filterStatus$(),
+  refresh: this.refresh(), 
+}));
 
-  private readonly queryState = computed(() => ({
-    playerId: this.playerId(),
-    page: this.page(),
-    pageSize: this.pageSize(),
-    name: this.search$(),
-    status: this.filterStatus$(),
-  }));
 
   private readonly queryState$ = toObservable(this.queryState);
 
@@ -122,9 +128,25 @@ export class UserReserve implements OnInit {
   }
 
   protected cancel(id: string): void {
-    this.reserveService.cancel(id);
-    this.closeModal();
-  }
+  this.reserveService
+    .cancel(id)
+    .pipe(takeUntilDestroyed(this.destroyRef))
+    .subscribe({
+      next: () => {
+        this.closeModal();
+        this.toast.set({ message: 'Reserva cancelada com sucesso.', type: 'success' });
+      },
+      error: (err: Error) => {
+        this.closeModal();
+        this.toast.set({ message: err.message, type: 'error' });
+        this.refresh.update((n) => n + 1); // atualiza canCancel na lista
+      },
+    });
+}
+
+protected dismissToast(): void {
+  this.toast.set(null);
+}
 
   protected nextPage(): void {
     if (this.page() < this.totalPages()) {

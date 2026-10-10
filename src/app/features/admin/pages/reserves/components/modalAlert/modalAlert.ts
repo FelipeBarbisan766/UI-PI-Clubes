@@ -21,16 +21,26 @@ import { ReserveService } from '../../../../services/service-reserve';
 export class ModalAlertComponent {
   reservationId = input.required<string>();
   close = output<void>();
+  cancelled = output<void>();
+  failed = output<string>();
 
   loading = signal(false);
-  error = signal<string | null>(null);
-
   private reserveService = inject(ReserveService);
 
   protected cancel(id: string): void {
-    this.reserveService.cancel(id);
-    this.close.emit();
+    this.loading.set(true);
+    this.reserveService
+      .cancel(id)
+      .pipe(finalize(() => this.loading.set(false)))
+      .subscribe({
+        next: () => {
+          this.cancelled.emit();
+          this.close.emit();
+        },
+        error: (err: Error) => {
+          this.failed.emit(err.message);
+          this.close.emit();
+        },
+      });
   }
- 
-
 }

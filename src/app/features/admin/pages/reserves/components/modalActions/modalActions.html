@@ -6,10 +6,12 @@
 </p>
 
 <div class="flex flex-col gap-3">
+  <!-- @if (reservation().status === StatusEnum.Confirmada && reservation().canCancel) { -->
   @if (reservation().status === StatusEnum.Confirmada) {
     <button
       type="button"
-      class="flex items-start gap-3 p-4 rounded-box border border-base-300 text-left cursor-pointer hover:bg-base-200 focus-visible:outline-2 focus-visible:outline-offset-2"
+      class="flex items-start gap-3 p-4 rounded-box border border-base-300 text-left cursor-pointer enabled:hover:bg-base-200 focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+      [disabled]="!reservation().canCancel"
       (click)="cancelReserve.emit()"
     >
       <svg
@@ -27,7 +29,13 @@
       </svg>
       <span class="flex flex-col">
         <span class="font-medium">Cancelar reserva</span>
-        <span class="text-sm text-base-content/60">Libera o horário da quadra.</span>
+        <span class="text-sm text-base-content/60">
+          @if (reservation().canCancel) {
+            Libera o horário da quadra.
+          } @else {
+            Prazo de cancelamento encerrado.
+          }
+        </span>
       </span>
     </button>
   }

@@ -4,9 +4,12 @@ export interface ApiReservation {
   id: string;
   date: string;
   status: string;
+  canCancel: boolean;   // novo
   club: Club;
   schedule: Schedule;
 }
+
+
 
 export interface Club {
   name: string;
@@ -38,6 +41,7 @@ export interface Reservation {
   date: string;
   time: string;
   status: StatusEnum;
+  canCancel: boolean;  
   pricePerHour: number;
 }
 
