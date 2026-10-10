@@ -1,5 +1,8 @@
 <!-- reservations.component.html -->
 <section class="space-y-6" aria-labelledby="reservations-title">
+  @if (toast(); as t) {
+    <app-toast-alert [message]="t.message" [type]="t.type" (dismiss)="dismissToast()" />
+  }
   <!-- ── Header ── -->
   <header class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
     <div>
@@ -283,6 +286,8 @@
       } @else if (selectedReservationId()) {
         <app-modal-alert
           [reservationId]="selectedReservationId()!"
+          (cancelled)="onCancelled()"
+          (failed)="onCancelFailed($event)"
           (close)="closeModal()"
         ></app-modal-alert>
       } @else if (selectedReport(); as report) {

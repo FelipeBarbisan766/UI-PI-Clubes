@@ -7,6 +7,7 @@ export interface ResponseReserveDetailDTO {
   name: string;
   phoneNumber: string;
   userId: string;
+  canCancel: boolean;   
   dateOfReservation: string;
   schedule: ApiSchedule;
 }
@@ -42,6 +43,7 @@ export interface Reservation {
   date: string; // "YYYY-MM-DD"
   time: string; // "HH:mm – HH:mm"
   status: StatusEnum;
+  canCancel: boolean;   
   pricePerHour: number;
 }
 

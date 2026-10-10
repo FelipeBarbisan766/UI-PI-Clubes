@@ -1,6 +1,6 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { catchError, EMPTY, finalize, Observable, tap } from 'rxjs';
+import { catchError, EMPTY, finalize, Observable, tap, throwError } from 'rxjs';
 
 import {
   ApiReservation,
@@ -10,6 +10,7 @@ import {
   StatusEnum,
 } from '../models/model-reserve';
 import { environment } from '../../../../environments/environment';
+import { getApiErrorMessage } from '../../../core/utils/api-error';
 
 @Injectable({ providedIn: 'root' })
 export class UserReserveService {
@@ -22,7 +23,9 @@ export class UserReserveService {
   private readonly _totalPages = signal(1);
   private readonly _isLoading = signal(false);
   private readonly _error = signal<string | null>(null);
+  private readonly _isCancelling = signal(false);
 
+  readonly isCancelling = this._isCancelling.asReadonly();
   readonly reservations = this._reservations.asReadonly();
   readonly totalCount = this._totalCount.asReadonly();
   readonly totalPages = this._totalPages.asReadonly();
@@ -62,24 +65,28 @@ export class UserReserveService {
       );
   }
 
-  cancel(id: string): void {
-    this._isLoading.set(true);
-    this._error.set(null);
+  cancel(id: string): Observable<void> {
+    this._isCancelling.set(true);
 
-    this.http
-      .put(`${this.apiUrl}/reserve/status/${id}?status=Cancelada`, null, {
+    return this.http
+      .put<void>(`${this.apiUrl}/reserve/status/${id}?status=Cancelada`, null, {
         withCredentials: true,
       })
       .pipe(
-        catchError((err) => this.handleError(err)),
-        finalize(() => this._isLoading.set(false)),
-      )
-      .subscribe(() => {
-        const updatedReservations = this._reservations().map((r) =>
-          r.id === id ? { ...r, status: StatusEnum.Cancelada } : r,
-        );
-        this._reservations.set(updatedReservations);
-      });
+        tap(() =>
+          this._reservations.update((list) =>
+            list.map((r) =>
+              r.id === id ? { ...r, status: StatusEnum.Cancelada, canCancel: false } : r,
+            ),
+          ),
+        ),
+        catchError((err) =>
+          throwError(
+            () => new Error(getApiErrorMessage(err, 'Não foi possível cancelar a reserva.')),
+          ),
+        ),
+        finalize(() => this._isCancelling.set(false)),
+      );
   }
 
   private mapReservation(r: ApiReservation): Reservation {
@@ -92,6 +99,7 @@ export class UserReserveService {
       time: `${r.schedule.startTime.slice(0, 5)} – ${r.schedule.endTime.slice(0, 5)}`,
       status: StatusEnum[r.status as keyof typeof StatusEnum],
       pricePerHour: r.schedule.court.pricePerHour,
+      canCancel: r.canCancel,
     };
   }
 

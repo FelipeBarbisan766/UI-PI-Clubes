@@ -19,6 +19,7 @@ import { ModalUserComponent } from './components/modalUser/modalUser';
 import { ModalAlertComponent } from './components/modalAlert/modalAlert';
 import { ModalReportComponent } from './components/modalReport/modalReport';
 import { ModalActionsComponent } from './components/modalActions/modalActions';
+import { ToastAlert } from '../../../../shared/components/toast-alert/toast-alert';
 
 interface StatusConfig {
   label: string;
@@ -48,7 +49,8 @@ const PAGE_SIZE_OPTIONS = [5, 10, 20, 50] as const;
     ModalAlertComponent,
     ModalReportComponent,
     ModalActionsComponent,
-  ],
+    ToastAlert
+],
 })
 export class Reserve implements OnInit {
   private readonly route = inject(ActivatedRoute);
@@ -77,7 +79,8 @@ export class Reserve implements OnInit {
   readonly selectedUserId = signal<string | null>(null);
   readonly selectedReport = signal<ReportTarget | null>(null);
   readonly selectedActions = signal<Reservation | null>(null);
-
+  protected readonly toast = signal<{ message: string; type: 'success' | 'error' } | null>(null);
+  private readonly refresh = signal(0);
   // ── Reservas já reportadas (ids de reserva) ───────────────────────────────
   private readonly reportedReserveIds = signal<ReadonlySet<string>>(new Set());
 
@@ -104,6 +107,7 @@ export class Reserve implements OnInit {
     pageSize: this.pageSize(),
     name: this.search$(),
     status: this.filterStatus$(),
+    refresh: this.refresh(),
   }));
 
   private readonly queryState$ = toObservable(this.queryState);
@@ -227,7 +231,18 @@ export class Reserve implements OnInit {
     this.pageSize.set(size);
     this.page.set(1);
   }
+  protected onCancelled(): void {
+    this.toast.set({ message: 'Reserva cancelada com sucesso.', type: 'success' });
+  }
 
+  protected onCancelFailed(message: string): void {
+    this.toast.set({ message, type: 'error' });
+    this.refresh.update((n) => n + 1);
+  }
+
+  protected dismissToast(): void {
+    this.toast.set(null);
+  }
   // ── Formatters ────────────────────────────────────────────────────────────
   protected formatDate(dateStr: string): string {
     const d = new Date(`${dateStr}T12:00:00`);

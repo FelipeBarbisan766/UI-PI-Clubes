@@ -1,6 +1,6 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { catchError, EMPTY, finalize, Observable, tap } from 'rxjs';
+import { catchError, EMPTY, finalize, Observable, tap, throwError } from 'rxjs';
 
 import {
   ResponseReserveDetailDTO,
@@ -10,6 +10,7 @@ import {
   StatusEnum,
 } from '../models/model-reserve';
 import { environment } from '../../../../environments/environment';
+import { getApiErrorMessage } from '../../../core/utils/api-error';
 
 @Injectable({ providedIn: 'root' })
 export class ReserveService {
@@ -82,24 +83,25 @@ export class ReserveService {
       });
   }
 
-  cancel(id: string): void {
-    this._isLoading.set(true);
-    this._error.set(null);
-
-    this.http
-      .put(`${this.apiUrl}/reserve/status/${id}?status=Cancelada`, null, {
+  cancel(id: string): Observable<void> {
+    return this.http
+      .put<void>(`${this.apiUrl}/reserve/status/${id}?status=Cancelada`, null, {
         withCredentials: true,
       })
       .pipe(
-        catchError((err) => this.handleError(err)),
-        finalize(() => this._isLoading.set(false)),
-      )
-      .subscribe(() => {
-        const updatedReservations = this._reservations().map((r) =>
-          r.id === id ? { ...r, status: StatusEnum.Cancelada } : r,
-        );
-        this._reservations.set(updatedReservations);
-      });
+        tap(() =>
+          this._reservations.update((list) =>
+            list.map((r) =>
+              r.id === id ? { ...r, status: StatusEnum.Cancelada, canCancel: false } : r,
+            ),
+          ),
+        ),
+        catchError((err) =>
+          throwError(
+            () => new Error(getApiErrorMessage(err, 'Não foi possível cancelar a reserva.')),
+          ),
+        ),
+      );
   }
 
   private mapReservation(r: ResponseReserveDetailDTO): Reservation {
@@ -114,6 +116,7 @@ export class ReserveService {
       time: `${r.schedule.startTime.slice(0, 5)} – ${r.schedule.endTime.slice(0, 5)}`,
       status: StatusEnum[r.status as keyof typeof StatusEnum],
       pricePerHour: r.schedule.court.pricePerHour,
+      canCancel: r.canCancel,
     };
   }
 
