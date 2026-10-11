@@ -171,7 +171,7 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 - (verificar se é erro do sistema ou do cliente/navegador/apis de terceiros)
 
 ### Modal
-- ajustar tamanho da label
+- ~~ajustar tamanho da label~~
 
 ### refresh
 - ajustar auto refresh

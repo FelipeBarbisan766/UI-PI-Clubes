@@ -6,9 +6,16 @@ import {
   signal,
   computed,
 } from '@angular/core';
-import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  ReactiveFormsModule,
+  ValidationErrors,
+  Validators,
+} from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { NgxMaskDirective } from 'ngx-mask';
 import { ServiceCourt } from '../../services/service-court';
 import { SurfaceEnum, ResponseCourtDTO } from '../../models/model-court';
 import { ServiceSport } from '../../../../core/services/service-sport';
@@ -20,9 +27,35 @@ import { getApiErrorMessage, isLimitExceededError } from '../../../../core/utils
 type FormMode = 'create' | 'edit' | null;
 type ToastState = { message: string; type: 'success' | 'error' | 'warning' | 'info' };
 
+/**
+ * Converte o valor do input mascarado (ex.: "1234,50", "1234.50" ou "R$ 1.234,50") em número.
+ * Retorna NaN quando o valor é vazio ou inválido.
+ */
+function parsePrice(value: unknown): number {
+  if (typeof value === 'number') return value;
+  if (typeof value !== 'string') return NaN;
+
+  const cleaned = value.replace(/R\$|\s/g, '');
+  if (cleaned === '') return NaN;
+
+  // Com vírgula: formato brasileiro (pontos são separadores de milhar).
+  // Sem vírgula: ponto, se existir, é o separador decimal.
+  const normalized = cleaned.includes(',') ? cleaned.replace(/\./g, '').replace(',', '.') : cleaned;
+
+  return Number(normalized);
+}
+
+function priceValidator(control: AbstractControl): ValidationErrors | null {
+  const raw = control.value;
+  if (raw === null || raw === '') return null; // deixa o `required` cuidar do vazio
+
+  const price = parsePrice(raw);
+  return Number.isNaN(price) || price < 0 ? { price: true } : null;
+}
+
 @Component({
   selector: 'app-court',
-  imports: [ReactiveFormsModule, Modal, RouterLink, ToastAlert],
+  imports: [ReactiveFormsModule, Modal, RouterLink, ToastAlert, NgxMaskDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './courts.html',
 })
@@ -93,11 +126,12 @@ export class Courts implements OnInit {
 
   // --- Form ---
   // clubId foi removido pois agora é preenchido de forma transparente via URL
+  // pricePerHour é string no form (valor do input mascarado) e convertido para number no submit
   protected readonly form = this.fb.group({
     name: ['', [Validators.required, Validators.minLength(3)]],
     surface: [null as SurfaceEnum | null, Validators.required],
     isCovered: [false],
-    pricePerHour: [null as number | null, [Validators.required, Validators.min(0)]],
+    pricePerHour: [null as string | null, [Validators.required, priceValidator]],
     description: ['', Validators.required],
   });
 
@@ -156,7 +190,8 @@ export class Courts implements OnInit {
       name: court.name,
       surface: court.surface,
       isCovered: court.isCovered,
-      pricePerHour: court.pricePerHour,
+      // "1234,50": a máscara aplica o separador de milhar e o prefixo na exibição
+      pricePerHour: Number(court.pricePerHour).toFixed(2).replace('.', ','),
       description: court.description,
     });
     this.selectedFiles.set([]);
@@ -207,6 +242,12 @@ export class Courts implements OnInit {
     }
 
     const { name, surface, isCovered, pricePerHour, description } = this.form.getRawValue();
+    const price = parsePrice(pricePerHour);
+
+    if (Number.isNaN(price)) {
+      this.form.controls.pricePerHour.markAsTouched();
+      return;
+    }
 
     if (this.formMode() === 'create') {
       this.courtService
@@ -215,7 +256,7 @@ export class Courts implements OnInit {
           sportIds: this.selectedSportIds(),
           surface: surface!,
           isCovered: isCovered!,
-          pricePerHour: pricePerHour!,
+          pricePerHour: price,
           description: description!,
           clubId: this.currentClubId,
           images: this.selectedFiles(),
@@ -249,7 +290,7 @@ export class Courts implements OnInit {
           sportIds: this.selectedSportIds(),
           surface: surface!,
           isCovered: isCovered!,
-          pricePerHour: pricePerHour!,
+          pricePerHour: price,
           description: description!,
         })
         .subscribe({
