@@ -177,10 +177,10 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 - ajustar auto refresh
 
 ### report
-- criar um sistema de aviso (se o jogador nao compareceu na reserva)
+- ~~criar um sistema de aviso (se o jogador nao compareceu na reserva)~~
 
 ### horario
-- não mostrar horarios que passou da hora atual (back)
+- ~~não mostrar horarios que passou da hora atual (back)~~
 
 ### cadastro
 - colocar dicas no espaço dos erros

@@ -1,6 +1,4 @@
-<main
-  class="min-h-screen w-full bg-base-200 flex flex-col items-center px-4 py-12 pt-20"
->
+<main class="min-h-screen w-full bg-base-200 flex flex-col items-center px-4 py-12 pt-20">
   <!-- ── Header ─────────────────────────────────────────────────────────── -->
   <header class="text-center mb-12 max-w-2xl">
     <h1 class="text-3xl md:text-4xl font-bold mb-3">Escolha seu plano</h1>
@@ -25,10 +23,25 @@
   <!-- ── Error state ────────────────────────────────────────────────────── -->
   @if (!isLoading() && errorMessage()) {
     <div class="w-full max-w-md">
-      <div class="alert alert-error alert-soft flex-col text-center gap-3 py-8" role="alert" aria-live="assertive">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+      <div
+        class="alert alert-error alert-soft flex-col text-center gap-3 py-8"
+        role="alert"
+        aria-live="assertive"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-8 w-8 shrink-0"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          aria-hidden="true"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+          />
         </svg>
         <span>{{ errorMessage() }}</span>
         <button
@@ -65,12 +78,14 @@
             [class.lg:scale-105]="plan.id === popularPlanId()"
           >
             <div class="card-body gap-5">
-
               <!-- Plan name + badge -->
               <div class="flex items-center justify-between gap-2">
                 <h2 class="text-lg font-bold">{{ plan.name }}</h2>
                 @if (plan.id === popularPlanId()) {
-                  <span class="badge badge-primary badge-sm text-white" aria-label="Plano mais popular">
+                  <span
+                    class="badge badge-primary badge-sm text-white"
+                    aria-label="Plano mais popular"
+                  >
                     Mais popular
                   </span>
                 }
@@ -83,16 +98,33 @@
                 <span class="text-4xl font-bold" [class.text-primary]="plan.id === popularPlanId()">
                   {{ formatPrice(plan.price) }}
                 </span>
-                <span class="text-sm text-base-content/60">{{ formatDuration(plan.durationDays) }}</span>
+                <span class="text-sm text-base-content/60">{{
+                  formatDuration(plan.durationDays)
+                }}</span>
               </div>
 
               <div class="divider my-0"></div>
 
               <!-- Features -->
-              <ul class="flex flex-col gap-3 text-sm text-base-content/80 grow" aria-label="Recursos do plano">
+              <ul
+                class="flex flex-col gap-3 text-sm text-base-content/80 grow"
+                aria-label="Recursos do plano"
+              >
                 <li class="flex items-center gap-2.5">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4 text-primary shrink-0"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                    />
                   </svg>
                   <span>
                     {{ plan.quantClub }}
@@ -101,13 +133,39 @@
                 </li>
 
                 <li class="flex items-center gap-2.5">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-primary lucide lucide-map-pin-icon lucide-map-pin"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="h-4 w-4 text-primary lucide lucide-map-pin-icon lucide-map-pin"
+                  >
+                    <path
+                      d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"
+                    />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
                   <span>{{ plan.quantCourt }} quadras por clube</span>
                 </li>
 
                 <li class="flex items-center gap-2.5">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4 text-primary shrink-0"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
                   </svg>
                   <span>Renova a cada {{ plan.durationDays }} dias</span>
                 </li>
@@ -120,13 +178,20 @@
                   class="btn w-full rounded-full bg-primary text-white border-none shadow-none font-bold"
                   [class.btn-primary]="plan.id === popularPlanId()"
                   [class.btn-outline]="plan.id !== popularPlanId()"
+                  [disabled]="isSubmitting()"
+                  [attr.aria-busy]="isSubmitting()"
                   (click)="selectPlan(plan.id)"
-                  [attr.aria-label]="'Assinar o plano ' + plan.name"
+                  [attr.aria-label]="
+                    (isFree(plan) ? 'Começar com o plano ' : 'Assinar o plano ') + plan.name
+                  "
                 >
-                  Assinar
+                  @if (isSubmitting()) {
+                    <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+                  } @else {
+                    {{ isFree(plan) ? 'Começar grátis' : 'Assinar' }}
+                  }
                 </button>
               </div>
-
             </div>
           </article>
         </li>

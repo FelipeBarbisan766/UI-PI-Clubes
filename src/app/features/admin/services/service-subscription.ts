@@ -56,7 +56,10 @@ export interface CheckAccessResult {
  * letting callers branch on specific status codes (e.g. 409 Conflict).
  */
 export class SubscriptionApiError extends Error {
-  constructor(message: string, readonly status?: number) {
+  constructor(
+    message: string,
+    readonly status?: number,
+  ) {
     super(message);
     this.name = 'SubscriptionApiError';
   }
@@ -76,10 +79,7 @@ export class ServiceSubscription {
       .pipe(catchError(this.handleError));
   }
 
-  initiatePayment(
-    planId: string,
-    method: PaymentMethod
-  ): Observable<PaymentInitiateResult> {
+  initiatePayment(planId: string, method: PaymentMethod): Observable<PaymentInitiateResult> {
     return this.http
       .post<PaymentInitiateResult>(
         `${environment.apiUrl}/payment/initiate`,
@@ -112,7 +112,7 @@ export class ServiceSubscription {
             return of(null);
           }
           return this.handleError(error);
-        })
+        }),
       );
   }
 
@@ -126,11 +126,15 @@ export class ServiceSubscription {
 
   cancelSubscription(subscriptionId: string): Observable<void> {
     return this.http
-      .post<void>(
-        `${environment.apiUrl}/subscription/cancel/${subscriptionId}`,
-        null,
-        { withCredentials: true },
-      )
+      .post<void>(`${environment.apiUrl}/subscription/cancel/${subscriptionId}`, null, {
+        withCredentials: true,
+      })
+      .pipe(catchError(this.handleError));
+  }
+
+  activateFreePlan(adminId: string, planId: string): Observable<void> {
+    return this.http
+      .post<void>(`${environment.apiUrl}/subscription/activate-free`, { adminId, planId })
       .pipe(catchError(this.handleError));
   }
 
