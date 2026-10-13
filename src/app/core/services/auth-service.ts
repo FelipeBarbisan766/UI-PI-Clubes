@@ -8,6 +8,7 @@ import {
   PlayerMeResponse,
   LoginPayload,
   MeEnvelope,
+  ChangeEmailDTO,
 } from '../models/auth-model';
 
 type AuthStatus = 'unknown' | 'authenticated' | 'unauthenticated';
@@ -193,7 +194,17 @@ export class AuthService {
       catchError(this.handleHttpError('Não foi possível carregar usuário.')),
     );
   }
-
+  changeEmail(payload: ChangeEmailDTO): Observable<string> {
+    return this.http
+      .post(`${this.baseUrl}/changeEmail`, payload, {
+        responseType: 'text',
+        withCredentials: true,
+      })
+      .pipe(
+        tap(() => this.clearSession()),
+        catchError(this.handleHttpError('Não foi possível alterar o e-mail.')),
+      );
+  }
   getAdminMe(): Observable<AdminMeResponse> {
     return this.http
       .get<AdminMeResponse>(`${this.adminBaseUrl}/me`, { withCredentials: true })

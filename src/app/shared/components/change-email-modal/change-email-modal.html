@@ -1,0 +1,154 @@
+<dialog
+  #dialog
+  class="modal"
+  aria-labelledby="change-email-title"
+  (cancel)="onCancel($event)"
+  (close)="onClosed()"
+>
+  <div class="modal-box rounded-3xl max-w-md">
+    @if (step() === 'form') {
+      <h3 id="change-email-title" class="font-bold text-xl text-base-content mb-1 text-center">
+        Alterar e-mail
+      </h3>
+      <p class="text-sm text-base-content/60 text-center mb-5">
+        Informe sua senha atual e o novo e-mail que deseja usar.
+      </p>
+
+      @if (error(); as msg) {
+        <div role="alert" class="alert alert-error alert-soft mb-4 text-sm">
+          <span>{{ msg }}</span>
+        </div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="goToConfirm()" novalidate class="flex flex-col gap-4">
+        <div class="form-control">
+          <label class="label pb-1" for="change-email-password">
+            <span class="label-text font-medium text-base-content">Senha atual</span>
+          </label>
+          <input
+            #passwordInput
+            id="change-email-password"
+            type="password"
+            formControlName="password"
+            autocomplete="current-password"
+            class="input input-bordered w-full"
+            [class.input-error]="fieldInvalid('password')"
+            aria-required="true"
+            [attr.aria-invalid]="fieldInvalid('password')"
+            [attr.aria-describedby]="fieldInvalid('password') ? 'change-email-password-error' : null"
+          />
+          @if (fieldInvalid('password')) {
+            <p id="change-email-password-error" role="alert" class="text-error text-xs mt-1">
+              Informe sua senha atual.
+            </p>
+          }
+        </div>
+
+        <div class="form-control">
+          <label class="label pb-1" for="change-email-new">
+            <span class="label-text font-medium text-base-content">Novo e-mail</span>
+          </label>
+          <input
+            id="change-email-new"
+            type="email"
+            formControlName="newEmail"
+            autocomplete="email"
+            placeholder="novo@email.com"
+            class="input input-bordered w-full"
+            [class.input-error]="fieldInvalid('newEmail')"
+            aria-required="true"
+            [attr.aria-invalid]="fieldInvalid('newEmail')"
+            [attr.aria-describedby]="fieldInvalid('newEmail') ? 'change-email-new-error' : null"
+          />
+          @if (fieldInvalid('newEmail')) {
+            <p id="change-email-new-error" role="alert" class="text-error text-xs mt-1">
+              @if (form.controls.newEmail.hasError('required')) {
+                Informe o novo e-mail.
+              } @else if (form.controls.newEmail.hasError('email')) {
+                Informe um e-mail válido.
+              } @else if (form.controls.newEmail.hasError('sameEmail')) {
+                O novo e-mail deve ser diferente do atual.
+              }
+            </p>
+          }
+        </div>
+
+        <div class="modal-action mt-2 flex gap-3">
+          <button type="button" class="btn btn-ghost flex-1" (click)="close()">Cancelar</button>
+          <button type="submit" class="btn btn-primary text-white flex-1">Continuar</button>
+        </div>
+      </form>
+    } @else {
+      <h3
+        #confirmHeading
+        id="change-email-title"
+        tabindex="-1"
+        class="font-bold text-xl text-base-content mb-4 text-center outline-none"
+      >
+        Confirmar alteração
+      </h3>
+
+      <div role="alert" class="alert alert-warning alert-soft mb-4 text-sm">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5 shrink-0"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          aria-hidden="true"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+          />
+        </svg>
+        <span>
+          Ao confirmar, você será <strong>desconectado</strong> e enviaremos um link de verificação
+          para o novo e-mail. Você só conseguirá entrar novamente depois de confirmá-lo.
+        </span>
+      </div>
+
+      <dl class="rounded-2xl border border-base-200 p-4 text-sm space-y-2">
+        <div class="flex justify-between gap-4">
+          <dt class="text-base-content/60 shrink-0">E-mail atual</dt>
+          <dd class="font-medium break-all text-right">{{ currentEmail() }}</dd>
+        </div>
+        <div class="flex justify-between gap-4">
+          <dt class="text-base-content/60 shrink-0">Novo e-mail</dt>
+          <dd class="font-medium break-all text-right">{{ pendingEmail() }}</dd>
+        </div>
+      </dl>
+
+      <div class="modal-action mt-6 flex gap-3">
+        <button
+          type="button"
+          class="btn btn-ghost flex-1"
+          [disabled]="isSubmitting()"
+          (click)="backToForm()"
+        >
+          Voltar
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary text-white flex-1"
+          [disabled]="isSubmitting()"
+          [attr.aria-busy]="isSubmitting()"
+          (click)="confirm()"
+        >
+          @if (isSubmitting()) {
+            <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+            Enviando…
+          } @else {
+            Confirmar e sair
+          }
+        </button>
+      </div>
+    }
+  </div>
+
+  <form method="dialog" class="modal-backdrop">
+    <button [disabled]="isSubmitting()" aria-label="Fechar janela">Fechar</button>
+  </form>
+</dialog>
