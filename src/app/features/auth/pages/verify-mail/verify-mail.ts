@@ -4,7 +4,6 @@ import { take } from 'rxjs';
 import { ServiceVerifymail } from '../../services/service-verifymail';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
-
 @Component({
   selector: 'app-verify-mail',
   imports: [ReactiveFormsModule],
@@ -17,6 +16,9 @@ export class VerifyMail {
   private readonly verifyMailService = inject(ServiceVerifymail);
   private readonly fb = inject(FormBuilder);
 
+  readonly isEmailChange = signal(
+    this.route.snapshot.queryParamMap.get('reason') === 'email-change',
+  );
   readonly status = signal('pending');
   readonly successMessage = signal('E-mail verificado com sucesso.');
   readonly errorMessage = signal('Não foi possível verificar seu e-mail.');
@@ -56,37 +58,36 @@ export class VerifyMail {
   }
 
   resendVerificationEmail() {
-      console.log('Resend verification email requested.');
-      if (this.emailForm.invalid) {
-        this.emailForm.markAllAsTouched();
-        return;
-
-      }
-      console.log('Requesting password reset for:', this.emailForm.get('email')!.value);
-      const email = this.emailForm.get('email')!.value!;
-      if (email) {
-        this.status.set('loading');
-        this.verifyMailService
-          .resendVerificationEmail(email)
-          .pipe(take(1))
-          .subscribe({
-            next: (result) => {
-              this.status.set('resendSuccess');
-              this.successMessage.set(result.message);
-            },
-            error: (error: unknown) => {
-              this.status.set('error');
-              this.errorMessage.set(
-                error instanceof Error
-                  ? error.message
-                  : 'Não foi possível reenviar o e-mail de verificação.',
-              );
-            },
-          });
-      } else {
-        console.log('Email is null or undefined. Cannot resend verification email.');
-      }
+    console.log('Resend verification email requested.');
+    if (this.emailForm.invalid) {
+      this.emailForm.markAllAsTouched();
+      return;
     }
+    console.log('Requesting password reset for:', this.emailForm.get('email')!.value);
+    const email = this.emailForm.get('email')!.value!;
+    if (email) {
+      this.status.set('loading');
+      this.verifyMailService
+        .resendVerificationEmail(email)
+        .pipe(take(1))
+        .subscribe({
+          next: (result) => {
+            this.status.set('resendSuccess');
+            this.successMessage.set(result.message);
+          },
+          error: (error: unknown) => {
+            this.status.set('error');
+            this.errorMessage.set(
+              error instanceof Error
+                ? error.message
+                : 'Não foi possível reenviar o e-mail de verificação.',
+            );
+          },
+        });
+    } else {
+      console.log('Email is null or undefined. Cannot resend verification email.');
+    }
+  }
 
   goToLogin() {
     this.router.navigate(['/login']);

@@ -9,10 +9,17 @@
         </h1>
 
         @if (status() === 'pending') {
-          <p class="text-sm md:text-base" aria-live="polite">
-            Enviamos um link de verificação para seu e-mail. Acesse sua caixa de entrada e clique no
-            link para ativar sua conta.
-          </p>
+          @if (isEmailChange()) {
+            <p class="text-sm md:text-base" aria-live="polite">
+              Enviamos um link de confirmação para o seu novo e-mail. Clique nele para concluir a
+              alteração. Até lá, não será possível entrar na sua conta.
+            </p>
+          } @else {
+            <p class="text-sm md:text-base" aria-live="polite">
+              Enviamos um link de verificação para seu e-mail. Acesse sua caixa de entrada e clique
+              no link para ativar sua conta.
+            </p>
+          }
         }
 
         @if (status() === 'loading') {
@@ -73,13 +80,15 @@
           >
             Ir para login
           </a>
-          <a
-            (click)="requestResendEmail()"
-            class="btn btn-primary rounded-full text-white w-full"
-            aria-label="Reenviar verificação"
-          >
-            Reenviar verificação
-          </a>
+          @if (!isEmailChange()) {
+            <a
+              (click)="requestResendEmail()"
+              class="btn btn-primary rounded-full text-white w-full"
+              aria-label="Reenviar verificação"
+            >
+              Reenviar verificação
+            </a>
+          }
         }
 
         @if (status() === 'loading') {

@@ -20,6 +20,7 @@ import { OnlyLetters } from '../../../shared/directives/only-letters';
 import { RouterLink } from '@angular/router';
 import { ServiceSport } from '../../../core/services/service-sport';
 import { ChangePasswordModal } from '../../../shared/components/change-password-modal/change-password-modal';
+import { ChangeEmailModal } from '../../../shared/components/change-email-modal/change-email-modal';
 
 type ToastType = 'success' | 'error' | 'warning' | 'info';
 
@@ -34,7 +35,8 @@ type ToastType = 'success' | 'error' | 'warning' | 'info';
     OnlyLetters,
     RouterLink,
     ChangePasswordModal,
-  ],
+    ChangeEmailModal
+],
   templateUrl: './user-config.html',
 })
 export class UserConfig implements OnInit, OnDestroy {

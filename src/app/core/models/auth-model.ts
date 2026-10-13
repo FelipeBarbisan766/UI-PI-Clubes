@@ -25,3 +25,7 @@ export interface AdminMeResponse {
 export interface PlayerMeResponse {
   id: string;
 }
+export interface ChangeEmailDTO {
+  password: string;
+  newEmail: string;
+}
