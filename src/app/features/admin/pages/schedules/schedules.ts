@@ -7,7 +7,7 @@ import {
   computed,
 } from '@angular/core';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ServiceSchedule } from '../../services/service-schedule';
 import {
@@ -17,6 +17,7 @@ import {
 } from '../../models/model-schedule';
 import { NgxMaskDirective } from 'ngx-mask';
 import { Modal } from '../../../../shared/components/modal/modal';
+import { ServiceCourt } from '../../services/service-court';
 
 type FormMode = 'create' | 'edit' | 'bulk' | null;
 
@@ -39,7 +40,7 @@ function normalizeTime(value: string | null | undefined): string {
 
 @Component({
   selector: 'app-schedule',
-  imports: [ReactiveFormsModule, Modal, NgxMaskDirective],
+  imports: [ReactiveFormsModule, Modal, NgxMaskDirective, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './schedules.html',
 })
@@ -47,6 +48,9 @@ export class Schedules implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly route = inject(ActivatedRoute);
   protected readonly scheduleService = inject(ServiceSchedule);
+  private readonly courtService = inject(ServiceCourt);
+  
+   protected readonly court = this.courtService.selectedCourt;
 
   // --- Enum options for selects ---
   protected readonly dayOfWeekOptions = [
@@ -64,22 +68,30 @@ export class Schedules implements OnInit {
   protected readonly formMode = signal<FormMode>(null);
   protected readonly editingId = signal<string | null>(null);
   protected readonly deleteConfirmId = signal<string | null>(null);
+  protected readonly clubId = signal('');
 
+  protected readonly backLink = computed(() => ['/admin/club', this.clubId(), 'courts']);
   protected readonly isFormOpen = computed(() => this.formMode() !== null);
   protected readonly isEditing = computed(() => this.formMode() === 'edit');
 
   protected readonly selectedDays = signal<DayOfWeek[]>([]);
   protected readonly bulkResult = signal<ResponseBulkScheduleDTO | null>(null);
 
+  protected readonly weekTabs = [...this.dayOfWeekOptions.slice(1), this.dayOfWeekOptions[0]];
+
+  protected readonly activeDay = signal<DayOfWeek>(DayOfWeek.Monday);
+
+  protected readonly activeDayLabel = computed(() => this.getDayName(this.activeDay()));
+
   // --- Form ---
   protected readonly form = this.fb.group({
-  startTime: ['', [Validators.required, Validators.pattern(TIME_24H_PATTERN)]],
-  endTime: ['', [Validators.required, Validators.pattern(TIME_24H_PATTERN)]],
-  isBlocked: [false],
-  isReserved: [false],
-  isFixed: [false],
-  dayOfWeek: [null as DayOfWeek | null, Validators.required],
-});
+    startTime: ['', [Validators.required, Validators.pattern(TIME_24H_PATTERN)]],
+    endTime: ['', [Validators.required, Validators.pattern(TIME_24H_PATTERN)]],
+    isBlocked: [false],
+    isReserved: [false],
+    isFixed: [false],
+    dayOfWeek: [null as DayOfWeek | null, Validators.required],
+  });
 
   private readonly formStatus = toSignal(this.form.statusChanges, {
     initialValue: this.form.status,
@@ -89,21 +101,41 @@ export class Schedules implements OnInit {
 
   ngOnInit(): void {
     this.courtId = this.route.snapshot.paramMap.get('courtId') ?? '';
-    this.scheduleService.getByCourtId(this.courtId).subscribe();
+
+    this.clubId.set(
+      this.route.pathFromRoot
+        .map((r) => r.snapshot.paramMap.get('clubId'))
+        .find((id): id is string => !!id) ?? '',
+    );
+
+    this.scheduleService.getByCourtId(this.courtId).subscribe((schedules) => {
+      const first = this.weekTabs.find((d) => schedules.some((s) => s.dayOfWeek === d.value));
+      if (first) this.activeDay.set(first.value);
+    });
   }
 
-  protected readonly scheduleGroups = computed(() => {
-    const schedules = this.scheduleService.schedules();
+  protected readonly slotsForActiveDay = computed(() =>
+    this.scheduleService
+      .schedules()
+      .filter((s) => s.dayOfWeek === this.activeDay())
+      .sort((a, b) => normalizeTime(a.startTime).localeCompare(normalizeTime(b.startTime))),
+  );
 
-    return this.dayOfWeekOptions
-      .map((day) => ({
-        day: day.value,
-        label: day.label,
-        schedules: schedules
-          .filter((s) => s.dayOfWeek === day.value)
-          .sort((a, b) => normalizeTime(a.startTime).localeCompare(normalizeTime(b.startTime))),
-      }))
-      .filter((group) => group.schedules.length > 0);
+  protected readonly countByDay = computed(() => {
+    const counts: Record<string, number> = {};
+    for (const s of this.scheduleService.schedules()) {
+      counts[s.dayOfWeek] = (counts[s.dayOfWeek] ?? 0) + 1;
+    }
+    return counts;
+  });
+
+  protected readonly courtSummary = computed(() => {
+    const c = this.court();
+    if (!c) return '';
+    const humanize = (v: string) => v.replace(/([a-zà-ÿ])([A-Z])/g, '$1 $2');
+    const price = c.pricePerHour.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    const type = c.sports.map((s) => s.name).join(', ');
+    return `${humanize(type)} · ${humanize(c.surface)} · ${price}/h`;
   });
 
   protected readonly bulkForm = this.fb.group({
@@ -159,6 +191,22 @@ export class Schedules implements OnInit {
   }
 
   // --- Form actions ---
+  protected selectDay(day: DayOfWeek): void {
+    this.activeDay.set(day);
+    this.deleteConfirmId.set(null);
+  }
+
+  protected durationLabel(schedule: ResponseScheduleDTO): string {
+    const toMinutes = (v: string): number => {
+      const [h, m] = normalizeTime(v).split(':').map(Number);
+      return h * 60 + m;
+    };
+    const diff = toMinutes(schedule.endTime) - toMinutes(schedule.startTime);
+    if (!(diff > 0)) return '';
+    const h = Math.floor(diff / 60);
+    const m = diff % 60;
+    return h && m ? `${h}h${m}` : h ? `${h}h` : `${m} min`;
+  }
 
   protected openCreate(): void {
     this.form.reset({
@@ -167,21 +215,21 @@ export class Schedules implements OnInit {
       isBlocked: false,
       isReserved: false,
       isFixed: false,
-      dayOfWeek: null,
+      dayOfWeek: this.activeDay(), // ← era null
     });
     this.editingId.set(null);
     this.formMode.set('create');
   }
 
- protected openEdit(schedule: ResponseScheduleDTO): void {
-  this.form.reset({
-    startTime: normalizeTime(schedule.startTime),
-    endTime: normalizeTime(schedule.endTime),
-    dayOfWeek: schedule.dayOfWeek,
-  });
-  this.editingId.set(schedule.id);
-  this.formMode.set('edit');
-}
+  protected openEdit(schedule: ResponseScheduleDTO): void {
+    this.form.reset({
+      startTime: normalizeTime(schedule.startTime),
+      endTime: normalizeTime(schedule.endTime),
+      dayOfWeek: schedule.dayOfWeek,
+    });
+    this.editingId.set(schedule.id);
+    this.formMode.set('edit');
+  }
 
   protected closeForm(): void {
     this.formMode.set(null);
@@ -206,37 +254,37 @@ export class Schedules implements OnInit {
   }
 
   private _submitCreate(): void {
-  const { startTime, endTime, dayOfWeek } = this.form.getRawValue();
+    const { startTime, endTime, dayOfWeek } = this.form.getRawValue();
 
-  this.scheduleService
-    .create({
-      startTime: normalizeTime(startTime),
-      endTime: normalizeTime(endTime),
-      dayOfWeek: dayOfWeek!,
-      courtId: this.courtId,
-    })
-    .subscribe({
-      next: () => this.closeForm(),
-      error: (err: unknown) => {
-        console.error('Erro ao criar horário', err);
-      },
-    });
-}
+    this.scheduleService
+      .create({
+        startTime: normalizeTime(startTime),
+        endTime: normalizeTime(endTime),
+        dayOfWeek: dayOfWeek!,
+        courtId: this.courtId,
+      })
+      .subscribe({
+        next: () => this.closeForm(),
+        error: (err: unknown) => {
+          console.error('Erro ao criar horário', err);
+        },
+      });
+  }
 
-private _submitUpdate(): void {
-  const id = this.editingId();
-  if (id === null) return;
+  private _submitUpdate(): void {
+    const id = this.editingId();
+    if (id === null) return;
 
-  const { startTime, endTime, dayOfWeek } = this.form.getRawValue();
+    const { startTime, endTime, dayOfWeek } = this.form.getRawValue();
 
-  this.scheduleService
-    .update(id, {
-      startTime: normalizeTime(startTime),
-      endTime: normalizeTime(endTime),
-      dayOfWeek: dayOfWeek!,
-    })
-    .subscribe({ next: () => this.closeForm() });
-}
+    this.scheduleService
+      .update(id, {
+        startTime: normalizeTime(startTime),
+        endTime: normalizeTime(endTime),
+        dayOfWeek: dayOfWeek!,
+      })
+      .subscribe({ next: () => this.closeForm() });
+  }
 
   // --- Delete ---
 

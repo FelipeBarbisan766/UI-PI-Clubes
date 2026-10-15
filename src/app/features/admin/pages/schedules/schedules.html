@@ -1,11 +1,42 @@
 <div class="p-6 max-w-7xl mx-auto">
-  <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+  <!-- ── Cabeçalho ───────────────────────────────────────────────────── -->
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4">
     <div>
-      <h1 class="text-3xl font-bold text-base-content">Gestão de Horários</h1>
-      <p class="text-base-content/60 mt-1">Gerencie os horários disponíveis para esta quadra.</p>
+      <a
+        [routerLink]="backLink()"
+        class="btn btn-ghost btn-sm -ml-3 mb-2 gap-2 text-xs font-semibold uppercase tracking-wide"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          aria-hidden="true"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M10 19l-7-7m0 0l7-7m-7 7h18"
+          />
+        </svg>
+        Voltar para quadras
+      </a>
+
+      <h1 class="text-3xl font-bold text-base-content">
+        Horários
+        @if (court(); as c) {
+          — {{ c.name }}
+        }
+      </h1>
+      @if (courtSummary()) {
+        <p class="text-base-content/60 mt-1 text-sm">{{ courtSummary() }}</p>
+      }
     </div>
+
     <div class="flex gap-2">
-      <button class="btn btn-outline btn-primary" (click)="openBulkCreate()">
+      <button type="button" class="btn btn-outline btn-primary" (click)="openBulkCreate()">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           class="h-5 w-5 mr-1"
@@ -23,7 +54,7 @@
         </svg>
         Criar em Massa
       </button>
-      <button class="btn btn-primary text-primary-content" (click)="openCreate()">
+      <button type="button" class="btn btn-primary text-primary-content" (click)="openCreate()">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           class="h-5 w-5 mr-1"
@@ -32,19 +63,14 @@
           stroke="currentColor"
           aria-hidden="true"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 4v16m8-8H4"
-          />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
         </svg>
         Novo Horário
       </button>
     </div>
   </div>
 
-  <!-- Alertas -->
+  <!-- ── Alertas ─────────────────────────────────────────────────────── -->
   @if (scheduleService.error()) {
     <div role="alert" class="alert alert-error mb-6">
       <svg
@@ -66,117 +92,184 @@
   }
 
   @if (scheduleService.loading()) {
-    <div class="flex justify-center my-10" aria-live="polite" aria-busy="true">
-      <span class="loading loading-spinner loading-lg text-primary"></span>
+    <div class="flex justify-center my-10" role="status" aria-live="polite" aria-busy="true">
+      <span class="loading loading-spinner loading-lg text-primary" aria-hidden="true"></span>
       <span class="sr-only">Carregando horários...</span>
     </div>
   }
 
-  @if (!isFormOpen()) {
-    @if (scheduleService.isEmpty()) {
-      <div
-        class="text-center py-16 text-base-content/50 border-2 border-dashed border-base-300 rounded-box"
-      >
-        <p class="text-lg">Nenhum horário cadastrado para esta quadra ainda.</p>
-      </div>
-    } @else {
-      <div class="flex flex-col gap-4 pb-16">
-        @for (group of scheduleGroups(); track group.day) {
-          <section class="card bg-base-100 card-border shadow-sm">
-            <div class="card-body p-5">
-              <h2 class="card-title text-lg font-bold text-base-content mb-3">
-                {{ group.label }}
-              </h2>
+  @if (scheduleService.isEmpty() && !scheduleService.loading()) {
+    <div
+      class="text-center py-16 text-base-content/50 border-2 border-dashed border-base-300 rounded-box"
+    >
+      <p class="text-lg">Nenhum horário cadastrado para esta quadra ainda.</p>
+    </div>
+  } @else if (!scheduleService.isEmpty()) {
+    <!-- ── Abas dos dias da semana ─────────────────────────────────── -->
+    <div
+      class="flex items-center gap-2 overflow-x-auto pb-2 mb-4"
+      role="tablist"
+      aria-label="Dias da semana"
+    >
+      @for (day of weekTabs; track day.value) {
+        <button
+          type="button"
+          role="tab"
+          class="btn btn-sm shrink-0 rounded-md text-xs font-semibold uppercase tracking-wide"
+          [class.btn-primary]="activeDay() === day.value"
+          [class.bg-base-100]="activeDay() !== day.value"
+          [attr.aria-selected]="activeDay() === day.value"
+          [attr.aria-controls]="'schedule-panel'"
+          (click)="selectDay(day.value)"
+        >
+          {{ day.label }}
+          @if (countByDay()[day.value]) {
+            <span
+              class="badge badge-xs border-0"
+              [class.bg-primary-content/20]="activeDay() === day.value"
+              [class.bg-base-200]="activeDay() !== day.value"
+            >
+              {{ countByDay()[day.value] }}
+            </span>
+          }
+        </button>
+      }
+    </div>
 
-              <div
-                class="flex flex-wrap gap-2"
-                role="list"
-                [attr.aria-label]="'Horários de ' + group.label"
-              >
-                @for (schedule of group.schedules; track schedule.id) {
-                  @if (deleteConfirmId() === schedule.id) {
-                    <div
-                      role="alert"
-                      class="alert alert-warning p-2 text-xs flex-col items-start gap-2 rounded-xl w-full sm:w-auto"
+    <!-- ── Painel do dia ───────────────────────────────────────────── -->
+    <section
+      id="schedule-panel"
+      role="tabpanel"
+      class="card bg-base-100 border border-base-200 shadow-sm mb-16"
+      [attr.aria-label]="'Horários de ' + activeDayLabel()"
+    >
+      <div class="card-body p-5 sm:p-6 gap-5">
+        <h2 class="flex items-center gap-2 text-base font-bold text-base-content">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4 text-primary"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          {{ activeDayLabel() }}
+        </h2>
+
+        @if (slotsForActiveDay().length > 0) {
+          <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3" role="list">
+            @for (schedule of slotsForActiveDay(); track schedule.id) {
+              @if (deleteConfirmId() === schedule.id) {
+                <div
+                  role="alert"
+                  class="alert alert-warning p-3 text-xs flex-col items-start gap-2 rounded-lg"
+                >
+                  <span class="font-semibold">
+                    Excluir {{ formatTime(schedule.startTime) }} - {{ formatTime(schedule.endTime) }}?
+                  </span>
+                  <div class="flex gap-2 w-full">
+                    <button
+                      type="button"
+                      class="btn btn-xs btn-error flex-1 text-error-content"
+                      (click)="confirmDelete()"
                     >
-                      <span class="font-semibold">Excluir este horário?</span>
-                      <div class="flex gap-2 w-full">
-                        <button
-                          class="btn btn-xs btn-error flex-1 text-error-content"
-                          (click)="confirmDelete()"
-                        >
-                          Excluir
-                        </button>
-                        <button
-                          class="btn btn-xs btn-ghost flex-1 border border-base-300"
-                          (click)="cancelDelete()"
-                        >
-                          Cancelar
-                        </button>
-                      </div>
-                    </div>
-                  } @else {
-                    <div
-                      role="listitem"
-                      class="flex items-center gap-1 rounded-xl border border-base-200 bg-base-100 pl-3 pr-1 py-1 hover:border-primary/40 hover:shadow-sm transition-colors"
+                      Excluir
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-xs btn-ghost flex-1 border border-base-300"
+                      (click)="cancelDelete()"
                     >
-                      <span class="text-sm font-semibold text-base-content">
-                        {{ formatTime(schedule.startTime) }} – {{ formatTime(schedule.endTime) }}
+                      Cancelar
+                    </button>
+                  </div>
+                </div>
+              } @else {
+                <div
+                  role="listitem"
+                  class="flex items-center justify-between rounded-lg border border-success/30 bg-success/5 p-3 transition-colors hover:bg-success/10"
+                >
+                  <div class="flex flex-col gap-1.5">
+                    <p class="text-sm font-medium text-base-content">
+                      {{ formatTime(schedule.startTime) }} - {{ formatTime(schedule.endTime) }}
+                    </p>
+                    @if (durationLabel(schedule)) {
+                      <span class="badge badge-outline badge-success badge-sm font-semibold">
+                        {{ durationLabel(schedule) }}
                       </span>
-                      <button
-                        class="btn btn-ghost btn-xs btn-square text-base-content/60 hover:text-primary"
-                        aria-label="Editar horário"
-                        title="Editar"
-                        (click)="openEdit(schedule)"
+                    }
+                  </div>
+
+                  <div class="flex gap-1">
+                    <button
+                      type="button"
+                      class="btn btn-ghost btn-sm btn-square text-base-content/70 hover:text-primary"
+                      aria-label="Editar horário"
+                      title="Editar"
+                      (click)="openEdit(schedule)"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        aria-hidden="true"
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          class="h-3.5 w-3.5"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          aria-hidden="true"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                          />
-                        </svg>
-                      </button>
-                      <button
-                        class="btn btn-ghost btn-xs btn-square text-base-content/60 hover:text-error"
-                        aria-label="Excluir horário"
-                        title="Excluir"
-                        (click)="requestDelete(schedule.id)"
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                        />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-ghost btn-sm btn-square text-base-content/70 hover:text-error"
+                      aria-label="Excluir horário"
+                      title="Excluir"
+                      (click)="requestDelete(schedule.id)"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        aria-hidden="true"
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          class="h-3.5 w-3.5"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          aria-hidden="true"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                          />
-                        </svg>
-                      </button>
-                    </div>
-                  }
-                }
-              </div>
-            </div>
-          </section>
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              }
+            }
+          </div>
+        } @else {
+          <div
+            class="py-10 text-center text-sm text-base-content/50 border-2 border-dashed border-base-300 rounded-box"
+          >
+            Nenhum horário cadastrado para {{ activeDayLabel() }}.
+          </div>
         }
       </div>
-    }
+    </section>
   }
+
   @if (formMode() === 'bulk') {
     <app-modal>
       <div class="flex justify-between items-center mb-4 border-b border-base-200 pb-3">
