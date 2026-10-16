@@ -16,32 +16,22 @@ import { take } from 'rxjs/operators';
 import {
   ActiveSubscription,
   PaymentHistory,
-  PaymentMethod,
   PaymentStatus,
   TypeAccess,
   ServiceSubscription,
 } from '../../services/service-subscription';
-
-// ─── Display maps (pure constants, no globals) ────────────────────────────────
-
-const METHOD_LABEL: Record<PaymentMethod, string> = {
-  Pix: 'PIX',
-  CreditCard: 'Cartão de Crédito',
-  Boleto: 'Boleto',
-};
+import { PaymentMethodPipe } from '../../../../shared/pipes/paymentMethodPipe';
 
 const STATUS_LABEL: Record<PaymentStatus, string> = {
   Confirmed: 'Confirmado',
   Pending: 'Pendente',
-  Failed: 'Falhou',
-  Refunded: 'Reembolsado',
+  Failed: 'Não aprovado',
 };
 
 const STATUS_BADGE: Record<PaymentStatus, string> = {
   Confirmed: 'badge-success',
   Pending: 'badge-warning',
   Failed: 'badge-error',
-  Refunded: 'badge-info',
 };
 
 const ACCESS_LABEL: Record<TypeAccess, string> = {
@@ -52,20 +42,17 @@ const ACCESS_LABEL: Record<TypeAccess, string> = {
 
 @Component({
   selector: 'app-subscription',
+  imports: [PaymentMethodPipe],
   templateUrl: './subscriptions.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Subscriptions implements OnInit {
   private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly subscriptionService = inject(ServiceSubscription);
 
-  // ─── Cancel modal reference ────────────────────────────────────────────
-  private readonly cancelModalEl =
-    viewChild<ElementRef<HTMLDialogElement>>('cancelModal');
+  private readonly cancelModalEl = viewChild<ElementRef<HTMLDialogElement>>('cancelModal');
 
-  private readonly destroyRef = inject(DestroyRef);
-
-  // ─── State signals ─────────────────────────────────────────────────────
   readonly isLoading = signal(true);
   readonly isCancelling = signal(false);
   readonly errorMessage = signal('');
@@ -74,30 +61,16 @@ export class Subscriptions implements OnInit {
   readonly subscription = signal<ActiveSubscription | null>(null);
   readonly paymentHistory = signal<PaymentHistory[]>([]);
 
-  // ─── Derived state ─────────────────────────────────────────────────────
-
   readonly hasSubscription = computed(() => this.subscription() !== null);
 
-  /**
-   * Days until expiry — computed without `new Date()` in template.
-   * Calculation happens here, in the class.
-   */
   readonly daysUntilExpiry = computed(() => {
     const sub = this.subscription();
     if (!sub) return 0;
     const msPerDay = 1000 * 60 * 60 * 24;
-    const expiry = new Date(sub.expiresAt).getTime();
-    const now = Date.now();
-    return Math.max(0, Math.ceil((expiry - now) / msPerDay));
+    return Math.max(0, Math.ceil((new Date(sub.expiresAt).getTime() - Date.now()) / msPerDay));
   });
 
   readonly isExpiringSoon = computed(() => this.daysUntilExpiry() <= 7);
-
-  readonly expiryAlertClass = computed(() =>
-    this.isExpiringSoon() ? 'alert-warning' : 'alert-info'
-  );
-
-  // ─── Lifecycle ─────────────────────────────────────────────────────────
 
   ngOnInit(): void {
     forkJoin({
@@ -118,8 +91,6 @@ export class Subscriptions implements OnInit {
       });
   }
 
-  // ─── Cancel modal ──────────────────────────────────────────────────────
-
   openCancelModal(): void {
     this.cancelError.set('');
     this.cancelModalEl()?.nativeElement.showModal();
@@ -138,7 +109,7 @@ export class Subscriptions implements OnInit {
 
     this.subscriptionService
       .cancelSubscription(sub.id)
-      .pipe(take(1))
+      .pipe(take(1), takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.isCancelling.set(false);
@@ -152,13 +123,9 @@ export class Subscriptions implements OnInit {
       });
   }
 
-  // ─── Navigation ────────────────────────────────────────────────────────
-
   changePlan(): void {
-    this.router.navigate(['/pricing']);
+    this.router.navigate(['/plans']); 
   }
-
-  // ─── Display helpers ───────────────────────────────────────────────────
 
   formatPrice(amount: number): string {
     return amount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -170,10 +137,6 @@ export class Subscriptions implements OnInit {
       month: '2-digit',
       year: 'numeric',
     });
-  }
-
-  methodLabel(method: PaymentMethod): string {
-    return METHOD_LABEL[method] ?? method;
   }
 
   statusLabel(status: PaymentStatus): string {

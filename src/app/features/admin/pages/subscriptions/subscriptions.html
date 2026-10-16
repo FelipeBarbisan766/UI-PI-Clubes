@@ -162,7 +162,7 @@
                           {{ formatDate(payment.date) }}
                         </td>
                         <td class="text-sm">
-                          {{ methodLabel(payment.method) }}
+                          {{ payment.method | paymentMethod }}
                         </td>
                         <td class="text-sm text-right font-medium whitespace-nowrap">
                           {{ formatPrice(payment.amount) }}

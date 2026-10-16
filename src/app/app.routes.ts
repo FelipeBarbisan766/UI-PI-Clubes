@@ -82,7 +82,7 @@ export const routes: Routes = [
         path: 'payment',
         loadComponent: () =>
           import('./features/admin/pages/payment/payment').then((m) => m.Payment),
-        data: { paymentStep: 'select-method' },
+        data: { paymentStep: 'review' },
       },
       {
         path: 'payment/success',
