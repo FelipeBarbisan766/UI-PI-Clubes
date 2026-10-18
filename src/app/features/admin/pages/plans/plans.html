@@ -1,5 +1,4 @@
 <main class="min-h-screen w-full bg-base-200 flex flex-col items-center px-4 py-12 pt-20">
-  <!-- ── Header ─────────────────────────────────────────────────────────── -->
   <header class="text-center mb-12 max-w-2xl">
     <h1 class="text-3xl md:text-4xl font-bold mb-3">Escolha seu plano</h1>
     <p class="text-sm md:text-base text-base-content/70">
@@ -7,7 +6,6 @@
     </p>
   </header>
 
-  <!-- ── Loading skeleton ───────────────────────────────────────────────── -->
   @if (isLoading()) {
     <div
       class="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
@@ -20,7 +18,6 @@
     </div>
   }
 
-  <!-- ── Error state ────────────────────────────────────────────────────── -->
   @if (!isLoading() && errorMessage()) {
     <div class="w-full max-w-md">
       <div
@@ -56,14 +53,12 @@
     </div>
   }
 
-  <!-- ── Empty state ────────────────────────────────────────────────────── -->
   @if (!isLoading() && !errorMessage() && plans().length === 0) {
     <div class="text-center text-base-content/60 py-16">
       <p>Nenhum plano disponível no momento.</p>
     </div>
   }
 
-  <!-- ── Plan cards ─────────────────────────────────────────────────────── -->
   @if (!isLoading() && !errorMessage() && plans().length > 0) {
     <ul
       class="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch"
@@ -73,15 +68,24 @@
         <li class="flex">
           <article
             class="card w-full bg-base-100 border border-base-300 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
-            [class.border-primary]="plan.id === popularPlanId()"
-            [class.shadow-lg]="plan.id === popularPlanId()"
+            [class.border-primary]="plan.id === popularPlanId() || isCurrent(plan)"
+            [class.ring-2]="isCurrent(plan)"
+            [class.ring-primary]="isCurrent(plan)"
+            [class.shadow-lg]="plan.id === popularPlanId() || isCurrent(plan)"
             [class.lg:scale-105]="plan.id === popularPlanId()"
           >
             <div class="card-body gap-5">
               <!-- Plan name + badge -->
               <div class="flex items-center justify-between gap-2">
                 <h2 class="text-lg font-bold">{{ plan.name }}</h2>
-                @if (plan.id === popularPlanId()) {
+                @if (isCurrent(plan)) {
+                  <span
+                    class="badge badge-primary badge-sm text-white"
+                    aria-label="Este é o seu plano atual"
+                  >
+                    Plano atual
+                  </span>
+                } @else if (plan.id === popularPlanId()) {
                   <span
                     class="badge badge-primary badge-sm text-white"
                     aria-label="Plano mais popular"
@@ -93,7 +97,6 @@
 
               <p class="text-sm text-base-content/70 -mt-3">{{ plan.description }}</p>
 
-              <!-- Price -->
               <div aria-label="Preço do plano" class="pb-1">
                 <span class="text-4xl font-bold" [class.text-primary]="plan.id === popularPlanId()">
                   {{ formatPrice(plan.price) }}
@@ -105,7 +108,6 @@
 
               <div class="divider my-0"></div>
 
-              <!-- Features -->
               <ul
                 class="flex flex-col gap-3 text-sm text-base-content/80 grow"
                 aria-label="Recursos do plano"
@@ -171,22 +173,25 @@
                 </li>
               </ul>
 
-              <!-- CTA -->
               <div class="card-actions">
                 <button
                   type="button"
                   class="btn w-full rounded-full bg-primary text-white border-none shadow-none font-bold"
                   [class.btn-primary]="plan.id === popularPlanId()"
                   [class.btn-outline]="plan.id !== popularPlanId()"
-                  [disabled]="isSubmitting()"
+                  [disabled]="isSubmitting() || isCurrent(plan)"
                   [attr.aria-busy]="isSubmitting()"
                   (click)="selectPlan(plan.id)"
                   [attr.aria-label]="
-                    (isFree(plan) ? 'Começar com o plano ' : 'Assinar o plano ') + plan.name
+                    isCurrent(plan)
+                      ? 'Plano atual: ' + plan.name
+                      : (isFree(plan) ? 'Começar com o plano ' : 'Assinar o plano ') + plan.name
                   "
                 >
                   @if (isSubmitting()) {
                     <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+                  } @else if (isCurrent(plan)) {
+                    Plano atual
                   } @else {
                     {{ isFree(plan) ? 'Começar grátis' : 'Assinar' }}
                   }

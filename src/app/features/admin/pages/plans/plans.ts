@@ -9,8 +9,12 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { Observable, finalize, from, of, switchMap, take } from 'rxjs';
-import { Plan, ServiceSubscription } from '../../services/service-subscription';
+import { Observable, catchError, finalize, forkJoin, from, of, switchMap, take } from 'rxjs';
+import {
+  ActiveSubscription,
+  Plan,
+  ServiceSubscription,
+} from '../../services/service-subscription';
 import { AuthService } from '../../../../core/services/auth-service';
 import { AdminService } from '../../../../core/services/admin-service';
 import { AuthRequiredModalService } from '../../../../shared/components/auth-required-modal/auth-required-modal-service';
@@ -37,7 +41,17 @@ export class Plans implements OnInit {
   readonly currentUserId = computed(() => this.me()?.id ?? '');
   readonly isAdmin = computed(() => this.me()?.role?.trim().toLowerCase() === 'admin');
 
+  readonly activeSubscription = signal<ActiveSubscription | null>(null);
+
+  /** Id do plano contratado hoje (null se não há assinatura ativa). */
+  readonly currentPlanId = computed<string | null>(() => {
+    const sub = this.activeSubscription();
+    return sub?.isActive ? sub.planId : null;
+  });
+
+  /** O selo "Mais popular" só faz sentido para quem ainda não tem plano. */
   readonly popularPlanId = computed<string | null>(() => {
+    if (this.currentPlanId()) return null;
     const list = this.plans();
     return list.length >= 2 ? (list[1]?.id ?? null) : null;
   });
@@ -51,7 +65,7 @@ export class Plans implements OnInit {
     if (this.isSubmitting()) return;
 
     const plan = this.plans().find((p) => p.id === planId);
-    if (!plan) return;
+    if (!plan || this.isCurrent(plan)) return;
 
     if (!this.currentUserId()) {
       this.authRequiredModal.show(
@@ -80,6 +94,10 @@ export class Plans implements OnInit {
 
   isFree(plan: Plan): boolean {
     return plan.price === 0;
+  }
+
+  isCurrent(plan: Plan): boolean {
+    return plan.id === this.currentPlanId();
   }
 
   private ensureAdmin(): Observable<unknown> {
@@ -119,12 +137,16 @@ export class Plans implements OnInit {
     this.isLoading.set(true);
     this.errorMessage.set('');
 
-    this.subscriptionService
-      .getPlans()
+    forkJoin({
+      plans: this.subscriptionService.getPlans(),
+      // Visitante sem login ou falha aqui não deve esconder a lista de planos.
+      active: this.subscriptionService.getActiveSubscription().pipe(catchError(() => of(null))),
+    })
       .pipe(take(1), takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (plans) => {
+        next: ({ plans, active }) => {
           this.plans.set(plans);
+          this.activeSubscription.set(active);
           this.isLoading.set(false);
         },
         error: (err: Error) => {
