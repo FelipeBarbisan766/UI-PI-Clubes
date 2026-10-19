@@ -114,11 +114,13 @@ export const routes: Routes = [
       // },
       {
         path: 'user-config',
+        canActivate: [authGuard],
         loadComponent: () =>
           import('./features/user/user-config/user-config').then((m) => m.UserConfig),
       },
       {
         path: 'user-reserves',
+        canActivate: [authGuard],
         loadComponent: () =>
           import('./features/user/user-reserves/user-reserves').then((m) => m.UserReserve),
       },

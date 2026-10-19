@@ -177,6 +177,42 @@
           </div>
         </div>
 
+        <div class="form-group">
+          <div class="flex items-start gap-3">
+            <input
+              id="acceptedTerms"
+              type="checkbox"
+              formControlName="acceptedTerms"
+              class="checkbox checkbox-sm mt-0.5"
+              (click)="onTermsCheckboxClick($event)"
+              [class.checkbox-error]="
+                form.controls.acceptedTerms.invalid && form.controls.acceptedTerms.touched
+              "
+              [attr.aria-invalid]="
+                form.controls.acceptedTerms.invalid && form.controls.acceptedTerms.touched
+              "
+              [attr.aria-describedby]="
+                form.controls.acceptedTerms.invalid && form.controls.acceptedTerms.touched
+                  ? 'acceptedTerms-error'
+                  : null
+              "
+            />
+            <label for="acceptedTerms" class="text-sm text-base-content/80">
+              Li e concordo com os
+              <button type="button" class="link link-primary font-semibold" (click)="openTerms()">
+                Termos de Uso e a Política de Privacidade
+              </button>
+            </label>
+          </div>
+          <div class="h-5 mt-1 px-3">
+            @if (form.controls.acceptedTerms.invalid && form.controls.acceptedTerms.touched) {
+              <p id="acceptedTerms-error" class="text-error text-xs" role="alert">
+                Você precisa aceitar os Termos de Uso e a Política de Privacidade.
+              </p>
+            }
+          </div>
+        </div>
+
         <div class="mt-2 pt-2">
           <button
             type="submit"
@@ -199,7 +235,20 @@
           <hr class="flex-1 border-base-300" />
         </div>
 
-        <div #googleBtn aria-label="Cadastrar com Google" class="flex justify-center"></div>
+        <div
+          class="flex flex-col items-center gap-1 transition-opacity"
+          [class.opacity-50]="!termsAccepted()"
+          [class.pointer-events-none]="!termsAccepted()"
+          [attr.inert]="termsAccepted() ? null : ''"
+          [attr.aria-disabled]="!termsAccepted()"
+        >
+          <div #googleBtn aria-label="Cadastrar com Google" class="flex justify-center"></div>
+        </div>
+        @if (!termsAccepted()) {
+          <p class="text-center text-base-content/60 text-xs">
+            Aceite os Termos de Uso e a Política de Privacidade para cadastrar com o Google.
+          </p>
+        }
 
         <div class="text-center pt-1">
           <p class="text-base-content/60 text-xs md:text-sm">
@@ -216,3 +265,25 @@
     </div>
   </div>
 </div>
+
+<dialog
+  #termsDialog
+  class="modal"
+  aria-labelledby="terms-modal-title"
+  (cancel)="$event.preventDefault()"
+>
+  <div class="modal-box w-11/12 max-w-4xl p-0 flex flex-col max-h-[90vh]">
+    <div class="px-6 py-4 border-b border-base-300 shrink-0">
+      <h2 id="terms-modal-title" class="text-lg font-bold">Termos de Uso e Privacidade</h2>
+    </div>
+
+    <div class="flex-1 min-h-0 overflow-y-auto px-2 md:px-4">
+      <app-termspgae [embedded]="true" />
+    </div>
+
+    <div class="modal-action m-0 px-6 py-4 border-t border-base-300 shrink-0">
+      <button type="button" class="btn" (click)="cancelTerms()">Cancelar</button>
+      <button type="button" class="btn btn-primary" (click)="acceptTerms()">Li e aceito</button>
+    </div>
+  </div>
+</dialog>

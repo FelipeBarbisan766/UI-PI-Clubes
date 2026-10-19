@@ -8,7 +8,7 @@ import {
   ElementRef,
   DestroyRef,
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
   NonNullableFormBuilder,
@@ -24,6 +24,8 @@ import { GoogleAuthService } from '../../services/service-google';
 import { AuthService } from '../../../../core/services/auth-service';
 import { OnlyLetters } from '../../../../shared/directives/only-letters';
 import { EmailDirective } from '../../../../shared/directives/email-directive';
+// TODO: ajuste o caminho conforme a localização do seu componente de termos
+import { Termspgae } from '../../../../shared/components/termspgae/termspgae';
 
 function passwordsMatchValidator(control: AbstractControl): ValidationErrors | null {
   const password = control.get('password')?.value ?? '';
@@ -33,7 +35,7 @@ function passwordsMatchValidator(control: AbstractControl): ValidationErrors | n
 
 @Component({
   selector: 'app-sign-up',
-  imports: [ReactiveFormsModule, RouterLink, ToastAlert, OnlyLetters, EmailDirective],
+  imports: [ReactiveFormsModule, RouterLink, ToastAlert, OnlyLetters, EmailDirective, Termspgae],
   templateUrl: './sign-up.html',
   styleUrl: './sign-up.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -47,6 +49,7 @@ export class SignUp implements AfterViewInit {
   private readonly destroyRef = inject(DestroyRef);
 
   readonly googleBtnRef = viewChild<ElementRef<HTMLElement>>('googleBtn');
+  readonly termsDialog = viewChild<ElementRef<HTMLDialogElement>>('termsDialog');
 
   readonly isSubmitting = signal(false);
   readonly errorMessage = signal<string | null>(null);
@@ -71,9 +74,14 @@ export class SignUp implements AfterViewInit {
         ],
       ],
       confirmPassword: ['', [Validators.required]],
+      acceptedTerms: [false, [Validators.requiredTrue]],
     },
     { validators: passwordsMatchValidator },
   );
+
+  readonly termsAccepted = toSignal(this.form.controls.acceptedTerms.valueChanges, {
+    initialValue: this.form.controls.acceptedTerms.value,
+  });
 
   ngAfterViewInit(): void {
     const btnEl = this.googleBtnRef()?.nativeElement;
@@ -85,7 +93,37 @@ export class SignUp implements AfterViewInit {
     this.destroyRef.onDestroy(() => this.googleAuth.cancel());
   }
 
+  onTermsCheckboxClick(event: Event): void {
+    // Impede o checkbox de alternar sozinho: o aceite só acontece pelo modal.
+    event.preventDefault();
+    this.openTerms();
+  }
+
+  openTerms(): void {
+    this.termsDialog()?.nativeElement.showModal();
+  }
+
+  acceptTerms(): void {
+    const control = this.form.controls.acceptedTerms;
+    control.setValue(true);
+    control.markAsTouched();
+    this.termsDialog()?.nativeElement.close();
+  }
+
+  cancelTerms(): void {
+    const control = this.form.controls.acceptedTerms;
+    control.setValue(false);
+    control.markAsTouched();
+    this.termsDialog()?.nativeElement.close();
+  }
+
   private handleGoogleSignUp(idToken: string): void {
+    if (!this.form.controls.acceptedTerms.value) {
+      this.form.controls.acceptedTerms.markAsTouched();
+      this.errorMessage.set('Para continuar, aceite os Termos de Uso e a Política de Privacidade.');
+      return;
+    }
+
     this.isSubmitting.set(true);
     this.errorMessage.set(null);
     console.log('Google ID Token:', idToken);
@@ -132,7 +170,7 @@ export class SignUp implements AfterViewInit {
     this.isSubmitting.set(true);
     this.errorMessage.set(null);
 
-    const { confirmPassword: _, ...payload } = this.form.getRawValue();
+    const { confirmPassword: _, acceptedTerms: __, ...payload } = this.form.getRawValue();
 
     this.signUpService
       .signUp(payload)
