@@ -16,22 +16,26 @@ export interface Plan {
   isActive: boolean;
 }
 
+export interface CreatePaymentRequest {
+  planId: string;
+}
+
 export interface PaymentInitiateResult {
   paymentId: string;
   checkoutUrl: string;
 }
 
-export type PaymentMethod = 'Pix' | 'CreditCard' | 'Boleto';
-export type PaymentStatus = 'Pending' | 'Confirmed' | 'Failed' | 'Refunded';
+export type PaymentStatus = 'Pending' | 'Confirmed' | 'Failed';
 export type TypeAccess = 'Owner' | 'Manager' | 'Staff';
 
 export interface PaymentHistory {
   id: string;
   amount: number;
   date: string;
-  method: PaymentMethod;
+  /** ID do método no Mercado Pago (pix, visa, master...). Null até o comprador pagar. */
+  method: string | null;
   status: PaymentStatus;
-  gatewayTransactionId: string | null;
+  mercadoPagoPaymentId: string | null;
 }
 
 export interface ActiveSubscription {
@@ -79,13 +83,13 @@ export class ServiceSubscription {
       .pipe(catchError(this.handleError));
   }
 
-  initiatePayment(planId: string, method: PaymentMethod): Observable<PaymentInitiateResult> {
+  /** O adminId vem do cookie e o valor é calculado pela API a partir do plano. */
+  initiatePayment(planId: string): Observable<PaymentInitiateResult> {
+    const body: CreatePaymentRequest = { planId };
     return this.http
-      .post<PaymentInitiateResult>(
-        `${environment.apiUrl}/payment/initiate`,
-        { planId, method },
-        { withCredentials: true },
-      )
+      .post<PaymentInitiateResult>(`${environment.apiUrl}/payment/initiate`, body, {
+        withCredentials: true,
+      })
       .pipe(catchError(this.handleError));
   }
 

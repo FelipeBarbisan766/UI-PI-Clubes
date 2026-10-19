@@ -1,104 +1,76 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  OnDestroy,
+  DestroyRef,
   OnInit,
   computed,
   inject,
   signal,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription, interval } from 'rxjs';
-import { switchMap, take } from 'rxjs/operators';
+import { map, take, takeWhile, timer, switchMap } from 'rxjs';
 import {
   Plan,
-  PaymentMethod,
+  PaymentStatus,
   ServiceSubscription,
   SubscriptionApiError,
 } from '../../services/service-subscription';
 import { AuthService } from '../../../../core/services/auth-service';
 
-type PaymentStep = 'select-method' | 'redirecting' | 'success' | 'pending' | 'failure';
+type PaymentStep = 'review' | 'redirecting' | 'success' | 'pending' | 'failure';
+type TrackedStatus = PaymentStatus | 'Unknown';
 
-const METHOD_LABELS: Record<PaymentMethod, string> = {
-  Pix: 'PIX',
-  CreditCard: 'Cartão de Crédito',
-  Boleto: 'Boleto Bancário',
-};
-
-const METHOD_DESCRIPTIONS: Record<PaymentMethod, string> = {
-  Pix: 'Aprovação imediata',
-  CreditCard: 'Parcelamento disponível',
-  Boleto: 'Vence em 3 dias úteis',
-};
+const PENDING_PAYMENT_KEY = 'clubera:pendingPaymentId';
+const POLL_INTERVAL_MS = 3000;
+const MAX_POLL_ATTEMPTS = 20; // 20 × 3 s ≈ 60 s
 
 @Component({
   selector: 'app-payment',
   templateUrl: './payment.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Payment implements OnInit, OnDestroy {
+export class Payment implements OnInit {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly subscriptionService = inject(ServiceSubscription);
   private readonly authService = inject(AuthService);
 
   // ─── State signals ──────────────────────────────────────────────────────
-  readonly step = signal<PaymentStep>('select-method');
+  readonly step = signal<PaymentStep>('review');
   readonly isLoading = signal(false);
   readonly errorMessage = signal('');
   readonly hasActiveSubscriptionConflict = signal(false);
-  readonly selectedMethod = signal<PaymentMethod | null>(null);
   readonly selectedPlan = signal<Plan | null>(null);
+
+  // Acompanhamento do pagamento (página de retorno)
+  readonly paymentStatus = signal<TrackedStatus>('Pending');
   readonly isPolling = signal(false);
-  readonly accessConfirmed = signal(false);
   readonly pollTimedOut = signal(false);
 
-  // ─── Derived state ──────────────────────────────────────────────────────
-  readonly methodOptions: PaymentMethod[] = ['Pix', 'CreditCard', 'Boleto'];
-
-  readonly methodLabels = METHOD_LABELS;
-  readonly methodDescriptions = METHOD_DESCRIPTIONS;
-
-  readonly canSubmit = computed(
-    () => this.selectedMethod() !== null && !this.isLoading()
-  );
-
-  // ─── Polling config ─────────────────────────────────────────────────────
-  private readonly MAX_POLL_ATTEMPTS = 20; // 20 × 3 s = 60 s max
-  private pollAttempts = 0;
-  private pollingSubscription?: Subscription;
+  readonly canSubmit = computed(() => this.selectedPlan() !== null && !this.isLoading());
 
   // ─── Lifecycle ──────────────────────────────────────────────────────────
 
   ngOnInit(): void {
     this.route.data.pipe(take(1)).subscribe((data) => {
-      const step = (data['paymentStep'] as PaymentStep) ?? 'select-method';
+      const step = (data['paymentStep'] as PaymentStep) ?? 'review';
       this.step.set(step);
 
       if (step === 'success') {
         this.startPolling();
-      } else if (step === 'select-method') {
+      } else if (step === 'review') {
         this.loadPlanFromQueryParams();
       }
     });
   }
 
-  ngOnDestroy(): void {
-    this.pollingSubscription?.unsubscribe();
-  }
-
   // ─── Actions ────────────────────────────────────────────────────────────
 
-  selectMethod(method: PaymentMethod): void {
-    this.selectedMethod.set(method);
-  }
-
   initiatePayment(): void {
-    const method = this.selectedMethod();
     const plan = this.selectedPlan();
-
-    if (!method || !plan) return;
+    if (!plan || this.isLoading()) return; // evita clique duplo (cada clique cria uma order)
 
     if (!this.authService.isAuthenticated()) {
       this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
@@ -111,15 +83,17 @@ export class Payment implements OnInit, OnDestroy {
     this.step.set('redirecting');
 
     this.subscriptionService
-      .initiatePayment(plan.id, method)
-      .pipe(take(1))
+      .initiatePayment(plan.id)
+      .pipe(take(1), takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (result) => {
-          window.location.href = result.checkoutUrl;
+        next: ({ paymentId, checkoutUrl }) => {
+          // Na volta do Mercado Pago o app recarrega do zero: o paymentId diz o que acompanhar.
+          sessionStorage.setItem(PENDING_PAYMENT_KEY, paymentId);
+          window.location.href = checkoutUrl;
         },
         error: (err: SubscriptionApiError) => {
           this.isLoading.set(false);
-          this.step.set('select-method');
+          this.step.set('review');
 
           if (err.status === 409) {
             this.hasActiveSubscriptionConflict.set(true);
@@ -142,6 +116,7 @@ export class Payment implements OnInit, OnDestroy {
   }
 
   retryPayment(): void {
+    sessionStorage.removeItem(PENDING_PAYMENT_KEY);
     this.router.navigate(['/plans']);
   }
 
@@ -157,7 +132,7 @@ export class Payment implements OnInit, OnDestroy {
 
       this.subscriptionService
         .getPlans()
-        .pipe(take(1))
+        .pipe(take(1), takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: (plans) => {
             const plan = plans.find((p) => p.id === planId) ?? null;
@@ -172,32 +147,42 @@ export class Payment implements OnInit, OnDestroy {
     });
   }
 
-
+  /**
+   * A página de retorno NÃO confirma pagamento: quem confirma é o webhook.
+   * Aqui só acompanhamos o status do paymentId guardado até sair de Pending.
+   */
   private startPolling(): void {
-    this.isPolling.set(true);
-    this.pollAttempts = 0;
+    const paymentId = sessionStorage.getItem(PENDING_PAYMENT_KEY);
+    if (!paymentId) {
+      this.paymentStatus.set('Unknown'); // abriu a página direto, sem iniciar pagamento
+      return;
+    }
 
-    this.pollingSubscription = interval(3000)
+    this.isPolling.set(true);
+    let attempts = 0;
+
+    timer(0, POLL_INTERVAL_MS)
       .pipe(
-        switchMap(() => this.subscriptionService.checkAccess()),
-        take(this.MAX_POLL_ATTEMPTS)
+        switchMap(() => this.subscriptionService.getPaymentHistory()),
+        map((list): TrackedStatus => list.find((p) => p.id === paymentId)?.status ?? 'Unknown'),
+        takeWhile((status) => {
+          attempts++;
+          return status === 'Pending' && attempts < MAX_POLL_ATTEMPTS;
+        }, true),
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
-        next: (result) => {
-          this.pollAttempts++;
-          if (result.hasAccess) {
-            this.isPolling.set(false);
-            this.accessConfirmed.set(true);
-            this.pollingSubscription?.unsubscribe();
-          }
-        },
+        next: (status) => this.paymentStatus.set(status),
         error: () => {
           this.isPolling.set(false);
+          this.pollTimedOut.set(true);
         },
         complete: () => {
-          if (!this.accessConfirmed()) {
-            this.isPolling.set(false);
+          this.isPolling.set(false);
+          if (this.paymentStatus() === 'Pending') {
             this.pollTimedOut.set(true);
+          } else {
+            sessionStorage.removeItem(PENDING_PAYMENT_KEY);
           }
         },
       });
