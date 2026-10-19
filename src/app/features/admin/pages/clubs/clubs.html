@@ -1,11 +1,13 @@
-<div class="card p-6 max-w-7xl mx-auto">
-  <div class="card-body bg-base-200 rounded-lg shadow-sm">
-    <!-- Cabeçalho -->
-    <div class="flex flex-col justify-between items-start md:flex-row md:items-center mb-8 gap-4">
-      <div class="flex items-center gap-4">
-        <div class="avatar avatar-placeholder">
+<div class="bg-base-200 min-h-screen">
+  <!-- Cabeçalho -->
+  <header class="bg-base-100 border-b border-base-300">
+    <div
+      class="max-w-5xl mx-auto px-4 sm:px-6 py-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
+    >
+      <div class="flex items-center gap-4 min-w-0">
+        <div class="avatar avatar-placeholder shrink-0">
           <div
-            class="w-24 h-24 rounded-full bg-neutral text-neutral-content relative overflow-hidden"
+            class="w-14 h-14 rounded-full bg-neutral text-neutral-content relative overflow-hidden"
           >
             @if (avatarUrl(); as avatarUrl) {
               <img
@@ -15,19 +17,19 @@
                 class="object-cover"
               />
             } @else {
-              <span class="text-3xl font-semibold flex items-center justify-center w-full h-full">
+              <span class="text-xl font-semibold flex items-center justify-center w-full h-full">
                 {{ initials() }}
               </span>
             }
           </div>
         </div>
-        <div>
-          <p class="text-base-content/60 mt-1">Olá, {{ displayName() }}</p>
+        <div class="min-w-0">
+          <p class="text-sm text-base-content/60 mt-1 truncate">Olá, {{ displayName() }}</p>
           <h1 class="text-2xl font-bold text-base-content">Selecione um clube para gerenciar</h1>
         </div>
       </div>
 
-      <div class="flex flex-col items-start md:items-end gap-2">
+      <div class="flex flex-col items-start md:items-end gap-2 shrink-0">
         <div
           class="tooltip-left"
           [class.tooltip]="!canCreateClub()"
@@ -35,27 +37,22 @@
         >
           <button
             type="button"
-            class="btn btn-primary text-white"
+            class="btn btn-primary text-white gap-2"
             [disabled]="!canCreateClub()"
             aria-describedby="club-limit-info"
             (click)="openCreate()"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              class="h-5 w-5 mr-1"
+              class="h-4 w-4"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
               aria-hidden="true"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 4v16m8-8H4"
-              />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>
-            Novo Clube
+            Novo clube
           </button>
         </div>
 
@@ -69,116 +66,121 @@
         }
       </div>
     </div>
+  </header>
 
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-6">
     <!-- Alertas -->
     @if (!canCreateClub()) {
-      <div role="alert" class="alert alert-warning alert-soft mb-6">
+      <div role="alert" class="alert alert-warning alert-soft shadow-sm">
         <span>Você atingiu o limite de clubes do seu plano. Faça upgrade para cadastrar mais.</span>
         <a class="btn btn-sm" routerLink="/plans">Ver planos</a>
       </div>
     }
 
     @if (clubService.error()) {
-      <div role="alert" class="alert alert-error mb-6">
+      <div role="alert" class="alert alert-error shadow-sm">
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          class="stroke-current shrink-0 h-6 w-6"
-          fill="none"
+          class="h-5 w-5 shrink-0"
           viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
           aria-hidden="true"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
+          <circle cx="12" cy="12" r="10" />
+          <line x1="15" y1="9" x2="9" y2="15" />
+          <line x1="9" y1="9" x2="15" y2="15" />
         </svg>
         <span>Erro: {{ clubService.error() }}</span>
       </div>
     }
 
-    @if (clubService.loading()) {
-      <div class="flex justify-center my-10" role="status" aria-live="polite" aria-busy="true">
-        <span class="loading loading-spinner loading-lg text-primary" aria-hidden="true"></span>
-        <span class="sr-only">Carregando clubes...</span>
-      </div>
-    }
-
-    <!-- Listagem de Clubes -->
+    <!-- Listagem de clubes -->
     @if (!isFormOpen()) {
-      @if (clubService.isEmpty()) {
+      @if (clubService.loading() && clubService.isEmpty()) {
         <div
-          class="text-center py-16 text-base-content/50 border-2 border-dashed border-base-300 rounded-box"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          role="status"
+          aria-busy="true"
+          aria-label="Carregando clubes"
         >
-          <p class="text-lg">Nenhum clube cadastrado ainda.</p>
-        </div>
-      } @else {
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          @for (club of clubService.clubs(); track club.id) {
-            <div class="card bg-base-100 card-border shadow-sm hover:shadow-md transition-shadow">
-              <div class="card-body p-5">
-                <!-- Título e Ações -->
-                <div class="flex justify-between items-start">
-                  <h2 class="card-title text-lg font-bold">{{ club.name }}</h2>
+          @for (i of [1, 2, 3]; track i) {
+            <div class="card bg-base-100 shadow-sm">
+              <div class="card-body gap-4">
+                <div class="skeleton h-5 w-40"></div>
+                <div class="flex gap-2">
+                  <div class="skeleton h-6 w-20 rounded-full"></div>
+                  <div class="skeleton h-6 w-24 rounded-full"></div>
                 </div>
-
-                <!-- Tags de Informação -->
-                <div class="flex flex-wrap gap-2 mt-2">
-                  <div
-                    class="badge badge-neutral badge-outline bg-base-200 border-none text-xs font-semibold px-3 py-2 h-auto text-base-content/70"
-                  >
-                    {{ club.city }}
-                  </div>
-                  <div
-                    class="badge badge-neutral badge-outline bg-base-200 border-none text-xs font-semibold px-3 py-2 h-auto text-base-content/70"
-                  >
-                    {{ club.courtCount }} quadra(s)
-                  </div>
-                </div>
-
-                <!-- Descrição -->
-                <p class="text-sm text-base-content/60 mt-3 line-clamp-2 min-h-[40px]">
-                  {{ club.description }}
-                </p>
-
-                <!-- Preço / Info Final -->
-                <div
-                  class="mt-4 pt-4 border-t border-base-200 flex items-center justify-between gap-2"
-                >
-                  <div class="flex flex-col gap-1">
-                    <p class="font-bold text-primary text-xl">R$ {{ club.minPrice }}/h</p>
-                    <p class="text-xs text-base-content/50">{{ club.phoneNumber }}</p>
-                  </div>
-                  <button
-                    type="button"
-                    class="btn btn-outline btn-sm gap-2"
-                    aria-label="Gerenciar quadras do clube"
-                    title="Gerenciar Quadras"
-                    (click)="goToCourts(club.id)"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      aria-hidden="true"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
-                    Selecionar
-                  </button>
-                </div>
+                <div class="skeleton h-10 w-full"></div>
+                <div class="skeleton h-10 w-full rounded-lg"></div>
               </div>
             </div>
           }
         </div>
+      } @else if (clubService.isEmpty()) {
+        <div class="card bg-base-100 shadow-sm max-w-lg mx-auto">
+          <div class="card-body items-center text-center gap-4 py-12">
+            <h2 class="text-xl font-bold text-base-content">Nenhum clube cadastrado ainda</h2>
+            <p class="text-sm text-base-content/60">
+              Cadastre seu primeiro clube para começar a gerenciar quadras e reservas.
+            </p>
+            @if (canCreateClub()) {
+              <button type="button" class="btn btn-primary text-white px-8" (click)="openCreate()">
+                Cadastrar clube
+              </button>
+            }
+          </div>
+        </div>
+      } @else {
+        <ul
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          aria-label="Seus clubes"
+        >
+          @for (club of clubService.clubs(); track club.id) {
+            <li class="flex">
+              <article class="card w-full bg-base-100 shadow-sm">
+                <div class="card-body gap-3">
+                  <h2 class="card-title text-lg font-bold text-base-content">{{ club.name }}</h2>
+
+                  <div class="flex flex-wrap gap-2">
+                    <span class="badge badge-ghost">{{ club.city }}</span>
+                    <span class="badge badge-ghost">{{ club.courtCount }} quadra(s)</span>
+                  </div>
+
+                  <p class="text-sm text-base-content/60 line-clamp-2 min-h-10">
+                    {{ club.description }}
+                  </p>
+
+                  <div class="divider my-0"></div>
+
+                  <div class="flex items-center justify-between gap-2">
+                    
+                    <button
+                      type="button"
+                      class="btn btn-outline btn-sm gap-2 shrink-0"
+                      [attr.aria-label]="'Selecionar clube ' + club.name"
+                      (click)="goToCourts(club.id)"
+                    >
+                      Selecionar
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        aria-hidden="true"
+                      >
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </article>
+            </li>
+          }
+        </ul>
       }
     }
   </div>
@@ -203,7 +205,7 @@
       <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-3" novalidate>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-2">
           <div class="flex flex-col w-full md:col-span-2">
-            <label class="py-1 font-medium text-xs text-base-content" for="name"
+            <label class="self-start py-1 font-medium text-xs text-base-content" for="name"
               >Nome do Clube</label
             >
             <input
@@ -229,7 +231,7 @@
           </div>
 
           <div class="flex flex-col w-full md:col-span-1">
-            <label class="py-1 font-medium text-xs text-base-content" for="phoneNumber"
+            <label class="self-start py-1 font-medium text-xs text-base-content" for="phoneNumber"
               >Telefone</label
             >
             <input
@@ -254,7 +256,7 @@
           </div>
 
           <div class="flex flex-col w-full md:col-span-3">
-            <label class="py-1 font-medium text-xs text-base-content" for="description"
+            <label class="self-start py-1 font-medium text-xs text-base-content" for="description"
               >Descrição</label
             >
             <textarea
@@ -281,7 +283,9 @@
           <legend class="fieldset-legend text-sm font-semibold px-2">Endereço</legend>
           <div class="grid grid-cols-1 md:grid-cols-4 gap-x-4 gap-y-2 w-full">
             <div class="flex flex-col w-full md:col-span-1">
-              <label class="py-1 font-medium text-xs text-base-content" for="zipCode">CEP</label>
+              <label class="self-start py-1 font-medium text-xs text-base-content" for="zipCode"
+                >CEP</label
+              >
               <input
                 id="zipCode"
                 type="text"
@@ -303,7 +307,9 @@
             </div>
 
             <div class="flex flex-col w-full md:col-span-3">
-              <label class="py-1 font-medium text-xs text-base-content" for="street">Rua</label>
+              <label class="self-start py-1 font-medium text-xs text-base-content" for="street"
+                >Rua</label
+              >
               <input
                 id="street"
                 type="text"
@@ -324,7 +330,9 @@
             </div>
 
             <div class="flex flex-col w-full md:col-span-1">
-              <label class="py-1 font-medium text-xs text-base-content" for="number">Número</label>
+              <label class="self-start py-1 font-medium text-xs text-base-content" for="number"
+                >Número</label
+              >
               <input
                 id="number"
                 type="text"
@@ -345,7 +353,7 @@
             </div>
 
             <div class="flex flex-col w-full md:col-span-1">
-              <label class="py-1 font-medium text-xs text-base-content" for="complement"
+              <label class="self-start py-1 font-medium text-xs text-base-content" for="complement"
                 >Complemento</label
               >
               <input
@@ -358,7 +366,7 @@
             </div>
 
             <div class="flex flex-col w-full md:col-span-2">
-              <label class="py-1 font-medium text-xs text-base-content" for="neighborhood"
+              <label class="self-start py-1 font-medium text-xs text-base-content" for="neighborhood"
                 >Bairro</label
               >
               <input
@@ -381,7 +389,9 @@
             </div>
 
             <div class="flex flex-col w-full md:col-span-2">
-              <label class="py-1 font-medium text-xs text-base-content" for="city">Cidade</label>
+              <label class="self-start py-1 font-medium text-xs text-base-content" for="city"
+                >Cidade</label
+              >
               <input
                 id="city"
                 type="text"
@@ -402,7 +412,9 @@
             </div>
 
             <div class="flex flex-col w-full md:col-span-1">
-              <label class="py-1 font-medium text-xs text-base-content" for="state">Estado</label>
+              <label class="self-start py-1 font-medium text-xs text-base-content" for="state"
+                >Estado</label
+              >
               <input
                 id="state"
                 type="text"
@@ -423,7 +435,9 @@
             </div>
 
             <div class="flex flex-col w-full md:col-span-1">
-              <label class="py-1 font-medium text-xs text-base-content" for="country">País</label>
+              <label class="self-start py-1 font-medium text-xs text-base-content" for="country"
+                >País</label
+              >
               <select
                 id="country"
                 formControlName="country"
@@ -449,7 +463,7 @@
         </fieldset>
 
         <div class="flex flex-col w-full mt-1">
-          <label class="py-1 font-medium text-xs text-base-content" for="images"
+          <label class="self-start py-1 font-medium text-xs text-base-content" for="images"
             >Imagens do Clube</label
           >
           <input

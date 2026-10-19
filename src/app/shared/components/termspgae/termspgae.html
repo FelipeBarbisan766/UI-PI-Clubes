@@ -1,7 +1,7 @@
-<div class="max-w-4xl mx-auto px-4 py-8">
-  <div class="tabs tabs-box justify-center mb-8">
+<div class="max-w-4xl mx-auto" [class.px-4]="!embedded()" [class.py-8]="!embedded()">
+  <div class="tabs tabs-box justify-center" [class.mb-8]="!embedded()" [class.mb-2]="embedded()">
     <input type="radio" name="legal_tabs" class="tab" aria-label="Termos de Uso" checked="checked" />
-    <div class="tab-content bg-base-100 border-base-300 rounded-box p-6 mt-4">
+    <div class="tab-content bg-base-100 border-base-300 rounded-box mt-4 p-4 md:p-6">
       <article class="prose max-w-none">
         <h1 class="text-2xl font-bold mb-2">TERMOS DE USO — CLUBERA</h1>
         <p class="text-sm opacity-70 mb-6"><strong>Última atualização:</strong> 14/09/2026</p>
@@ -120,7 +120,7 @@
     </div>
 
     <input type="radio" name="legal_tabs" class="tab" aria-label="Política de Privacidade" />
-    <div class="tab-content bg-base-100 border-base-300 rounded-box p-6 mt-4">
+    <div class="tab-content bg-base-100 border-base-300 rounded-box mt-4 p-4 md:p-6">
       <article class="prose max-w-none">
         <h1 class="text-2xl font-bold mb-2">POLÍTICA DE PRIVACIDADE — CLUBERA</h1>
         <p class="text-sm opacity-70 mb-6"><strong>Última atualização:</strong> 14/09/2026</p>

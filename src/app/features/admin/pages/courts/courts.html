@@ -244,7 +244,7 @@
     <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-3">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-2">
         <div class="flex flex-col w-full md:col-span-2">
-          <label class="py-1 font-medium text-xs text-base-content" for="name"
+          <label class="self-start py-1 font-medium text-xs text-base-content" for="name"
             >Nome da Quadra</label
           >
           <input
@@ -263,16 +263,22 @@
         </div>
 
         <div class="flex flex-col w-full md:col-span-1">
-          <label class="py-1 font-medium text-xs text-base-content" for="pricePerHour"
+          <label class="self-start py-1 font-medium text-xs text-base-content" for="pricePerHour"
             >Preço por Hora (R$)</label
           >
           <input
             id="pricePerHour"
             type="text"
+            inputmode="decimal"
             formControlName="pricePerHour"
+            mask="separator.2"
+            thousandSeparator="."
+            decimalMarker=","
+            prefix="R$ "
             class="input input-bordered input-sm w-full"
             [class.input-error]="fieldInvalid('pricePerHour')"
-            placeholder="0.00"
+            [attr.aria-invalid]="fieldInvalid('pricePerHour')"
+            placeholder="R$ 0,00"
           />
           @if (fieldInvalid('pricePerHour')) {
             <span role="alert" class="block text-error text-[11px] mt-1 font-medium px-1"
@@ -282,7 +288,9 @@
         </div>
 
         <div class="flex flex-col w-full md:col-span-1">
-          <label class="py-1 font-medium text-xs text-base-content" for="surface">Superfície</label>
+          <label class="self-start py-1 font-medium text-xs text-base-content" for="surface"
+            >Superfície</label
+          >
           <select
             id="surface"
             formControlName="surface"
@@ -302,7 +310,7 @@
         </div>
 
         <div class="flex flex-col w-full md:col-span-1 justify-center pt-5">
-          <label class="label cursor-pointer justify-start gap-3">
+          <label class="self-start label cursor-pointer justify-start gap-3">
             <span class="label-text font-medium text-xs text-base-content">Quadra é coberta?</span>
             <input
               type="checkbox"
@@ -313,11 +321,13 @@
         </div>
 
         <div class="flex flex-col w-full md:col-span-3">
-          <label class="py-1 font-medium text-xs text-base-content">Modalidades esportivas</label>
+          <span class="self-start py-1 font-medium text-xs text-base-content" id="sports-label"
+            >Modalidades esportivas</span
+          >
           <div
             class="flex flex-wrap gap-2 mt-1"
             role="group"
-            aria-label="Selecione as modalidades da quadra"
+            aria-labelledby="sports-label"
           >
             @for (sport of sportService.sports(); track sport.id) {
               <label
@@ -346,7 +356,7 @@
         </div>
 
         <div class="flex flex-col w-full md:col-span-3">
-          <label class="py-1 font-medium text-xs text-base-content" for="description"
+          <label class="self-start py-1 font-medium text-xs text-base-content" for="description"
             >Descrição</label
           >
           <textarea
@@ -366,7 +376,7 @@
 
       @if (!isEditing()) {
         <div class="flex flex-col w-full mt-1">
-          <label class="py-1 font-medium text-xs text-base-content " for="images"
+          <label class="self-start py-1 font-medium text-xs text-base-content" for="images"
             >Imagens da Quadra</label
           >
           <input

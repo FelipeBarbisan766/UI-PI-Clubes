@@ -171,7 +171,7 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 - (verificar se é erro do sistema ou do cliente/navegador/apis de terceiros)
 
 ### Modal
-- ajustar tamanho da label
+- ~~ajustar tamanho da label~~
 
 ### refresh
 - ajustar auto refresh
@@ -185,7 +185,7 @@ src/app/shared/components/bread-crumb/bread-crumb.html
 ### cadastro
 - colocar dicas no espaço dos erros
 - verificar espaços e etc
-- adicionar checkbox de termos de uso
+- ~~adicionar checkbox de termos de uso~~
 
 ### editar e excluir
 - quadras

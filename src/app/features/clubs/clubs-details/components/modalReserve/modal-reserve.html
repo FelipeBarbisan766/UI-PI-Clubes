@@ -178,7 +178,7 @@
                 @if (slot) {
                   <span class="font-semibold text-right">{{ formatDate(slot.date) }}</span>
                 } @else {
-                  <span class="skeleton h-4 w-24" aria-hidden="true"></span>
+                  <span class="font-semibold text-right" aria-hidden="true">---</span>
                 }
               </p>
               <p class="flex justify-between items-center gap-4">
@@ -188,7 +188,7 @@
                     >{{ slot.startTime }} — {{ slot.endTime }}</span
                   >
                 } @else {
-                  <span class="skeleton h-4 w-28" aria-hidden="true"></span>
+                  <span class="font-semibold text-right" aria-hidden="true">---</span>
                 }
               </p>
 
@@ -201,7 +201,7 @@
                     formatPrice(court().pricePerHour)
                   }}</span>
                 } @else {
-                  <span class="skeleton h-7 w-24" aria-hidden="true"></span>
+                  <span class="text-2xl font-bold text-primary" aria-hidden="true">R$ 0,00</span>
                 }
               </p>
             </div>
