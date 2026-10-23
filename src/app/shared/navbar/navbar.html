@@ -3,22 +3,20 @@
   class="fixed top-0 inset-x-0 z-50 h-16 border-b border-white/5 bg-neutral/80 backdrop-blur-md"
 >
   <div class="container mx-auto px-3 sm:px-4 lg:px-6 h-full">
-    <div class="navbar h-full min-h-0 p-0 gap-2">
-      <div class="navbar-start min-w-0">
+    <div class="navbar h-full min-h-0 p-0 gap-2 flex-nowrap">
+      <div class="navbar-start min-w-0 w-auto flex-none">
         <button
           type="button"
           (click)="goToHome()"
           class="flex items-center shrink-0 cursor-pointer font-destaque text-white font-bold"
+          aria-label="Clubera - ir para o início"
         >
-        <div class="flex items-center gap-3">
-          <div class="w-8 h-8">
-            <img src="/logo.png" alt="">
+          <div class="flex items-center gap-2 sm:gap-3">
+            <img src="/logo.png" alt="" class="size-8 w-10 shrink-0" />
+            <span class="text-lg sm:text-xl whitespace-nowrap hidden min-[300px]:inline">
+              Clubera
+            </span>
           </div>
-          
-          <span class="text-lg sm:text-xl whitespace-nowrap hidden min-[350px]:inline">
-            Clubera
-          </span>
-        </div>
         </button>
 
         <div class="hidden lg:flex ml-6 min-w-0">
@@ -27,44 +25,45 @@
               <a
                 (click)="goToHome()"
                 class="text-gray-300 hover:text-white hover:bg-white/10 rounded-lg font-medium text-sm transition-colors"
+                >Início</a
               >
-                Início
-              </a>
             </li>
             <li>
               <a
                 (click)="goToClubsList()"
                 class="text-gray-300 hover:text-white hover:bg-white/10 rounded-lg font-medium text-sm transition-colors"
+                >Clubes</a
               >
-                Clubes
-              </a>
             </li>
             <li>
               <a
                 (click)="goToCourtsList()"
                 class="text-gray-300 hover:text-white hover:bg-white/10 rounded-lg font-medium text-sm transition-colors"
+                >Quadras</a
               >
-                Quadras
-              </a>
             </li>
           </ul>
         </div>
       </div>
 
-      <div class="navbar-end gap-1 sm:gap-2 lg:gap-4 shrink-0">
-        @if (!isAuthenticated()) {
-          <a
-            [routerLink]="['/login']"
-            class="btn btn-outline btn-primary btn-sm rounded-lg font-semibold text-white"
-          >
-            Entrar
-          </a>
-        } @else {
-          <app-notification-icon></app-notification-icon>
-          <app-user-menu></app-user-menu>
-        }
-
-        <div class="lg:hidden shrink-0">
+      <div class="navbar-end flex-1 min-w-0 flex-nowrap justify-end gap-1 sm:gap-2 lg:gap-4">
+        <ul class="menu menu-horizontal flex-nowrap p-0 gap-0" [class]="inlineLinksClass()">
+          <li>
+            <a
+              (click)="goToClubsList()"
+              class="px-2 text-gray-300 hover:text-white hover:bg-white/10 rounded-lg font-medium text-sm transition-colors"
+              >Clubes</a
+            >
+          </li>
+          <li>
+            <a
+              (click)="goToCourtsList()"
+              class="px-2 text-gray-300 hover:text-white hover:bg-white/10 rounded-lg font-medium text-sm transition-colors"
+              >Quadras</a
+            >
+          </li>
+        </ul>
+        <div class="shrink-0" [class]="hamburgerClass()">
           <button
             type="button"
             class="btn btn-sm btn-ghost btn-circle text-white"
@@ -95,7 +94,7 @@
           <ul
             id="mobile-nav-menu"
             popover
-            class="dropdown dropdown-end menu w-64 max-w-[90vw] rounded-box bg-base-100 shadow-sm mt-2"
+            class="dropdown dropdown-end menu w-64 max-w-[90vw] rounded-box border border-base-300 bg-base-100 shadow-sm mt-2"
             style="position-anchor: --mobile-nav-anchor"
             role="menu"
           >
@@ -108,13 +107,19 @@
             <li role="none">
               <button type="button" role="menuitem" (click)="goToCourtsList()">Quadras</button>
             </li>
-            @if (!isAuthenticated()) {
-              <li role="none">
-                <a role="menuitem" [routerLink]="['/login']">Entrar</a>
-              </li>
-            }
           </ul>
         </div>
+        @if (!isAuthenticated()) {
+          <a
+            [routerLink]="['/login']"
+            class="btn btn-outline btn-primary btn-sm rounded-lg font-semibold text-white shrink-0"
+          >
+            Entrar
+          </a>
+        } @else {
+          <app-notification-icon></app-notification-icon>
+          <app-user-menu></app-user-menu>
+        }
       </div>
     </div>
   </div>
