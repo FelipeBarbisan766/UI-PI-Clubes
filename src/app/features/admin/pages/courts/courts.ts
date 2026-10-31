@@ -5,6 +5,7 @@ import {
   OnInit,
   signal,
   computed,
+  DestroyRef,
 } from '@angular/core';
 import {
   AbstractControl,
@@ -14,7 +15,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { NgxMaskDirective } from 'ngx-mask';
 import { ServiceCourt } from '../../services/service-court';
 import { SurfaceEnum, ResponseCourtDTO } from '../../models/model-court';
@@ -23,6 +24,7 @@ import { Modal } from '../../../../shared/components/modal/modal';
 import { ToastAlert } from '../../../../shared/components/toast-alert/toast-alert';
 import { ServiceSubscriptionUsage } from '../../services/service-subscription-usage';
 import { getApiErrorMessage, isLimitExceededError } from '../../../../core/utils/api-error';
+import { finalize } from 'rxjs';
 
 type FormMode = 'create' | 'edit' | null;
 type ToastState = { message: string; type: 'success' | 'error' | 'warning' | 'info' };
@@ -65,13 +67,11 @@ export class Courts implements OnInit {
   protected readonly sportService = inject(ServiceSport);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute); // Injeção da rota para pegar o ID
-
-  private currentClubId: string = '';
-
-  // --- Limite do plano ---
+  private readonly destroyRef = inject(DestroyRef);
   private readonly usageService = inject(ServiceSubscriptionUsage);
 
   protected readonly planName = this.usageService.planName;
+  private currentClubId: string = '';
 
   protected readonly courtUsage = computed(() =>
     this.usageService.courtUsageFor(this.currentClubId),
@@ -82,6 +82,10 @@ export class Courts implements OnInit {
     const usage = this.courtUsage();
     return usage === null || usage.used < usage.limit;
   });
+  protected readonly togglingIds = signal<ReadonlySet<string>>(new Set());
+
+  // com o limite atingido (usage.used >= usage.limit), quadras inativas não podem ser ativadas
+  protected readonly limitReached = computed(() => !this.canCreateCourt());
 
   // --- Toast ---
   protected readonly toast = signal<ToastState | null>(null);
@@ -219,7 +223,50 @@ export class Courts implements OnInit {
   protected removeFile(index: number): void {
     this.selectedFiles.update((files) => files.filter((_, i) => i !== index));
   }
+  protected isToggleBlocked(court: ResponseCourtDTO): boolean {
+    return this.togglingIds().has(court.id) || (!court.isCourtActive && this.limitReached());
+  }
+  protected onToggleActive(court: ResponseCourtDTO, event: Event): void {
+  const input = event.target as HTMLInputElement;
 
+  if (this.isToggleBlocked(court)) {
+    input.checked = court.isCourtActive;
+    return;
+  }
+
+  this.togglingIds.update((ids) => new Set(ids).add(court.id));
+
+  this.courtService
+    .toggleActive(court.id)
+    .pipe(
+      finalize(() =>
+        this.togglingIds.update((ids) => {
+          const next = new Set(ids);
+          next.delete(court.id);
+          return next;
+        }),
+      ),
+      takeUntilDestroyed(this.destroyRef),
+    )
+    .subscribe({
+      next: () => {
+        this.usageService.refresh();
+        this.toast.set({
+          message: court.isCourtActive ? 'Quadra desativada.' : 'Quadra ativada.',
+          type: 'success',
+        });
+      },
+      error: (err: unknown) => {
+        // o checkbox já mudou visualmente; volta para o valor real
+        input.checked = court.isCourtActive;
+        this.courtService.clearError();
+        this.toast.set({
+          message: getApiErrorMessage(err),
+          type: isLimitExceededError(err) ? 'warning' : 'error',
+        });
+      },
+    });
+}
   // --- Esportes ---
 
   protected toggleSport(id: string): void {

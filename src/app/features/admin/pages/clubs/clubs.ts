@@ -10,15 +10,22 @@ import {
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { debounceTime, distinctUntilChanged, filter, map, switchMap } from 'rxjs/operators';
+import {
+  debounceTime,
+  distinctUntilChanged,
+  filter,
+  finalize,
+  map,
+  switchMap,
+} from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ServiceClub } from '../../services/service-club';
 import { AuthService } from '../../../../core/services/auth-service';
 import { Modal } from '../../../../shared/components/modal/modal';
-import { ViaCepService } from '../../../../core/services/via-cep'; 
+import { ViaCepService } from '../../../../core/services/via-cep';
 import { NgxMaskDirective } from 'ngx-mask';
 import { NgOptimizedImage } from '@angular/common';
-import { CountryEnum } from '../../models/model-club';
+import { CountryEnum, ResponseClubDTO } from '../../models/model-club';
 import { ToastAlert } from '../../../../shared/components/toast-alert/toast-alert';
 import { ServiceSubscriptionUsage } from '../../services/service-subscription-usage';
 import { getApiErrorMessage, isLimitExceededError } from '../../../../core/utils/api-error';
@@ -29,7 +36,15 @@ type ToastState = { message: string; type: 'success' | 'error' | 'warning' | 'in
 
 @Component({
   selector: 'app-club',
-  imports: [ReactiveFormsModule, Modal, NgxMaskDirective, NgOptimizedImage, RouterLink, ToastAlert, TextDirective],
+  imports: [
+    ReactiveFormsModule,
+    Modal,
+    NgxMaskDirective,
+    NgOptimizedImage,
+    RouterLink,
+    ToastAlert,
+    TextDirective,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './clubs.html',
 })
@@ -45,6 +60,12 @@ export class Clubs implements OnInit {
   protected readonly planName = this.usageService.planName;
   protected readonly clubsUsage = this.usageService.clubsUsage;
   protected readonly canCreateClub = this.usageService.canCreateClub;
+  protected readonly limitReached = computed(() => {
+    const usage = this.clubsUsage();
+    return !!usage && usage.used >= usage.limit;
+  });
+
+  
 
   // --- Toast ---
   protected readonly toast = signal<ToastState | null>(null);
@@ -62,9 +83,9 @@ export class Clubs implements OnInit {
       type: 'warning',
     });
   }
-
+  protected readonly togglingIds = signal<ReadonlySet<string>>(new Set());
   private readonly me = this.authService.me;
-  
+
   protected readonly countryOptions = Object.values(CountryEnum);
 
   readonly avatarUrl = computed(() => this.me()?.avatarUrl);
@@ -213,7 +234,7 @@ export class Clubs implements OnInit {
     if (this.formMode() === 'create') {
       this.submitCreate();
     } else {
-      return
+      return;
     }
   }
 
@@ -233,10 +254,61 @@ export class Clubs implements OnInit {
       },
     });
   }
+  protected isToggleBlocked(club: ResponseClubDTO): boolean {
+    return this.togglingIds().has(club.id) || (!club.isClubActive && this.limitReached());
+  }
+  protected onToggleActive(club: ResponseClubDTO, event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (this.togglingIds().has(club.id)) return;
+
+    this.togglingIds.update((ids) => new Set(ids).add(club.id));
+
+    this.clubService
+      .toggleActive(club.id)
+      .pipe(
+        finalize(() =>
+          this.togglingIds.update((ids) => {
+            const next = new Set(ids);
+            next.delete(club.id);
+            return next;
+          }),
+        ),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: () => {
+          this.usageService.refresh();
+          this.toast.set({
+            message: club.isClubActive ? 'Clube desativado.' : 'Clube ativado.',
+            type: 'success',
+          });
+        },
+        error: (err: unknown) => {
+          // o checkbox já mudou visualmente; volta para o valor real
+          input.checked = club.isClubActive;
+          this.clubService.clearError();
+          this.toast.set({
+            message: getApiErrorMessage(err),
+            type: isLimitExceededError(err) ? 'warning' : 'error',
+          });
+        },
+      });
+  }
 
   private dispatchCreate(adminId: string): void {
-    const { name, phoneNumber, description, zipCode, street, number, neighborhood, complement, city, state, country } =
-      this.form.getRawValue();
+    const {
+      name,
+      phoneNumber,
+      description,
+      zipCode,
+      street,
+      number,
+      neighborhood,
+      complement,
+      city,
+      state,
+      country,
+    } = this.form.getRawValue();
 
     this.clubService
       .create({

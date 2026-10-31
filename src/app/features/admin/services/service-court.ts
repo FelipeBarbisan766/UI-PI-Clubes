@@ -61,20 +61,29 @@ export class ServiceCourt {
       catchError((err) => this.handleError(err)),
     );
   }
-
+  toggleActive(id: string): Observable<void> {
+    return this.http.patch<void>(`${this.apiUrl}/${id}/toggle-active`, null).pipe(
+      tap(() =>
+        this._courts.update((courts) =>
+          courts.map((c) => (c.id === id ? { ...c, isCourtActive: !c.isCourtActive } : c)),
+        ),
+      ),
+      catchError((err) => this.handleError(err)),
+    );
+  }
   create(dto: CreateCourtDTO): Observable<ResponseCourtDTO> {
     this._loading.set(true);
     this._error.set(null);
 
     const formData = new FormData();
     formData.append('name', dto.name);
-    dto.sportIds.forEach(id => formData.append('SportIds', id));
+    dto.sportIds.forEach((id) => formData.append('SportIds', id));
     formData.append('surface', dto.surface.toString());
     formData.append('isCovered', String(dto.isCovered));
     formData.append('pricePerHour', dto.pricePerHour.toString());
     formData.append('description', dto.description);
     formData.append('clubId', dto.clubId);
-    dto.images.forEach(img => formData.append('images', img));
+    dto.images.forEach((img) => formData.append('images', img));
 
     return this.http.post<ResponseCourtDTO>(this.apiUrl, formData).pipe(
       tap((newCourt) => {
@@ -91,9 +100,7 @@ export class ServiceCourt {
 
     return this.http.put<ResponseCourtDTO>(`${this.apiUrl}/${id}`, dto).pipe(
       tap((updated) => {
-        this._courts.update((courts) =>
-          courts.map((c) => (c.id === id ? updated : c)),
-        );
+        this._courts.update((courts) => courts.map((c) => (c.id === id ? updated : c)));
         if (this._selectedCourt()?.id === id) {
           this._selectedCourt.set(updated);
         }

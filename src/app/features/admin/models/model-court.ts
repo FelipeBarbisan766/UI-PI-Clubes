@@ -45,6 +45,7 @@ export interface ResponseCourtDTO {
   isCovered: boolean;
   pricePerHour: number;
   description: string;
+  isCourtActive: boolean;
   clubId: string;
   imagesUrls: string[];
 }

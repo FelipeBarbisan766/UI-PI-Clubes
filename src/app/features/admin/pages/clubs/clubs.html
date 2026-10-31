@@ -50,7 +50,12 @@
               stroke="currentColor"
               aria-hidden="true"
             >
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 4v16m8-8H4"
+              />
             </svg>
             Novo clube
           </button>
@@ -134,19 +139,18 @@
           </div>
         </div>
       } @else {
-        <ul
-          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-          aria-label="Seus clubes"
-        >
+        <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" aria-label="Seus clubes">
           @for (club of clubService.clubs(); track club.id) {
             <li class="flex">
               <article class="card w-full bg-base-100 shadow-sm">
                 <div class="card-body gap-3">
                   <h2 class="card-title text-lg font-bold text-base-content">{{ club.name }}</h2>
-
                   <div class="flex flex-wrap gap-2">
                     <span class="badge badge-ghost">{{ club.city }}</span>
                     <span class="badge badge-ghost">{{ club.courtCount }} quadra(s)</span>
+                    @if (!club.isClubActive) {
+                      <span class="badge badge-warning badge-soft">Inativo</span>
+                    }
                   </div>
 
                   <p class="text-sm text-base-content/60 line-clamp-2 min-h-10">
@@ -156,7 +160,31 @@
                   <div class="divider my-0"></div>
 
                   <div class="flex items-center justify-between gap-2">
-                    
+                    <label
+                      class="flex items-center gap-2 tooltip-right"
+                      [class.tooltip]="!club.isClubActive && limitReached()"
+                      [class.cursor-pointer]="!isToggleBlocked(club)"
+                      [class.cursor-not-allowed]="isToggleBlocked(club)"
+                      [attr.data-tip]="
+                        !club.isClubActive && limitReached()
+                          ? 'Limite de clubes ativos atingido. Desative outro clube primeiro.'
+                          : null
+                      "
+                    >
+                      <input
+                        type="checkbox"
+                        role="switch"
+                        class="toggle toggle-success toggle-sm"
+                        [checked]="club.isClubActive"
+                        [disabled]="isToggleBlocked(club)"
+                        [attr.aria-label]="'Clube disponível: ' + club.name"
+                        (change)="onToggleActive(club, $event)"
+                      />
+                      <span class="text-sm text-base-content/70">
+                        {{ club.isClubActive ? 'Ativo' : 'Inativo' }}
+                      </span>
+                    </label>
+
                     <button
                       type="button"
                       class="btn btn-outline btn-sm gap-2 shrink-0"
@@ -172,7 +200,12 @@
                         stroke="currentColor"
                         aria-hidden="true"
                       >
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M9 5l7 7-7 7"
+                        />
                       </svg>
                     </button>
                   </div>
@@ -366,7 +399,9 @@
             </div>
 
             <div class="flex flex-col w-full md:col-span-2">
-              <label class="self-start py-1 font-medium text-xs text-base-content" for="neighborhood"
+              <label
+                class="self-start py-1 font-medium text-xs text-base-content"
+                for="neighborhood"
                 >Bairro</label
               >
               <input
@@ -478,9 +513,7 @@
           @if (selectedFiles().length > 0) {
             <ul class="flex flex-wrap gap-2 mt-2" aria-label="Imagens selecionadas">
               @for (file of selectedFiles(); track file.name; let i = $index) {
-                <li
-                  class="badge badge-primary badge-sm text-white gap-1 p-3 text-xs font-semibold"
-                >
+                <li class="badge badge-primary badge-sm text-white gap-1 p-3 text-xs font-semibold">
                   <span class="truncate max-w-[120px]">{{ file.name }}</span>
                   <button
                     type="button"

@@ -83,7 +83,16 @@ export class ServiceClub {
       catchError((err) => this.handleError(err)),
     );
   }
-
+  toggleActive(id: string): Observable<void> {
+    return this.http.patch<void>(`${this.apiUrl}/${id}/toggle-active`, null).pipe(
+      tap(() =>
+        this._clubs.update((clubs) =>
+          clubs.map((c) => (c.id === id ? { ...c, isClubActive: !c.isClubActive } : c)),
+        ),
+      ),
+      catchError((err) => this.handleError(err)),
+    );
+  }
   create(dto: CreateClubDTO): Observable<ResponseClubDTO> {
     this._loading.set(true);
     this._error.set(null);

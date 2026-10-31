@@ -50,6 +50,7 @@ export interface ResponseClubDTO {
   country: string;
   minPrice: number;
   courtCount: number;
+  isClubActive: boolean;
   sports: SportDTO[];
   images: ImageDTO[];
 }
