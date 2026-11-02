@@ -27,6 +27,7 @@ export interface ResponseCourtDTO {
   /** Menor preço entre os horários da quadra; null se não houver horários. */
   minPrice: number | null;
   description: string;
+  isCourtActive: boolean;
   clubId: string;
   images: ImageDTO[];
 }
