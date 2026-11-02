@@ -29,6 +29,7 @@ export interface TimeSlot {
   date: string;
   startTime: string;
   endTime: string;
+  price: number;
   available: boolean;
 }
 
@@ -69,6 +70,7 @@ function mapAvailabilityToSlots(dtos: ScheduleAvailabilityDTO[], date: string): 
     date,
     startTime: dto.startTime.slice(0, 5),
     endTime: dto.endTime.slice(0, 5),
+    price: dto.price,
     available: dto.isAvailable,
   }));
 }

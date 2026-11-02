@@ -115,7 +115,7 @@ export class ReserveService {
       date: r.date.slice(0, 10),
       time: `${r.schedule.startTime.slice(0, 5)} – ${r.schedule.endTime.slice(0, 5)}`,
       status: StatusEnum[r.status as keyof typeof StatusEnum],
-      pricePerHour: r.schedule.court.pricePerHour,
+      price: r.schedule.price,
       canCancel: r.canCancel,
     };
   }

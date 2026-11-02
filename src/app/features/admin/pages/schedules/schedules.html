@@ -199,6 +199,8 @@
                   <div class="flex flex-col gap-1.5">
                     <p class="text-sm font-medium text-base-content">
                       {{ formatTime(schedule.startTime) }} - {{ formatTime(schedule.endTime) }}
+                      <span class="text-base-content/50" aria-hidden="true">·</span>
+                      <span class="font-bold text-primary">{{ formatPrice(schedule.price) }}</span>
                     </p>
                     @if (durationLabel(schedule)) {
                       <span class="badge badge-outline badge-success badge-sm font-semibold">
@@ -389,6 +391,34 @@
               [class.input-error]="bulkFieldInvalid('slotDurationMinutes')"
             />
           </div>
+
+          <div class="flex flex-col w-full md:col-span-3">
+            <label class="py-1 font-medium text-xs text-base-content" for="bulkPrice"
+              >Preço (R$)</label
+            >
+            <input
+              id="bulkPrice"
+              type="number"
+              inputmode="decimal"
+              step="0.01"
+              min="0"
+              formControlName="price"
+              placeholder="0,00"
+              class="input input-bordered input-sm w-full"
+              [class.input-error]="bulkFieldInvalid('price')"
+              [attr.aria-invalid]="bulkFieldInvalid('price')"
+              [attr.aria-describedby]="bulkFieldInvalid('price') ? 'bulkPrice-error' : null"
+            />
+            @if (bulkFieldInvalid('price')) {
+              <span
+                id="bulkPrice-error"
+                role="alert"
+                class="block text-error text-[11px] mt-1 font-medium px-1"
+              >
+                Informe um preço válido (≥ 0)
+              </span>
+            }
+          </div>
         </div>
 
         <!-- Resultado -->
@@ -514,6 +544,34 @@
                 } @else {
                   Use o formato 24h (ex: 18:00)
                 }
+              </span>
+            }
+          </div>
+
+          <div class="flex flex-col w-full md:col-span-2">
+            <label class="py-1 font-medium text-xs text-base-content" for="price"
+              >Preço (R$)</label
+            >
+            <input
+              id="price"
+              type="number"
+              inputmode="decimal"
+              step="0.01"
+              min="0"
+              formControlName="price"
+              placeholder="0,00"
+              class="input input-bordered input-sm w-full"
+              [class.input-error]="fieldInvalid('price')"
+              [attr.aria-invalid]="fieldInvalid('price')"
+              [attr.aria-describedby]="fieldInvalid('price') ? 'price-error' : null"
+            />
+            @if (fieldInvalid('price')) {
+              <span
+                id="price-error"
+                role="alert"
+                class="block text-error text-[11px] mt-1 font-medium px-1"
+              >
+                Informe um preço válido (≥ 0)
               </span>
             }
           </div>

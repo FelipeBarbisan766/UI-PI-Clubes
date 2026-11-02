@@ -87,6 +87,7 @@ export class Schedules implements OnInit {
   protected readonly form = this.fb.group({
     startTime: ['', [Validators.required, Validators.pattern(TIME_24H_PATTERN)]],
     endTime: ['', [Validators.required, Validators.pattern(TIME_24H_PATTERN)]],
+    price: [null as number | null, [Validators.required, Validators.min(0)]],
     isBlocked: [false],
     isReserved: [false],
     isFixed: [false],
@@ -133,15 +134,15 @@ export class Schedules implements OnInit {
     const c = this.court();
     if (!c) return '';
     const humanize = (v: string) => v.replace(/([a-zà-ÿ])([A-Z])/g, '$1 $2');
-    const price = c.pricePerHour.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     const type = c.sports.map((s) => s.name).join(', ');
-    return `${humanize(type)} · ${humanize(c.surface)} · ${price}/h`;
+    return `${humanize(type)} · ${humanize(c.surface)}`;
   });
 
   protected readonly bulkForm = this.fb.group({
     startTime: ['', [Validators.required, Validators.pattern(TIME_24H_PATTERN)]],
     endTime: ['', [Validators.required, Validators.pattern(TIME_24H_PATTERN)]],
     slotDurationMinutes: [60, [Validators.required, Validators.min(15)]],
+    price: [null as number | null, [Validators.required, Validators.min(0)]],
   });
 
   private readonly bulkFormStatus = toSignal(this.bulkForm.statusChanges, {
@@ -152,7 +153,7 @@ export class Schedules implements OnInit {
     () => this.bulkFormStatus() === 'VALID' && this.selectedDays().length > 0,
   );
   protected openBulkCreate(): void {
-    this.bulkForm.reset({ startTime: '', endTime: '', slotDurationMinutes: 60 });
+    this.bulkForm.reset({ startTime: '', endTime: '', slotDurationMinutes: 60, price: null });
     this.selectedDays.set([]);
     this.bulkResult.set(null);
     this.formMode.set('bulk');
@@ -174,7 +175,7 @@ export class Schedules implements OnInit {
       return;
     }
 
-    const { startTime, endTime, slotDurationMinutes } = this.bulkForm.getRawValue();
+    const { startTime, endTime, slotDurationMinutes, price } = this.bulkForm.getRawValue();
 
     this.scheduleService
       .createBulk(this.courtId, {
@@ -182,6 +183,7 @@ export class Schedules implements OnInit {
         startTime: normalizeTime(startTime),
         endTime: normalizeTime(endTime),
         slotDurationMinutes: slotDurationMinutes!,
+        price: price!,
         courtId: this.courtId,
       })
       .subscribe({
@@ -212,6 +214,7 @@ export class Schedules implements OnInit {
     this.form.reset({
       startTime: '',
       endTime: '',
+      price: null,
       isBlocked: false,
       isReserved: false,
       isFixed: false,
@@ -225,6 +228,7 @@ export class Schedules implements OnInit {
     this.form.reset({
       startTime: normalizeTime(schedule.startTime),
       endTime: normalizeTime(schedule.endTime),
+      price: schedule.price,
       dayOfWeek: schedule.dayOfWeek,
     });
     this.editingId.set(schedule.id);
@@ -254,12 +258,13 @@ export class Schedules implements OnInit {
   }
 
   private _submitCreate(): void {
-    const { startTime, endTime, dayOfWeek } = this.form.getRawValue();
+    const { startTime, endTime, price, dayOfWeek } = this.form.getRawValue();
 
     this.scheduleService
       .create({
         startTime: normalizeTime(startTime),
         endTime: normalizeTime(endTime),
+        price: price!,
         dayOfWeek: dayOfWeek!,
         courtId: this.courtId,
       })
@@ -275,12 +280,13 @@ export class Schedules implements OnInit {
     const id = this.editingId();
     if (id === null) return;
 
-    const { startTime, endTime, dayOfWeek } = this.form.getRawValue();
+    const { startTime, endTime, price, dayOfWeek } = this.form.getRawValue();
 
     this.scheduleService
       .update(id, {
         startTime: normalizeTime(startTime),
         endTime: normalizeTime(endTime),
+        price: price!,
         dayOfWeek: dayOfWeek!,
       })
       .subscribe({ next: () => this.closeForm() });
@@ -305,6 +311,10 @@ export class Schedules implements OnInit {
   // --- Helpers ---
   protected formatTime(value: string): string {
     return normalizeTime(value);
+  }
+
+  protected formatPrice(value: number | null | undefined): string {
+    return (value ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   }
 
   protected getDayName(value: DayOfWeek): string {

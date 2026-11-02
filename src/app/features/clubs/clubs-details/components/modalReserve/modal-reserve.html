@@ -99,10 +99,13 @@
                     slot.startTime +
                     ' - ' +
                     slot.endTime +
+                    ', ' +
+                    formatPrice(slot.price) +
                     (slot.available ? ' disponível' : ' indisponível')
                   "
                 >
                   {{ slot.startTime }} - {{ slot.endTime }}
+                  <div class="text-xs font-semibold mt-0.5">{{ formatPrice(slot.price) }}</div>
                   <div class="text-[10px] uppercase tracking-wider mt-0.5 opacity-80 font-normal">
                     {{
                       selectedSlotId() === slot.id
@@ -198,7 +201,7 @@
                 <span class="font-medium text-base-content/60">Total</span>
                 @if (slot) {
                   <span class="text-2xl font-bold text-primary">{{
-                    formatPrice(court().pricePerHour)
+                    formatPrice(slot.price)
                   }}</span>
                 } @else {
                   <span class="text-2xl font-bold text-primary" aria-hidden="true">R$ 0,00</span>

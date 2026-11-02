@@ -21,8 +21,8 @@ export interface ScheduleAvailabilityDTO {
   id:  string;
   startTime:   string;            // ex.: "08:00:00"
   endTime:     string;            // ex.: "09:00:00"
+  price:       number;            // preço do horário
   isAvailable: boolean;           // !isBlocked && reserve == null
   isBlocked:   boolean;           // horário fixo/bloqueado
   reserve:     ReserveInfoDTO | null;
 }
-

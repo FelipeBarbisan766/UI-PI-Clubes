@@ -11,6 +11,7 @@ export enum DayOfWeek {
 export interface CreateScheduleDTO {
   startTime: string; // "HH:mm:ss"
   endTime: string;   // "HH:mm:ss"
+  price: number;
   dayOfWeek: DayOfWeek;
   courtId: string;
 }
@@ -18,6 +19,7 @@ export interface CreateScheduleDTO {
 export interface UpdateScheduleDTO {
   startTime: string;
   endTime: string;
+  price: number;
   dayOfWeek: DayOfWeek;
 }
 
@@ -25,6 +27,7 @@ export interface ResponseScheduleDTO {
   id: string;
   startTime: string;
   endTime: string;
+  price: number;
   dayOfWeek: DayOfWeek;
   courtId: string;
 }
@@ -33,6 +36,7 @@ export interface CreateBulkScheduleDTO {
   startTime: string; // "HH:mm"
   endTime: string;   // "HH:mm"
   slotDurationMinutes: number;
+  price: number;
   courtId: string;
 }
 

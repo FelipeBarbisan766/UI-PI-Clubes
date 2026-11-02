@@ -47,10 +47,6 @@ function sanitizePhone(phone: string): string {
   return phone.replace(/\D/g, '');
 }
 
-function formatPrice(price: number): string {
-  return price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-}
-
 function getFirstImage(club: ResponseClubByIdDTO | null): string | null {
   const images = club?.images;
   return images?.length ? images[0].fullUrl : null;
@@ -330,7 +326,6 @@ startReevaluation(): void {
   // ── Helpers expostos ao template ─────────────────────────────────────────
 
   readonly sanitizePhone = sanitizePhone;
-  readonly formatPrice = formatPrice;
   readonly getFirstImage = getFirstImage;
   readonly getSurfaceName = getSurfaceName;
   readonly sportsLabel = sportsLabel;

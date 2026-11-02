@@ -24,7 +24,8 @@ export interface ResponseCourtDTO {
   sports: SportDTO[];
   surface: SurfaceEnum;
   isCovered: boolean;
-  pricePerHour: number;
+  /** Menor preço entre os horários da quadra; null se não houver horários. */
+  minPrice: number | null;
   description: string;
   clubId: string;
   images: ImageDTO[];

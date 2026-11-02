@@ -19,12 +19,12 @@ export interface ApiPlayer {
 export interface ApiSchedule {
   startTime: string; // TimeOnly → "HH:mm:ss"
   endTime: string;
+  price: number; // preço do horário
   court: ApiCourt;
 }
 
 export interface ApiCourt {
   name: string;
-  pricePerHour: number;
   type: string;
 }
 
@@ -44,7 +44,7 @@ export interface Reservation {
   time: string; // "HH:mm – HH:mm"
   status: StatusEnum;
   canCancel: boolean;   
-  pricePerHour: number;
+  price: number;
 }
 
 export interface ReserveQueryParams {
