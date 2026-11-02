@@ -6,6 +6,7 @@ import {
   computed,
   inject,
   signal,
+  viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
@@ -18,9 +19,14 @@ import {
 import { AuthService } from '../../../../core/services/auth-service';
 import { AdminService } from '../../../../core/services/admin-service';
 import { AuthRequiredModalService } from '../../../../shared/components/auth-required-modal/auth-required-modal-service';
+import {
+  CustomPlanSelection,
+  PlanCalculatorModal,
+} from '../../../../shared/components/plan-calculator-modal/plan-calculator-modal';
 
 @Component({
   selector: 'app-plans',
+  imports: [PlanCalculatorModal],
   templateUrl: './plans.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -31,6 +37,8 @@ export class Plans implements OnInit {
   private readonly adminService = inject(AdminService);
   private readonly subscriptionService = inject(ServiceSubscription);
   private readonly authRequiredModal = inject(AuthRequiredModalService);
+
+  private readonly calculatorModal = viewChild.required(PlanCalculatorModal);
 
   readonly plans = signal<Plan[]>([]);
   readonly isLoading = signal(true);
@@ -61,26 +69,75 @@ export class Plans implements OnInit {
   ngOnInit(): void {
     this.loadPlans();
   }
+
   selectPlan(planId: string): void {
     if (this.isSubmitting()) return;
 
     const plan = this.plans().find((p) => p.id === planId);
     if (!plan || this.isCurrent(plan)) return;
 
-    if (!this.currentUserId()) {
-      this.authRequiredModal.show(
-        'Você precisa estar logado para assinar um plano.',
-        this.router.url,
-      );
-      return;
-    }
+    if (!this.requireLogin()) return;
 
+    this.startCheckout(() => (this.isFree(plan) ? this.goToAdminArea() : this.goToPayment(plan)));
+  }
+
+  openCalculator(): void {
+    this.calculatorModal().open();
+  }
+
+  selectCustomPlan(selection: CustomPlanSelection): void {
+    if (this.isSubmitting()) return;
+    if (!this.requireLogin()) return;
+
+    this.startCheckout(() => this.goToCustomPayment(selection));
+  }
+
+  isFree(plan: Plan): boolean {
+    return plan.price === 0;
+  }
+
+  isCurrent(plan: Plan): boolean {
+    return plan.id === this.currentPlanId();
+  }
+
+  /** Botão do card fica inativo no plano atual e enquanto uma assinatura está em andamento. */
+  isActionDisabled(plan: Plan): boolean {
+    return this.isSubmitting() || this.isCurrent(plan);
+  }
+
+  formatPrice(price: number): string {
+    return price === 0
+      ? 'Grátis'
+      : price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  }
+
+  formatDuration(days: number): string {
+    if (days === 30) return '/mês';
+    if (days === 365) return '/ano';
+    return `/ ${days} dias`;
+  }
+
+  retryLoad(): void {
+    this.loadPlans();
+  }
+
+  private requireLogin(): boolean {
+    if (this.currentUserId()) return true;
+
+    this.authRequiredModal.show(
+      'Você precisa estar logado para assinar um plano.',
+      this.router.url,
+    );
+    return false;
+  }
+
+  private startCheckout(navigate: () => Observable<boolean>): void {
     this.isSubmitting.set(true);
     this.errorMessage.set('');
 
     this.ensureAdmin()
       .pipe(
-        switchMap(() => (this.isFree(plan) ? this.goToAdminArea() : this.goToPayment(plan))),
+        switchMap(() => navigate()),
         finalize(() => this.isSubmitting.set(false)),
         takeUntilDestroyed(this.destroyRef),
       )
@@ -90,14 +147,6 @@ export class Plans implements OnInit {
             error instanceof Error ? error.message : 'Não foi possível concluir a operação.',
           ),
       });
-  }
-
-  isFree(plan: Plan): boolean {
-    return plan.price === 0;
-  }
-
-  isCurrent(plan: Plan): boolean {
-    return plan.id === this.currentPlanId();
   }
 
   private ensureAdmin(): Observable<unknown> {
@@ -117,20 +166,17 @@ export class Plans implements OnInit {
     return from(this.router.navigate(['/payment'], { queryParams: { planId: plan.id } }));
   }
 
-  formatPrice(price: number): string {
-    return price === 0
-      ? 'Grátis'
-      : price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-  }
-
-  formatDuration(days: number): string {
-    if (days === 30) return '/mês';
-    if (days === 365) return '/ano';
-    return `/ ${days} dias`;
-  }
-
-  retryLoad(): void {
-    this.loadPlans();
+  private goToCustomPayment(selection: CustomPlanSelection): Observable<boolean> {
+    return from(
+      this.router.navigate(['/payment'], {
+        queryParams: {
+          custom: true,
+          clubQuantity: selection.clubQuantity,
+          courtQuantity: selection.courtQuantity,
+          durationMonths: selection.durationMonths,
+        },
+      }),
+    );
   }
 
   private loadPlans(): void {

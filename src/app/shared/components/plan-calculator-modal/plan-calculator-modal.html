@@ -1,0 +1,108 @@
+<dialog #dialog class="modal" aria-labelledby="calculator-title">
+  <div class="modal-box">
+    <h3 id="calculator-title" class="text-lg font-bold">Monte seu plano</h3>
+    <p class="mt-1 text-sm text-base-content/70">
+      Informe quantos clubes e quadras você precisa e calcule o valor.
+    </p>
+
+    <form [formGroup]="form" (ngSubmit)="calculate()" class="mt-4 flex flex-col gap-3" novalidate>
+      <fieldset class="fieldset">
+        <label class="label" for="calc-clubs">Quantidade de clubes</label>
+        <input
+          id="calc-clubs"
+          type="number"
+          inputmode="numeric"
+          class="input w-full"
+          formControlName="clubQuantity"
+          min="1"
+          [max]="maxClubs"
+          step="1"
+          (beforeinput)="blockNonDigits($event)"
+          (paste)="blockNonDigitsPaste($event)"
+          [attr.aria-invalid]="clubQuantityControl.invalid && clubQuantityControl.touched"
+          [attr.aria-describedby]="
+            clubQuantityControl.invalid && clubQuantityControl.touched ? 'calc-clubs-error' : null
+          "
+        />
+        @if (clubQuantityControl.invalid && clubQuantityControl.touched) {
+          <p id="calc-clubs-error" class="label text-error" role="alert">
+            Informe de 1 a {{ maxClubs }} clubes.
+          </p>
+        }
+      </fieldset>
+
+      <fieldset class="fieldset">
+        <label class="label" for="calc-courts">Quadras por clube</label>
+        <input
+          id="calc-courts"
+          type="number"
+          inputmode="numeric"
+          class="input w-full"
+          formControlName="courtQuantity"
+          min="1"
+          [max]="maxCourts"
+          step="1"
+          (beforeinput)="blockNonDigits($event)"
+          (paste)="blockNonDigitsPaste($event)"
+          [attr.aria-invalid]="courtQuantityControl.invalid && courtQuantityControl.touched"
+          [attr.aria-describedby]="
+            courtQuantityControl.invalid && courtQuantityControl.touched
+              ? 'calc-courts-error'
+              : null
+          "
+        />
+        @if (courtQuantityControl.invalid && courtQuantityControl.touched) {
+          <p id="calc-courts-error" class="label text-error" role="alert">
+            Informe de 1 a {{ maxCourts }} quadras.
+          </p>
+        }
+      </fieldset>
+
+      <fieldset class="fieldset">
+        <label class="label" for="calc-duration">Duração</label>
+        <select id="calc-duration" class="select w-full" formControlName="durationMonths">
+          @for (option of durationOptions; track option.value) {
+            <option [ngValue]="option.value">{{ option.label }}</option>
+          }
+        </select>
+      </fieldset>
+
+      <div
+        class="flex min-h-20 items-center justify-between gap-4 rounded-box bg-base-200 p-4"
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        @if (errorMessage()) {
+          <p class="text-sm text-error" role="alert">{{ errorMessage() }}</p>
+        } @else if (canConfirm()) {
+          <span class="text-sm text-base-content/70">Valor total</span>
+          <span class="text-2xl font-bold">{{ formattedPrice() }}</span>
+        } @else if (isCalculating()) {
+          <span class="text-sm text-base-content/70">Calculando…</span>
+        } @else {
+          <span class="text-sm text-base-content/70">Calcule para ver o valor total.</span>
+        }
+      </div>
+
+      <div class="modal-action">
+        <button type="button" class="btn" (click)="close()">Cancelar</button>
+
+        @if (canConfirm()) {
+          <button type="button" class="btn btn-primary" (click)="confirm()">Assinar plano</button>
+        } @else {
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="isCalculating()"
+            [attr.aria-busy]="isCalculating()"
+          >
+            @if (isCalculating()) {
+              <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+            }
+            Calcular
+          </button>
+        }
+      </div>
+    </form>
+  </div>
+</dialog>
