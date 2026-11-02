@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DOCUMENT,
   DestroyRef,
   OnInit,
   computed,
@@ -10,19 +11,13 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { Observable, catchError, finalize, forkJoin, from, of, switchMap, take } from 'rxjs';
-import {
-  ActiveSubscription,
-  Plan,
-  ServiceSubscription,
-} from '../../services/service-subscription';
+import { Observable, catchError, finalize, forkJoin, from, of, switchMap, take, tap } from 'rxjs';
 import { AuthService } from '../../../../core/services/auth-service';
 import { AdminService } from '../../../../core/services/admin-service';
 import { AuthRequiredModalService } from '../../../../shared/components/auth-required-modal/auth-required-modal-service';
-import {
-  CustomPlanSelection,
-  PlanCalculatorModal,
-} from '../../../../shared/components/plan-calculator-modal/plan-calculator-modal';
+import { PlanCalculatorModal } from '../../../../shared/components/plan-calculator-modal/plan-calculator-modal';
+import { ServiceSubscription } from '../../services/service-subscription';
+import { ActiveSubscription, CustomPlanSelection, Plan } from '../../models/model-plan-payment';
 
 @Component({
   selector: 'app-plans',
@@ -37,12 +32,12 @@ export class Plans implements OnInit {
   private readonly adminService = inject(AdminService);
   private readonly subscriptionService = inject(ServiceSubscription);
   private readonly authRequiredModal = inject(AuthRequiredModalService);
+  private readonly document = inject(DOCUMENT);
 
   private readonly calculatorModal = viewChild.required(PlanCalculatorModal);
-
   readonly plans = signal<Plan[]>([]);
   readonly isLoading = signal(true);
-  readonly isSubmitting = signal(false); // separado do isLoading para não esconder os cards
+  readonly isSubmitting = signal(false);
   readonly errorMessage = signal('');
 
   readonly me = this.authService.me;
@@ -51,13 +46,11 @@ export class Plans implements OnInit {
 
   readonly activeSubscription = signal<ActiveSubscription | null>(null);
 
-  /** Id do plano contratado hoje (null se não há assinatura ativa). */
   readonly currentPlanId = computed<string | null>(() => {
     const sub = this.activeSubscription();
     return sub?.isActive ? sub.planId : null;
   });
 
-  /** O selo "Mais popular" só faz sentido para quem ainda não tem plano. */
   readonly popularPlanId = computed<string | null>(() => {
     if (this.currentPlanId()) return null;
     const list = this.plans();
@@ -100,7 +93,6 @@ export class Plans implements OnInit {
     return plan.id === this.currentPlanId();
   }
 
-  /** Botão do card fica inativo no plano atual e enquanto uma assinatura está em andamento. */
   isActionDisabled(plan: Plan): boolean {
     return this.isSubmitting() || this.isCurrent(plan);
   }
@@ -131,7 +123,7 @@ export class Plans implements OnInit {
     return false;
   }
 
-  private startCheckout(navigate: () => Observable<boolean>): void {
+  private startCheckout(navigate: () => Observable<unknown>): void {
     this.isSubmitting.set(true);
     this.errorMessage.set('');
 
@@ -166,6 +158,17 @@ export class Plans implements OnInit {
     return from(this.router.navigate(['/payment'], { queryParams: { planId: plan.id } }));
   }
 
+  private payForPlan(planId: string): Observable<unknown> {
+    return this.authService.getAdminMe().pipe(
+      take(1),
+      switchMap((admin) => this.subscriptionService.initiatePayment(planId)),
+      tap((result) => (this.document.location.href = result.checkoutUrl)),
+    );
+  }
+  onCustomPlanConfirmed(selection: CustomPlanSelection): void {
+    if (this.isSubmitting()) return;
+    this.startCheckout(() => this.payForPlan(selection.planId));
+  }
   private goToCustomPayment(selection: CustomPlanSelection): Observable<boolean> {
     return from(
       this.router.navigate(['/payment'], {
@@ -185,7 +188,6 @@ export class Plans implements OnInit {
 
     forkJoin({
       plans: this.subscriptionService.getPlans(),
-      // Visitante sem login ou falha aqui não deve esconder a lista de planos.
       active: this.subscriptionService.getActiveSubscription().pipe(catchError(() => of(null))),
     })
       .pipe(take(1), takeUntilDestroyed(this.destroyRef))

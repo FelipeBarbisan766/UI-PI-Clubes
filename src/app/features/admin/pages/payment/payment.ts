@@ -11,12 +11,11 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { map, take, takeWhile, timer, switchMap } from 'rxjs';
 import {
-  Plan,
-  PaymentStatus,
   ServiceSubscription,
   SubscriptionApiError,
 } from '../../services/service-subscription';
 import { AuthService } from '../../../../core/services/auth-service';
+import { PaymentStatus, Plan } from '../../models/model-plan-payment';
 
 type PaymentStep = 'review' | 'redirecting' | 'success' | 'pending' | 'failure';
 type TrackedStatus = PaymentStatus | 'Unknown';

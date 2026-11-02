@@ -2,74 +2,18 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable, catchError, of, throwError } from 'rxjs';
 import { environment } from '../../../../environments/environment';
+import {
+  ActiveSubscription,
+  CheckAccessResult,
+  CreatePaymentRequest,
+  CustomPlanCalculationRequest,
+  CustomPlanCalculationResponse,
+  CustomPlanResponse,
+  PaymentHistory,
+  PaymentInitiateResult,
+  Plan,
+} from '../models/model-plan-payment';
 
-// ─── Domain Types ────────────────────────────────────────────────────────────
-
-export interface Plan {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  quantClub: number;
-  quantCourt: number;
-  durationDays: number;
-  isActive: boolean;
-}
-
-export interface CreatePaymentRequest {
-  planId: string;
-}
-
-export interface PaymentInitiateResult {
-  paymentId: string;
-  checkoutUrl: string;
-}
-
-export type PaymentStatus = 'Pending' | 'Confirmed' | 'Failed';
-export type TypeAccess = 'Owner' | 'Manager' | 'Staff';
-
-export interface PaymentHistory {
-  id: string;
-  amount: number;
-  date: string;
-  /** ID do método no Mercado Pago (pix, visa, master...). Null até o comprador pagar. */
-  method: string | null;
-  status: PaymentStatus;
-  mercadoPagoPaymentId: string | null;
-}
-
-export interface ActiveSubscription {
-  id: string;
-  adminId: string;
-  planId: string;
-  planName: string;
-  typeAccess: TypeAccess;
-  startDate: string;
-  expiresAt: string;
-  isActive: boolean;
-}
-
-export interface CheckAccessResult {
-  hasAccess: boolean;
-}
-
-export interface CustomPlanCalculationRequest {
-  clubQuantity: number;
-  courtQuantity: number;
-  durationMonths: number;
-}
- 
-export interface CustomPlanCalculationResponse {
-  totalPrice: number;
-}
-
-
-/**
- * Error thrown by ServiceSubscription methods. Extends the native `Error` so
- * every existing `err.message` usage keeps working unchanged; `status` is
- * optional and only present when the failure came from an HTTP response,
- * letting callers branch on specific status codes (e.g. 409 Conflict).
- */
 export class SubscriptionApiError extends Error {
   constructor(
     message: string,
@@ -112,10 +56,7 @@ export class ServiceSubscription {
       .pipe(catchError(this.handleError));
   }
 
-  /**
-   * Returns null (instead of throwing) when the admin has no active subscription (HTTP 404).
-   * All other errors are propagated normally.
-   */
+  
   getActiveSubscription(): Observable<ActiveSubscription | null> {
     return this.http
       .get<ActiveSubscription>(`${environment.apiUrl}/subscription/active`, {
@@ -172,5 +113,9 @@ export class ServiceSubscription {
       request,
     );
   }
-
+  createCustomPlan(request: CustomPlanCalculationRequest): Observable<CustomPlanResponse> {
+    return this.http
+      .post<CustomPlanResponse>(`${environment.apiUrl}/plan/custom`, request)
+      .pipe(catchError(this.handleError));
+  }
 }

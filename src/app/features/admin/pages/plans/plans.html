@@ -304,5 +304,5 @@
     </ul>
   }
 
-  <app-plan-calculator-modal (confirmed)="selectCustomPlan($event)" />
+  <app-plan-calculator-modal #calculator (confirmed)="onCustomPlanConfirmed($event)" />
 </main>

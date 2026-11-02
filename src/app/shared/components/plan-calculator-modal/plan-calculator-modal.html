@@ -85,10 +85,23 @@
       </div>
 
       <div class="modal-action">
-        <button type="button" class="btn" (click)="close()">Cancelar</button>
+        <button type="button" class="btn" [disabled]="isConfirming()" (click)="close()">
+          Cancelar
+        </button>
 
         @if (canConfirm()) {
-          <button type="button" class="btn btn-primary" (click)="confirm()">Assinar plano</button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            [disabled]="isConfirming()"
+            [attr.aria-busy]="isConfirming()"
+            (click)="confirm()"
+          >
+            @if (isConfirming()) {
+              <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+            }
+            Assinar plano
+          </button>
         } @else {
           <button
             type="submit"

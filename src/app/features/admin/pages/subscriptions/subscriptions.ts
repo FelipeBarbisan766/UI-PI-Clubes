@@ -11,10 +11,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import {
-  ActiveSubscription,
   ServiceSubscription,
 } from '../../services/service-subscription';
 import { ServiceSubscriptionUsage } from '../../services/service-subscription-usage';
+import { ActiveSubscription } from '../../models/model-plan-payment';
 
 /** Forma mínima de um recurso com limite (compatível com ResourceUsageDTO). */
 interface UsageLike {
