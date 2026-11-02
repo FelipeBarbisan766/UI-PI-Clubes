@@ -19,12 +19,12 @@ export interface Club {
 export interface Schedule {
   startTime: string;
   endTime: string;
+  price: number; // preço do horário
   court: Court;
 }
 
 export interface Court {
   name: string;
-  pricePerHour: number;
   type: string;
 }
 
@@ -42,7 +42,7 @@ export interface Reservation {
   time: string;
   status: StatusEnum;
   canCancel: boolean;  
-  pricePerHour: number;
+  price: number;
 }
 
 export interface ReserveQueryParams {
