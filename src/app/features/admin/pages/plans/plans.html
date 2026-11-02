@@ -176,10 +176,12 @@
               <div class="card-actions">
                 <button
                   type="button"
-                  class="btn w-full rounded-full bg-primary text-white border-none shadow-none font-bold"
-                  [class.btn-primary]="plan.id === popularPlanId()"
-                  [class.btn-outline]="plan.id !== popularPlanId()"
-                  [disabled]="isSubmitting() || isCurrent(plan)"
+                  class="btn w-full rounded-lg font-bold"
+                  [class.bg-primary]="!isActionDisabled(plan)"
+                  [class.text-primary-content]="!isActionDisabled(plan)"
+                  [class.border-none]="!isActionDisabled(plan)"
+                  [class.btn-outline]="isCurrent(plan)"
+                  [disabled]="isActionDisabled(plan)"
                   [attr.aria-busy]="isSubmitting()"
                   (click)="selectPlan(plan.id)"
                   [attr.aria-label]="
@@ -188,7 +190,7 @@
                       : (isFree(plan) ? 'Começar com o plano ' : 'Assinar o plano ') + plan.name
                   "
                 >
-                  @if (isSubmitting()) {
+                  @if (isSubmitting() && !isCurrent(plan)) {
                     <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
                   } @else if (isCurrent(plan)) {
                     Plano atual
@@ -201,6 +203,106 @@
           </article>
         </li>
       }
+
+      <li class="flex">
+        <article
+          class="card w-full bg-base-100 border border-base-300 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+        >
+          <div class="card-body gap-5">
+            <div class="flex items-center justify-between gap-2">
+              <h2 class="text-lg font-bold">Personalizado</h2>
+            </div>
+
+            <p class="text-sm text-base-content/70 -mt-3">
+              Defina quantos clubes e quadras você precisa e pague só por isso.
+            </p>
+
+            <div aria-label="Preço do plano" class="pb-1">
+              <span class="text-4xl font-bold">Sob medida</span>
+            </div>
+
+            <div class="divider my-0"></div>
+
+            <ul
+              class="flex flex-col gap-3 text-sm text-base-content/80 grow"
+              aria-label="Recursos do plano personalizado"
+            >
+              <li class="flex items-center gap-2.5">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-4 w-4 text-primary shrink-0"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <rect width="16" height="20" x="4" y="2" rx="2" />
+                  <line x1="8" x2="16" y1="6" y2="6" />
+                  <line x1="16" x2="16" y1="14" y2="18" />
+                  <path d="M16 10h.01" /><path d="M12 10h.01" /><path d="M8 10h.01" />
+                  <path d="M12 14h.01" /><path d="M8 14h.01" />
+                  <path d="M12 18h.01" /><path d="M8 18h.01" />
+                </svg>
+                <span>Quantidade de clubes à sua escolha</span>
+              </li>
+              <li class="flex items-center gap-2.5">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="h-4 w-4 text-primary shrink-0"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"
+                  />
+                  <circle cx="12" cy="10" r="3" />
+                </svg>
+                <span>Quadras por clube à sua escolha</span>
+              </li>
+              <li class="flex items-center gap-2.5">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-4 w-4 text-primary shrink-0"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+                <span>Valor calculado na hora</span>
+              </li>
+            </ul>
+
+            <div class="card-actions">
+              <button
+                type="button"
+                class="btn w-full rounded-lg btn-outline font-bold"
+                aria-haspopup="dialog"
+                [disabled]="isSubmitting()"
+                (click)="openCalculator()"
+              >
+                Calcular meu plano
+              </button>
+            </div>
+          </div>
+        </article>
+      </li>
     </ul>
   }
+
+  <app-plan-calculator-modal (confirmed)="selectCustomPlan($event)" />
 </main>

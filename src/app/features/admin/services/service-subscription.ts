@@ -53,6 +53,17 @@ export interface CheckAccessResult {
   hasAccess: boolean;
 }
 
+export interface CustomPlanCalculationRequest {
+  clubQuantity: number;
+  courtQuantity: number;
+  durationMonths: number;
+}
+ 
+export interface CustomPlanCalculationResponse {
+  totalPrice: number;
+}
+
+
 /**
  * Error thrown by ServiceSubscription methods. Extends the native `Error` so
  * every existing `err.message` usage keeps working unchanged; `status` is
@@ -152,4 +163,14 @@ export class ServiceSubscription {
     }
     return throwError(() => new SubscriptionApiError('Ocorreu um erro inesperado.'));
   }
+
+  calculateCustomPlan(
+    request: CustomPlanCalculationRequest,
+  ): Observable<CustomPlanCalculationResponse> {
+    return this.http.post<CustomPlanCalculationResponse>(
+      `${environment.apiUrl}/Plan/custom/calculate`,
+      request,
+    );
+  }
+
 }
