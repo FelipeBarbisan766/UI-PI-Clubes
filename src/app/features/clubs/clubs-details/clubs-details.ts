@@ -23,6 +23,7 @@ import { ImageCarousel } from '../../../shared/components/image-carousel/image-c
 import { AuthRequiredModalService } from '../../../shared/components/auth-required-modal/auth-required-modal-service';
 import { ModalReserve } from './components/modalReserve/modal-reserve';
 import { Footer } from '../../../shared/footer/footer';
+import { ShareService } from '../../../core/services/share-service';
 
 const SURFACE_LABELS: Record<SurfaceEnum, string> = {
   [SurfaceEnum.None]: 'Outro',
@@ -84,6 +85,7 @@ export class ClubsDetail {
   private readonly courtAvailabilitySignalR = inject(ServiceCourtAvailabilitySignalR);
   private readonly authRequiredModal = inject(AuthRequiredModalService);
   private readonly location = inject(Location);
+  private readonly shareService = inject(ShareService);
 
   readonly starIndexes = [0, 1, 2, 3, 4] as const;
 
@@ -192,7 +194,21 @@ export class ClubsDetail {
       });
     });
   }
+  
 
+  shareClub(): void {
+    const club = this.club();
+    const id = this.routeClubId();
+    if (!club || !id) return;
+
+    void this.shareService.shareClub({
+      id,
+      name: club.name,
+      city: club.city,
+      state: club.state,
+      minPrice: club.minPrice,
+    });
+  }
   // ── URL do mapa ──────────────────────────────────────────────────────────
 
   readonly mapUrl: Signal<SafeResourceUrl | null> = computed(() => {
@@ -265,17 +281,17 @@ export class ClubsDetail {
   }
 
   openRatingModal(current: number | null = null): void {
-  this.myRating.set(current);
-  this.selectedRatingValue.set(current ?? 0);
-  this.reevaluating.set(false);
-  this.reviewError.set(null);
-  this.ratingModalOpen.set(true);
-}
+    this.myRating.set(current);
+    this.selectedRatingValue.set(current ?? 0);
+    this.reevaluating.set(false);
+    this.reviewError.set(null);
+    this.ratingModalOpen.set(true);
+  }
 
-startReevaluation(): void {
-  this.selectedRatingValue.set(0);
-  this.reevaluating.set(true);
-}
+  startReevaluation(): void {
+    this.selectedRatingValue.set(0);
+    this.reevaluating.set(true);
+  }
 
   closeRatingModal(): void {
     if (this.isSubmittingReview()) return;
@@ -287,32 +303,32 @@ startReevaluation(): void {
   }
 
   submitReview(): void {
-  const clubId = this.routeClubId();
-  const rating = this.selectedRatingValue();
-  if (!clubId || rating <= 0 || this.isSubmittingReview()) return;
+    const clubId = this.routeClubId();
+    const rating = this.selectedRatingValue();
+    if (!clubId || rating <= 0 || this.isSubmittingReview()) return;
 
-  this.isSubmittingReview.set(true);
-  this.reviewError.set(null);
+    this.isSubmittingReview.set(true);
+    this.reviewError.set(null);
 
-  const request$ = this.hasReviewed()
-    ? this.clubService.updateRating(clubId, rating)  // PUT
-    : this.clubService.rate(clubId, rating);         // POST
+    const request$ = this.hasReviewed()
+      ? this.clubService.updateRating(clubId, rating) // PUT
+      : this.clubService.rate(clubId, rating); // POST
 
-  request$
-    .pipe(
-      takeUntilDestroyed(this.destroyRef),
-      finalize(() => this.isSubmittingReview.set(false)),
-    )
-    .subscribe({
-      next: (summary) => {
-        this.clubService.applyReviewSummary(summary);
-        this.myRating.set(rating);
-        this.reevaluating.set(false);
-        this.ratingModalOpen.set(false);
-      },
-      error: (err: Error) => this.reviewError.set(err.message),
-    });
-}
+    request$
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.isSubmittingReview.set(false)),
+      )
+      .subscribe({
+        next: (summary) => {
+          this.clubService.applyReviewSummary(summary);
+          this.myRating.set(rating);
+          this.reevaluating.set(false);
+          this.ratingModalOpen.set(false);
+        },
+        error: (err: Error) => this.reviewError.set(err.message),
+      });
+  }
 
   private openBlockedModal(message: string): void {
     this.blockedModalMessage.set(message);

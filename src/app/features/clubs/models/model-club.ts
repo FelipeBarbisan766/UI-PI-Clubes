@@ -35,6 +35,7 @@ export interface ResponseClubByIdDTO {
   complement?: string;
   city: string;
   state: string;
+  minPrice: number;
   country: string;
   images: ImageDTO[];
   courts: import('./model-court').ResponseCourtDTO[];
