@@ -22,7 +22,6 @@ export interface CreateCourtDTO {
   sportIds: string[];
   surface: SurfaceEnum;
   isCovered: boolean;
-  pricePerHour: number;
   description: string;
   clubId: string;
   images: File[];
@@ -33,7 +32,6 @@ export interface UpdateCourtDTO {
   sportIds: string[];
   surface: SurfaceEnum;
   isCovered: boolean;
-  pricePerHour: number;
   description: string;
 }
 
@@ -43,7 +41,8 @@ export interface ResponseCourtDTO {
   sports: SportDTO[];
   surface: SurfaceEnum;
   isCovered: boolean;
-  pricePerHour: number;
+  minPrice : number;
+  maxPrice : number;
   description: string;
   isCourtActive: boolean;
   clubId: string;

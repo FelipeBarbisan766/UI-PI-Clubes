@@ -135,7 +135,6 @@ export class Courts implements OnInit {
     name: ['', [Validators.required, Validators.minLength(3)]],
     surface: [null as SurfaceEnum | null, Validators.required],
     isCovered: [false],
-    pricePerHour: [null as string | null, [Validators.required, priceValidator]],
     description: ['', Validators.required],
   });
 
@@ -179,7 +178,6 @@ export class Courts implements OnInit {
       name: '',
       surface: null,
       isCovered: false,
-      pricePerHour: null,
       description: '',
     });
     this.selectedFiles.set([]);
@@ -195,7 +193,6 @@ export class Courts implements OnInit {
       surface: court.surface,
       isCovered: court.isCovered,
       // "1234,50": a máscara aplica o separador de milhar e o prefixo na exibição
-      pricePerHour: Number(court.pricePerHour).toFixed(2).replace('.', ','),
       description: court.description,
     });
     this.selectedFiles.set([]);
@@ -288,14 +285,9 @@ export class Courts implements OnInit {
       return;
     }
 
-    const { name, surface, isCovered, pricePerHour, description } = this.form.getRawValue();
-    const price = parsePrice(pricePerHour);
+    const { name, surface, isCovered, description } = this.form.getRawValue();
 
-    if (Number.isNaN(price)) {
-      this.form.controls.pricePerHour.markAsTouched();
-      return;
-    }
-
+    
     if (this.formMode() === 'create') {
       this.courtService
         .create({
@@ -303,7 +295,6 @@ export class Courts implements OnInit {
           sportIds: this.selectedSportIds(),
           surface: surface!,
           isCovered: isCovered!,
-          pricePerHour: price,
           description: description!,
           clubId: this.currentClubId,
           images: this.selectedFiles(),
@@ -337,7 +328,6 @@ export class Courts implements OnInit {
           sportIds: this.selectedSportIds(),
           surface: surface!,
           isCovered: isCovered!,
-          pricePerHour: price,
           description: description!,
         })
         .subscribe({
