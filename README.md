@@ -6,7 +6,7 @@ Interface web do **Clubera**, uma plataforma que centraliza o gerenciamento de c
 
 ---
 
-## 📖 Sobre o projeto
+## Sobre o projeto
 
 ### História
 
@@ -32,11 +32,11 @@ O desenvolvimento envolve levantamento de requisitos, modelagem, implementação
 
 Fatec Taquaritinga — 2026
 
-> ⚠️ O sistema está **em desenvolvimento**. Algumas funcionalidades podem mudar ou ainda não estar completas.
+> O sistema está **em desenvolvimento**. Algumas funcionalidades podem mudar ou ainda não estar completas.
 
 ---
 
-## ✨ Funcionalidades
+## Funcionalidades
 
 ### Para jogadores
 
@@ -69,7 +69,7 @@ Fatec Taquaritinga — 2026
 
 ---
 
-## 🧱 Arquitetura
+## Arquitetura
 
 Aplicação **Angular standalone** (sem NgModules), organizada por responsabilidade:
 
@@ -112,7 +112,7 @@ Um **interceptor HTTP** envia as credenciais (cookies) em todas as requisições
 
 ---
 
-## 🛠️ Stack
+## Stack
 
 | Camada | Tecnologia |
 |---|---|
@@ -132,7 +132,7 @@ Fontes: **Roboto** (texto) e **Space Grotesk** (destaques).
 
 ---
 
-## 🚀 Rodando localmente
+## Rodando localmente
 
 ### Pré-requisitos
 
@@ -171,7 +171,7 @@ ng test
 
 ---
 
-## ⚙️ Configuração de ambiente
+## Configuração de ambiente
 
 Os ambientes ficam em `src/environments/`:
 
@@ -202,7 +202,7 @@ export const environment = {
 
 ---
 
-## 🔐 Boas práticas de segurança
+## Boas práticas de segurança
 
 - O frontend não guarda tokens em `localStorage`: a sessão fica em cookies enviados pela API.
 - O `localStorage` é usado apenas para a preferência de tema, e o `sessionStorage` para lembrar que o aviso de perfil incompleto foi dispensado.
@@ -211,7 +211,7 @@ export const environment = {
 
 ---
 
-## 📚 Referências
+## Referências
 
 - [Documentação do Angular](https://angular.dev/docs)
 - [Tailwind CSS](https://tailwindcss.com/docs)
@@ -223,7 +223,8 @@ export const environment = {
 
 ---
 
-## 📄 Licença
+## Licença
 
 Projeto acadêmico desenvolvido na Fatec Taquaritinga.
+
 Apache 2.0 License, Version 2.0, January 2004, [www.apache.org/licenses/](www.apache.org/licenses/).
