@@ -1,7 +1,5 @@
 import { DOCUMENT } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 export interface ShareClubInput {
@@ -25,59 +23,9 @@ function formatPrice(price: number): string {
 @Injectable({ providedIn: 'root' })
 export class ShareService {
   private readonly window = inject(DOCUMENT).defaultView;
-  private readonly http = inject(HttpClient);
-  private readonly imageCache = new Map<string, Promise<File | null>>();
-
-  
-  prefetchClubImage(clubId: string): Promise<File | null> {
-    let promise = this.imageCache.get(clubId);
-
-    if (!promise) {
-      promise = firstValueFrom(
-        this.http.get(`${environment.apiUrl}/club/${clubId}/share-image`, { responseType: 'blob' })
-      )
-        .then((blob) => new File([blob], 'clube.jpg', { type: 'image/jpeg' }))
-        .catch(() => {
-          this.imageCache.delete(clubId);
-          return null;
-        });
-
-      this.imageCache.set(clubId, promise);
-    }
-
-    return promise;
-  }
 
   async shareClub(club: ShareClubInput): Promise<void> {
-    const content = this.buildClubContent(club);
-    const message = `${content.text}\n${content.url}`;
-    const nav = this.window?.navigator;
-
-    const file = await this.prefetchClubImage(club.id);
-
-    if (file && nav?.canShare?.({ files: [file] })) {
-      try {
-        await nav.share({ files: [file], text: message });
-        return;
-      } catch (err) {
-        if (err instanceof DOMException && err.name === 'AbortError') return;
-      }
-    }
-
-    if (nav?.share) {
-      try {
-        await nav.share({ title: content.title, text: content.text, url: content.url });
-        return;
-      } catch (err) {
-        if (err instanceof DOMException && err.name === 'AbortError') return;
-      }
-    }
-
-    this.window?.open(
-      `https://wa.me/?text=${encodeURIComponent(message)}`,
-      '_blank',
-      'noopener,noreferrer'
-    );
+    await this.share(this.buildClubContent(club));
   }
 
   buildClubContent(club: ShareClubInput): ShareContent {
@@ -96,6 +44,22 @@ export class ShareService {
   }
 
   private clubUrl(clubId: string): string {
-    return `${environment.siteUrl}/clubs/${clubId}`;
+    return `${environment.apiUrl}/share/club/${clubId}`;
+  }
+
+  private async share(content: ShareContent): Promise<void> {
+    const nav = this.window?.navigator;
+
+    if (nav?.share) {
+      try {
+        await nav.share(content);
+        return;
+      } catch (err) {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
+      }
+    }
+
+    const message = encodeURIComponent(`${content.text}\n${content.url}`);
+    this.window?.open(`https://wa.me/?text=${message}`, '_blank', 'noopener,noreferrer');
   }
 }
