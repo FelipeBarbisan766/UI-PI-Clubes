@@ -46,5 +46,12 @@ export interface ResponseCourtDTO {
   description: string;
   isCourtActive: boolean;
   clubId: string;
-  imagesUrls: string[];
+  images: ImageDTO[];
+}
+export interface ImageDTO {
+  id: string;
+  thumbUrl: string;
+  mediumUrl: string;
+  fullUrl: string;
+  order: number;
 }

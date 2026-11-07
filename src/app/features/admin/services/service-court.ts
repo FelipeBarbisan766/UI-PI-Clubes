@@ -4,6 +4,7 @@ import { Observable, tap, catchError, throwError } from 'rxjs';
 import { ResponseCourtDTO, CreateCourtDTO, UpdateCourtDTO } from '../models/model-court';
 import { environment } from '../../../../environments/environment';
 import { getApiErrorMessage } from '../../../core/utils/api-error';
+import { ReorderImageDTO } from '../models/model-club';
 
 export interface CourtState {
   courts: ResponseCourtDTO[];
@@ -123,6 +124,25 @@ export class ServiceCourt {
       }),
       catchError((err) => this.handleError(err)),
     );
+  }
+  addImages(courtId: string, images: File[]): Observable<void> {
+    const formData = new FormData();
+    images.forEach((img) => formData.append('Images', img));
+    return this.http
+      .post<void>(`${this.apiUrl}/${courtId}/images`, formData)
+      .pipe(catchError((err) => this.handleError(err)));
+  }
+
+  deleteImage(courtId: string, imageId: string): Observable<void> {
+    return this.http
+      .delete<void>(`${this.apiUrl}/${courtId}/images/${encodeURIComponent(imageId)}`)
+      .pipe(catchError((err) => this.handleError(err)));
+  }
+
+  reorderImages(courtId: string, orders: ReorderImageDTO[]): Observable<void> {
+    return this.http
+      .put<void>(`${this.apiUrl}/${courtId}/images/reorder`, { orders })
+      .pipe(catchError((err) => this.handleError(err)));
   }
 
   // --- Helpers ---
