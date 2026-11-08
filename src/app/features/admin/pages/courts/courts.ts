@@ -6,7 +6,10 @@ import {
   signal,
   computed,
   DestroyRef,
+  ElementRef,
+  viewChild,
 } from '@angular/core';
+import { NgOptimizedImage } from '@angular/common';
 import {
   AbstractControl,
   FormBuilder,
@@ -19,12 +22,14 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { NgxMaskDirective } from 'ngx-mask';
 import { ServiceCourt } from '../../services/service-court';
 import { SurfaceEnum, ResponseCourtDTO } from '../../models/model-court';
+import { ExistingPhoto, ImageDTO, NewPhoto } from '../../models/model-club';
 import { ServiceSport } from '../../../../core/services/service-sport';
 import { Modal } from '../../../../shared/components/modal/modal';
 import { ToastAlert } from '../../../../shared/components/toast-alert/toast-alert';
+import { ImageCarousel } from '../../../../shared/components/image-carousel/image-carousel';
 import { ServiceSubscriptionUsage } from '../../services/service-subscription-usage';
 import { getApiErrorMessage, isLimitExceededError } from '../../../../core/utils/api-error';
-import { finalize } from 'rxjs';
+import { Observable, finalize, forkJoin } from 'rxjs';
 
 type FormMode = 'create' | 'edit' | null;
 type ToastState = { message: string; type: 'success' | 'error' | 'warning' | 'info' };
@@ -57,7 +62,15 @@ function priceValidator(control: AbstractControl): ValidationErrors | null {
 
 @Component({
   selector: 'app-court',
-  imports: [ReactiveFormsModule, Modal, RouterLink, ToastAlert, NgxMaskDirective],
+  imports: [
+    ReactiveFormsModule,
+    Modal,
+    RouterLink,
+    ToastAlert,
+    NgxMaskDirective,
+    NgOptimizedImage,
+    ImageCarousel,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './courts.html',
 })
@@ -112,12 +125,33 @@ export class Courts implements OnInit {
   // --- Local state ---
   protected readonly formMode = signal<FormMode>(null);
   protected readonly editingId = signal<string | null>(null);
-  protected readonly selectedFiles = signal<File[]>([]);
   protected readonly deleteConfirmId = signal<string | null>(null);
 
-  // --- Esportes selecionados (fora do reactive form, mesmo padrão de selectedFiles) ---
+  // --- Esportes selecionados (fora do reactive form, mesmo padrão das fotos) ---
   protected readonly selectedSportIds = signal<string[]>([]);
   protected readonly sportsTouched = signal(false);
+
+  protected readonly isSubmitting = signal(false);
+
+  // --- Fotos (mesmo padrão do config-club) ---
+  protected readonly MAX_PHOTOS = 5;
+
+  private readonly fileInputRef = viewChild<ElementRef<HTMLInputElement>>('fileInput');
+
+  protected readonly existingPhotos = signal<ExistingPhoto[]>([]);
+  protected readonly newPhotos = signal<NewPhoto[]>([]);
+  protected readonly draggedPhotoId = signal<string | null>(null);
+  protected readonly dragOverPhotoId = signal<string | null>(null);
+  private readonly removedExistingIds = signal<Set<string>>(new Set());
+  private initialExistingOrder: string[] = [];
+
+  protected readonly totalPhotosCount = computed(
+    () => this.existingPhotos().length + this.newPhotos().length,
+  );
+  protected readonly canAddMorePhotos = computed(() => this.totalPhotosCount() < this.MAX_PHOTOS);
+  protected readonly remainingPhotoSlots = computed(
+    () => this.MAX_PHOTOS - this.totalPhotosCount(),
+  );
 
   protected readonly isFormOpen = computed(() => this.formMode() !== null);
   protected readonly isEditing = computed(() => this.formMode() === 'edit');
@@ -145,10 +179,11 @@ export class Courts implements OnInit {
   protected readonly hasSports = computed(() => this.selectedSportIds().length > 0);
 
   protected readonly isSubmitEnabled = computed(() => {
+    if (!this.hasSports()) return false;
     if (this.formMode() === 'create') {
-      return this.formStatus() === 'VALID' && this.selectedFiles().length > 0 && this.hasSports();
+      return this.formStatus() === 'VALID' && this.newPhotos().length > 0;
     }
-    return this.formStatus() === 'VALID' && this.hasSports();
+    return this.formStatus() === 'VALID';
   });
 
   ngOnInit(): void {
@@ -160,6 +195,8 @@ export class Courts implements OnInit {
     this.loadCourts();
     this.sportService.getAll().subscribe();
     this.usageService.refresh();
+
+    this.destroyRef.onDestroy(() => this.clearPhotosState());
   }
 
   private loadCourts(): void {
@@ -180,7 +217,7 @@ export class Courts implements OnInit {
       isCovered: false,
       description: '',
     });
-    this.selectedFiles.set([]);
+    this.clearPhotosState();
     this.selectedSportIds.set([]);
     this.sportsTouched.set(false);
     this.editingId.set(null);
@@ -195,7 +232,7 @@ export class Courts implements OnInit {
       // "1234,50": a máscara aplica o separador de milhar e o prefixo na exibição
       description: court.description,
     });
-    this.selectedFiles.set([]);
+    this.resetPhotosState(court.images);
     this.selectedSportIds.set(court.sports.map((s) => s.id));
     this.sportsTouched.set(false);
     this.editingId.set(court.id);
@@ -206,20 +243,143 @@ export class Courts implements OnInit {
     this.formMode.set(null);
     this.editingId.set(null);
     this.form.reset();
+    this.clearPhotosState();
     this.selectedSportIds.set([]);
     this.sportsTouched.set(false);
   }
 
-  protected onFilesSelected(event: Event): void {
+  // --- Fotos ---
+
+  private resetPhotosState(images: ImageDTO[] | undefined | null): void {
+    this.newPhotos().forEach((p) => URL.revokeObjectURL(p.previewUrl));
+    this.newPhotos.set([]);
+
+    const sorted = [...(images ?? [])].sort((a, b) => a.order - b.order);
+    this.existingPhotos.set(
+      sorted.map((image) => ({
+        kind: 'existing' as const,
+        id: image.id,
+        thumbUrl: image.thumbUrl,
+      })),
+    );
+    this.initialExistingOrder = sorted.map((image) => image.id);
+    this.removedExistingIds.set(new Set());
+    this.draggedPhotoId.set(null);
+    this.dragOverPhotoId.set(null);
+  }
+
+  private clearPhotosState(): void {
+    this.resetPhotosState([]);
+  }
+
+  protected triggerFileInput(): void {
+    this.fileInputRef()?.nativeElement.click();
+  }
+
+  protected onPhotosSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
-    if (input.files) {
-      this.selectedFiles.set(Array.from(input.files));
+    const files = input.files;
+    if (!files || files.length === 0) return;
+
+    const availableSlots = this.remainingPhotoSlots();
+    const incoming = Array.from(files).slice(0, availableSlots);
+
+    if (files.length > availableSlots) {
+      this.toast.set({
+        message: `Você só pode adicionar mais ${availableSlots} foto${availableSlots === 1 ? '' : 's'} (máximo de ${this.MAX_PHOTOS}).`,
+        type: 'warning',
+      });
+    }
+
+    const newPhotos: NewPhoto[] = incoming
+      .filter((file) => this.validatePhotoFile(file))
+      .map((file) => ({
+        kind: 'new' as const,
+        id: crypto.randomUUID(),
+        file,
+        previewUrl: URL.createObjectURL(file),
+      }));
+
+    if (newPhotos.length > 0) {
+      this.newPhotos.update((current) => [...current, ...newPhotos]);
+    }
+
+    input.value = '';
+  }
+
+  private validatePhotoFile(file: File): boolean {
+    const maxSizeBytes = 5 * 1024 * 1024;
+
+    if (!file.type.startsWith('image/')) {
+      this.toast.set({ message: `"${file.name}" não é uma imagem válida.`, type: 'error' });
+      return false;
+    }
+    if (file.size > maxSizeBytes) {
+      this.toast.set({ message: `"${file.name}" excede o tamanho máximo de 5MB.`, type: 'error' });
+      return false;
+    }
+    return true;
+  }
+
+  protected removeExistingPhoto(photo: ExistingPhoto): void {
+    this.removedExistingIds.update((current) => new Set(current).add(photo.id));
+    this.existingPhotos.update((current) => current.filter((p) => p.id !== photo.id));
+  }
+
+  protected removeNewPhoto(photo: NewPhoto): void {
+    URL.revokeObjectURL(photo.previewUrl);
+    this.newPhotos.update((current) => current.filter((p) => p.id !== photo.id));
+  }
+
+  protected onExistingDragStart(photo: ExistingPhoto, event: DragEvent): void {
+    this.draggedPhotoId.set(photo.id);
+    event.dataTransfer?.setData('text/plain', photo.id);
+    if (event.dataTransfer) event.dataTransfer.effectAllowed = 'move';
+  }
+
+  protected onExistingDragOver(photo: ExistingPhoto, event: DragEvent): void {
+    event.preventDefault();
+    if (photo.id !== this.draggedPhotoId()) {
+      this.dragOverPhotoId.set(photo.id);
     }
   }
 
-  protected removeFile(index: number): void {
-    this.selectedFiles.update((files) => files.filter((_, i) => i !== index));
+  protected onExistingDragLeave(photo: ExistingPhoto): void {
+    if (this.dragOverPhotoId() === photo.id) {
+      this.dragOverPhotoId.set(null);
+    }
   }
+
+  protected onExistingDrop(target: ExistingPhoto, event: DragEvent): void {
+    event.preventDefault();
+    const draggedId = this.draggedPhotoId();
+    this.dragOverPhotoId.set(null);
+    this.draggedPhotoId.set(null);
+    if (!draggedId || draggedId === target.id) return;
+
+    this.existingPhotos.update((current) => {
+      const fromIndex = current.findIndex((p) => p.id === draggedId);
+      const toIndex = current.findIndex((p) => p.id === target.id);
+      if (fromIndex === -1 || toIndex === -1) return current;
+
+      const updated = [...current];
+      const [moved] = updated.splice(fromIndex, 1);
+      updated.splice(toIndex, 0, moved);
+      return updated;
+    });
+  }
+
+  protected onExistingDragEnd(): void {
+    this.draggedPhotoId.set(null);
+    this.dragOverPhotoId.set(null);
+  }
+
+  private hasExistingOrderChanged(): boolean {
+    const currentIds = this.existingPhotos().map((p) => p.id);
+    const filteredInitial = this.initialExistingOrder.filter((id) => currentIds.includes(id));
+    return JSON.stringify(currentIds) !== JSON.stringify(filteredInitial);
+  }
+
   protected isToggleBlocked(court: ResponseCourtDTO): boolean {
     return this.togglingIds().has(court.id) || (!court.isCourtActive && this.limitReached());
   }
@@ -297,7 +457,7 @@ export class Courts implements OnInit {
           isCovered: isCovered!,
           description: description!,
           clubId: this.currentClubId,
-          images: this.selectedFiles(),
+          images: this.newPhotos().map((p) => p.file),
         })
         .subscribe({
           next: () => {
@@ -322,21 +482,56 @@ export class Courts implements OnInit {
       const id = this.editingId();
       if (id === null) return;
 
-      this.courtService
-        .update(id, {
-          name: name!,
-          sportIds: this.selectedSportIds(),
-          surface: surface!,
-          isCovered: isCovered!,
-          description: description!,
-        })
-        .subscribe({
-          next: () => {
-            this.closeForm();
-            this.loadCourts();
-          },
-        });
+      this.submitUpdate(id);
     }
+  }
+
+  private submitUpdate(id: string): void {
+    const { name, surface, isCovered, description } = this.form.getRawValue();
+
+    this.isSubmitting.set(true);
+
+    const requests: Observable<unknown>[] = [
+      this.courtService.update(id, {
+        name: name!,
+        sportIds: this.selectedSportIds(),
+        surface: surface!,
+        isCovered: isCovered!,
+        description: description!,
+      }),
+    ];
+
+    const filesToUpload = this.newPhotos().map((p) => p.file);
+    if (filesToUpload.length > 0) {
+      requests.push(this.courtService.addImages(id, filesToUpload));
+    }
+
+    for (const imageId of this.removedExistingIds()) {
+      requests.push(this.courtService.deleteImage(id, imageId));
+    }
+
+    if (this.hasExistingOrderChanged()) {
+      const orders = this.existingPhotos().map((p, index) => ({ id: p.id, order: index }));
+      requests.push(this.courtService.reorderImages(id, orders));
+    }
+
+    forkJoin(requests)
+      .pipe(
+        finalize(() => this.isSubmitting.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: () => {
+          this.closeForm();
+          this.loadCourts();
+          this.toast.set({ message: 'Quadra atualizada com sucesso!', type: 'success' });
+        },
+        error: (err: unknown) => {
+          console.error('Erro ao atualizar quadra', err);
+          this.courtService.clearError();
+          this.toast.set({ message: getApiErrorMessage(err), type: 'error' });
+        },
+      });
   }
 
   // --- Delete ---
