@@ -53,6 +53,8 @@ export class SignUp implements AfterViewInit {
 
   readonly isSubmitting = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly showPassword = signal(false);
+  readonly showConfirmPassword = signal(false);
 
   readonly form = this.fb.group(
     {
@@ -82,6 +84,14 @@ export class SignUp implements AfterViewInit {
   readonly termsAccepted = toSignal(this.form.controls.acceptedTerms.valueChanges, {
     initialValue: this.form.controls.acceptedTerms.value,
   });
+
+  toggleShowPassword(): void {
+    this.showPassword.update((v) => !v);
+  }
+
+  toggleShowConfirmPassword(): void {
+    this.showConfirmPassword.update((v) => !v);
+  }
 
   ngAfterViewInit(): void {
     const btnEl = this.googleBtnRef()?.nativeElement;

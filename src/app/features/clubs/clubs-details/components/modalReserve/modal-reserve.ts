@@ -64,15 +64,31 @@ function buildAvailableDates(days = 7): string[] {
   });
 }
 
+/** Converte 'HH:mm' (24h) em minutos desde a meia-noite. */
+function toMinutes(time: string): number {
+  const [hours, minutes] = time.split(':').map(Number);
+  return hours * 60 + minutes;
+}
+
+/** Ordena por horário de início e, em caso de empate, pelo de término. */
+function compareSlotsByTime(a: TimeSlot, b: TimeSlot): number {
+  return (
+    toMinutes(a.startTime) - toMinutes(b.startTime) ||
+    toMinutes(a.endTime) - toMinutes(b.endTime)
+  );
+}
+
 function mapAvailabilityToSlots(dtos: ScheduleAvailabilityDTO[], date: string): TimeSlot[] {
-  return dtos.map((dto) => ({
-    id: dto.id,
-    date,
-    startTime: dto.startTime.slice(0, 5),
-    endTime: dto.endTime.slice(0, 5),
-    price: dto.price,
-    available: dto.isAvailable,
-  }));
+  return dtos
+    .map((dto) => ({
+      id: dto.id,
+      date,
+      startTime: dto.startTime.slice(0, 5),
+      endTime: dto.endTime.slice(0, 5),
+      price: dto.price,
+      available: dto.isAvailable,
+    }))
+    .sort(compareSlotsByTime);
 }
 
 const SLOT_CLASS_SELECTED = 'bg-primary text-primary-content border-primary shadow-md';

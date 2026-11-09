@@ -32,11 +32,16 @@ export class Login implements AfterViewInit, OnDestroy {
 
   readonly isSubmitting = signal(false);
   readonly errorMessage = signal('');
+  readonly showPassword = signal(false);
 
   readonly form = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(6)]],
   });
+
+  toggleShowPassword(): void {
+    this.showPassword.update((v) => !v);
+  }
 
   ngAfterViewInit(): void {
     const btnEl = this.googleBtnRef()?.nativeElement;

@@ -7,29 +7,15 @@
     <!-- Busca por nome -->
     <div>
       <label for="search-input" class="text-sm font-bold text-base-content block mb-2">
-        Pesquisar propriedade
+        Nome
       </label>
       <div class="relative">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-base-content/50"
-          aria-hidden="true"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
-          />
-        </svg>
+       
         <input
           id="search-input"
           type="search"
           [placeholder]="searchPlaceholder()"
-          class="input input-bordered input-sm w-full pl-9 rounded-md"
+          class="input input-bordered input-sm w-full rounded-md"
           [value]="searchTerm()"
           (input)="onSearchInput($event)"
           TextDirective
@@ -40,7 +26,7 @@
     <!-- Cidade -->
     <div>
       <label for="city-input" class="text-sm font-bold text-base-content block mb-2">
-        Destino / Cidade
+        Cidade
       </label>
 
      @if (suggestedCity(); as city) {
@@ -82,7 +68,7 @@
     <!-- Modalidades (Sport) -->
     <div>
       <span class="text-sm font-bold text-base-content block mb-3" id="sports-filter-label">
-        Comodidades / Modalidades
+        Esportes
       </span>
 
       @if (selectedSportIds().length > 0) {
