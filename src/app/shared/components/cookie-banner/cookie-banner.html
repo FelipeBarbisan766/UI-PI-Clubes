@@ -1,0 +1,46 @@
+@if (!consent.accepted()) {
+  <section
+    role="region"
+    aria-label="Aviso de cookies"
+    class="fixed bottom-0 inset-x-0 z-50 p-4 sm:p-6"
+  >
+    <div
+      class="mx-auto max-w-5xl flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8
+             rounded-3xl border border-white/10 bg-neutral/95 backdrop-blur-md
+             px-6 py-6 sm:px-8 shadow-2xl text-white"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-10 w-10 shrink-0 text-primary hidden sm:block"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5" />
+        <path d="M8.5 8.5v.01" />
+        <path d="M16 15.5v.01" />
+        <path d="M12 12v.01" />
+      </svg>
+
+      <div class="flex-1 space-y-1">
+        <h2 class="font-destaque text-lg sm:text-xl font-bold">Nós usamos cookies</h2>
+        <p class="text-base leading-relaxed text-gray-200">
+          Usamos cookies para manter sua sessão ativa e melhorar sua experiência na Clubera.
+          Ao continuar navegando, você concorda com o uso de cookies.
+        </p>
+      </div>
+
+      <button
+        type="button"
+        class="btn btn-primary btn-md sm:btn-lg rounded-lg font-bold text-white shrink-0 w-full sm:w-auto px-10"
+        (click)="consent.accept()"
+      >
+        Entendi
+      </button>
+    </div>
+  </section>
+}

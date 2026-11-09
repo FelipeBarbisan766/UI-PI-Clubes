@@ -133,8 +133,7 @@ export class Courts implements OnInit {
 
   protected readonly isSubmitting = signal(false);
 
-  // --- Fotos (mesmo padrão do config-club) ---
-  protected readonly MAX_PHOTOS = 5;
+  protected readonly MAX_PHOTOS = 3;
 
   private readonly fileInputRef = viewChild<ElementRef<HTMLInputElement>>('fileInput');
 
@@ -162,9 +161,6 @@ export class Courts implements OnInit {
     this.router.navigate(['/admin/club', this.currentClubId, 'court', courtId, 'schedule']);
   }
 
-  // --- Form ---
-  // clubId foi removido pois agora é preenchido de forma transparente via URL
-  // pricePerHour é string no form (valor do input mascarado) e convertido para number no submit
   protected readonly form = this.fb.group({
     name: ['', [Validators.required, Validators.minLength(3)]],
     surface: [null as SurfaceEnum | null, Validators.required],

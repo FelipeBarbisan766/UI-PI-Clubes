@@ -1,194 +1,327 @@
 <div class="flex-1 overflow-y-auto w-full bg-base-100">
-  <div class="max-w-4xl mx-auto px-4 py-10 md:py-14">
+  <div class="max-w-5xl mx-auto px-4 py-10 md:py-16">
+    <!-- ── Hero ─────────────────────────────────────────────────────────── -->
     <section
       aria-labelledby="hero-title"
-      class="grid md:grid-cols-2 gap-10 items-center pb-14 md:pb-20"
+      class="grid md:grid-cols-2 gap-10 lg:gap-14 items-center pb-14 md:pb-20"
     >
       <div>
+
         <h1
           id="hero-title"
-          class="text-3xl md:text-4xl font-extrabold text-base-content leading-tight mb-4"
+          class="font-destaque text-4xl md:text-5xl font-bold text-base-content leading-[1.1] tracking-tight mb-5"
         >
-          Torne-se administrador
-          <span class="text-primary">do seu clube</span>
+          Todas as reservas do seu clube em um só lugar
         </h1>
 
-        <p class="text-base text-base-content/70 mb-8 leading-relaxed max-w-md">
-          Gerencie quadras, horários e reservas num só lugar. Deixa o sistema trabalhar — você foca
-          em receber os jogadores.
+        <p class="text-base md:text-lg text-base-content/70 mb-8 leading-relaxed max-w-md">
+          Cadastre suas quadras, defina os horários e acompanhe cada reserva. O sistema cuida da
+          organização, e você cuida de receber os jogadores.
         </p>
 
-        <button
-          type="button"
-          class="btn btn-primary btn-lg text-white"
-          (click)="goToPlans()"
-          aria-label="Começar como Dono de Clube"
-        >
-          Quero cadastrar meu clube
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
+        <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+          <button
+            type="button"
+            class="btn btn-primary btn-lg text-white rounded-lg shadow-md"
+            (click)="goToPlans()"
           >
-            <line x1="5" y1="12" x2="19" y2="12" />
-            <polyline points="12 5 19 12 12 19" />
-          </svg>
-        </button>
+            Ver planos e cadastrar meu clube
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </button>
+        </div>
 
-        <p class="text-xs text-base-content/40 mt-4">Sujeito a cobrança. Assinatura paga.</p>
+        <p class="text-sm text-base-content/60 mt-4">
+          Serviço por assinatura. Você escolhe o plano na próxima etapa.
+        </p>
       </div>
 
-      <div class="mockup-window border border-base-300">
-        <div class="px-4 pb-4 pt-2">
-          <p class="text-xs font-semibold text-base-content/50 mb-2">Hoje · Quadras</p>
-          <div class="overflow-x-auto">
-            <table class="table table-sm">
-              <thead>
-                <tr class="text-xs">
-                  <th class="text-base-content/50 font-normal"></th>
-                  <th class="text-base-content/50 font-normal">Quadra 1</th>
-                  <th class="text-base-content/50 font-normal">Quadra 2</th>
-                  <th class="text-base-content/50 font-normal">Quadra 3</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th class="text-xs font-normal text-base-content/50">18:00</th>
-                  <td><span class="badge badge-soft badge-success badge-sm">Livre</span></td>
-                  <td><span class="badge badge-soft badge-neutral badge-sm">Reservada</span></td>
-                  <td><span class="badge badge-soft badge-success badge-sm">Livre</span></td>
-                </tr>
-                <tr>
-                  <th class="text-xs font-normal text-base-content/50">19:00</th>
-                  <td><span class="badge badge-soft badge-neutral badge-sm">Reservada</span></td>
-                  <td><span class="badge badge-soft badge-neutral badge-sm">Reservada</span></td>
-                  <td><span class="badge badge-soft badge-success badge-sm">Livre</span></td>
-                </tr>
-                <tr>
-                  <th class="text-xs font-normal text-base-content/50">20:00</th>
-                  <td><span class="badge badge-soft badge-success badge-sm">Livre</span></td>
-                  <td><span class="badge badge-soft badge-success badge-sm">Livre</span></td>
-                  <td><span class="badge badge-soft badge-neutral badge-sm">Reservada</span></td>
-                </tr>
-              </tbody>
-            </table>
+      <!-- Pré-visualização do painel -->
+      <div class="relative">
+        <div
+          class="absolute -inset-3 rounded-3xl bg-primary/10 -z-10 rotate-2"
+          aria-hidden="true"
+        ></div>
+
+        <div class="mockup-window border border-base-300 bg-base-100 shadow-xl">
+          <div class="px-4 pb-4 pt-3">
+            <div class="flex items-center justify-between mb-3">
+              <p class="text-sm font-semibold text-base-content">Agenda de hoje</p>
+              <div class="flex items-center gap-3 text-xs text-base-content/60">
+                <span class="flex items-center gap-1.5">
+                  <span class="status status-success" aria-hidden="true"></span>
+                  Livre
+                </span>
+                <span class="flex items-center gap-1.5">
+                  <span class="status status-neutral" aria-hidden="true"></span>
+                  Reservada
+                </span>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="table table-sm" aria-label="Exemplo de agenda de quadras">
+                <thead>
+                  <tr class="text-xs text-base-content/60">
+                    <th scope="col" class="font-medium">Horário</th>
+                    <th scope="col" class="font-medium">Quadra 1</th>
+                    <th scope="col" class="font-medium">Quadra 2</th>
+                    <th scope="col" class="font-medium">Quadra 3</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row" class="text-xs font-medium text-base-content/70">18:00</th>
+                    <td><span class="badge badge-soft badge-success badge-sm">Livre</span></td>
+                    <td><span class="badge badge-soft badge-neutral badge-sm">Reservada</span></td>
+                    <td><span class="badge badge-soft badge-success badge-sm">Livre</span></td>
+                  </tr>
+                  <tr>
+                    <th scope="row" class="text-xs font-medium text-base-content/70">19:00</th>
+                    <td><span class="badge badge-soft badge-neutral badge-sm">Reservada</span></td>
+                    <td><span class="badge badge-soft badge-neutral badge-sm">Reservada</span></td>
+                    <td><span class="badge badge-soft badge-success badge-sm">Livre</span></td>
+                  </tr>
+                  <tr>
+                    <th scope="row" class="text-xs font-medium text-base-content/70">20:00</th>
+                    <td><span class="badge badge-soft badge-success badge-sm">Livre</span></td>
+                    <td><span class="badge badge-soft badge-success badge-sm">Livre</span></td>
+                    <td><span class="badge badge-soft badge-neutral badge-sm">Reservada</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <div class="divider my-0"></div>
-
-    <section class="py-10" aria-label="Destaques da plataforma">
-      <div class="stats stats-horizontal w-full border border-base-300 shadow-none">
-        @for (
-          stat of [
-            { value: '100%', label: 'Online' },
-            { value: '< 15min', label: 'Para ativar' },
-            { value: '24/7', label: 'Reservas abertas' },
-          ];
-          track stat.label
-        ) {
-          <div class="stat place-items-center">
-            <div class="stat-value text-xl md:text-2xl text-primary">{{ stat.value }}</div>
-            <div class="stat-desc text-xs">{{ stat.label }}</div>
+    <!-- ── Destaques ────────────────────────────────────────────────────── -->
+    <section aria-label="Destaques da plataforma" class="pb-14 md:pb-20">
+      <ul class="grid grid-cols-1 sm:grid-cols-3 gap-4 list-none">
+        <li class="flex items-center gap-4 rounded-2xl border border-base-300 bg-base-100 p-5">
+          <span
+            class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary"
+            aria-hidden="true"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="size-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <path d="M2 12h20" />
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+            </svg>
+          </span>
+          <div>
+            <p class="font-bold text-base-content leading-tight">100% online</p>
+            <p class="text-sm text-base-content/70">Sem papel e sem planilhas</p>
           </div>
-        }
-      </div>
+        </li>
+
+        <li class="flex items-center gap-4 rounded-2xl border border-base-300 bg-base-100 p-5">
+          <span
+            class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary"
+            aria-hidden="true"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="size-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+          </span>
+          <div>
+            <p class="font-bold text-base-content leading-tight">Ativo em até 15 minutos</p>
+            <p class="text-sm text-base-content/70">Configuração rápida</p>
+          </div>
+        </li>
+
+        <li class="flex items-center gap-4 rounded-2xl border border-base-300 bg-base-100 p-5">
+          <span
+            class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary"
+            aria-hidden="true"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="size-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect width="18" height="18" x="3" y="4" rx="2" />
+              <path d="M16 2v4M8 2v4M3 10h18" />
+            </svg>
+          </span>
+          <div>
+            <p class="font-bold text-base-content leading-tight">Reservas 24 horas</p>
+            <p class="text-sm text-base-content/70">Os jogadores reservam a qualquer hora</p>
+          </div>
+        </li>
+      </ul>
     </section>
 
-    <div class="divider my-0"></div>
-
-    <section class="py-14 md:py-20" aria-labelledby="steps-title">
-      <h2 id="steps-title" class="text-2xl md:text-3xl font-bold text-base-content mb-10">
-        Ative seu clube em 3 passos
-      </h2>
+    <!-- ── Passo a passo ────────────────────────────────────────────────── -->
+    <section
+      class="rounded-3xl bg-base-200 px-6 py-12 md:px-10 md:py-16"
+      aria-labelledby="steps-title"
+    >
+      <div class="max-w-xl mb-10">
+        <h2
+          id="steps-title"
+          class="font-destaque text-2xl md:text-3xl font-bold text-base-content mb-2"
+        >
+          Ative seu clube em 3 passos
+        </h2>
+        <p class="text-base-content/70">
+          Do cadastro à primeira reserva, tudo é feito dentro da plataforma.
+        </p>
+      </div>
 
       <ol
-        class="join join-vertical md:join-horizontal w-full border border-base-300 list-none"
+        class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 list-none"
         aria-label="Passos para ativar o clube"
       >
-        <li class="join-item flex-1 p-6 md:p-8 md:border-r border-base-300 last:border-r-0">
-          <div
-            class="w-10 h-10 rounded-full bg-primary text-primary-content font-bold flex items-center justify-center shrink-0 mb-4"
-            aria-hidden="true"
-          >
-            1
+        <li class="rounded-2xl bg-base-100 border border-base-300 p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <span
+              class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-content font-bold"
+              aria-hidden="true"
+            >
+              1
+            </span>
+            <h3 class="font-bold text-base-content">Crie o perfil do clube</h3>
           </div>
-          <h3 class="font-bold text-base-content mb-1">Crie o perfil do clube</h3>
-          <p class="text-sm text-base-content/65 leading-relaxed">
-            Nome, endereço, fotos e informações de contato. Leva menos de 5 minutos.
+          <p class="text-sm text-base-content/70 leading-relaxed">
+            Informe nome, endereço, fotos e contato. Leva menos de 5 minutos.
           </p>
         </li>
 
-        <li class="join-item flex-1 p-6 md:p-8 md:border-r border-base-300 last:border-r-0">
-          <div
-            class="w-10 h-10 rounded-full bg-primary text-primary-content font-bold flex items-center justify-center shrink-0 mb-4"
-            aria-hidden="true"
-          >
-            2
+        <li class="rounded-2xl bg-base-100 border border-base-300 p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <span
+              class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-content font-bold"
+              aria-hidden="true"
+            >
+              2
+            </span>
+            <h3 class="font-bold text-base-content">Cadastre suas quadras</h3>
           </div>
-          <h3 class="font-bold text-base-content mb-1">Cadastre suas quadras</h3>
-          <p class="text-sm text-base-content/65 leading-relaxed">
-            Adicione quadras com tipo, fotos, horários disponíveis e preços.
+          <p class="text-sm text-base-content/70 leading-relaxed">
+            Adicione cada quadra com modalidade, fotos, horários disponíveis e preço por hora.
           </p>
         </li>
 
-        <li class="join-item flex-1 p-6 md:p-8 md:border-r border-base-300 last:border-r-0">
-          <div
-            class="w-10 h-10 rounded-full bg-primary text-primary-content font-bold flex items-center justify-center shrink-0 mb-4"
-            aria-hidden="true"
-          >
-            3
+        <li class="rounded-2xl bg-base-100 border border-base-300 p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <span
+              class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-content font-bold"
+              aria-hidden="true"
+            >
+              3
+            </span>
+            <h3 class="font-bold text-base-content">Comece a receber reservas</h3>
           </div>
-          <h3 class="font-bold text-base-content mb-1">Comece a receber</h3>
-          <p class="text-sm text-base-content/65 leading-relaxed">
-            Seu clube já aparece para os jogadores. Reservas chegam automaticamente.
+          <p class="text-sm text-base-content/70 leading-relaxed">
+            Seu clube aparece para os jogadores e as reservas chegam automaticamente.
           </p>
         </li>
       </ol>
     </section>
 
-    <div class="divider my-0"></div>
-
-    <section class="py-14 md:py-20 pb-4" aria-labelledby="faq-title">
-      <h2 id="faq-title" class="text-2xl md:text-3xl font-bold text-base-content mb-10">
-        Perguntas frequentes
-      </h2>
-
-      <div class="join join-vertical w-full border border-base-300" role="list">
-        @for (faq of faqs; track faq.question; let i = $index) {
-          <div
-            class="join-item collapse collapse-plus border-b border-base-300 last:border-b-0"
-            [class.collapse-open]="openFaqIndex() === i"
-            role="listitem"
+    <!-- ── Perguntas frequentes ─────────────────────────────────────────── -->
+    <section class="pt-14 md:pt-20" aria-labelledby="faq-title">
+      <div class="grid lg:grid-cols-3 gap-8 lg:gap-12">
+        <div class="lg:col-span-1">
+          <h2
+            id="faq-title"
+            class="font-destaque text-2xl md:text-3xl font-bold text-base-content mb-2"
           >
-            <button
-              type="button"
-              class="collapse-title font-semibold text-sm text-base-content"
-              [attr.aria-expanded]="openFaqIndex() === i"
-              [attr.aria-controls]="'faq-answer-' + i"
-              (click)="toggleFaq(i)"
-            >
-              {{ faq.question }}
-            </button>
+            Perguntas frequentes
+          </h2>
+          <p class="text-base-content/70">
+            Ainda com dúvidas? Veja as respostas mais comuns antes de começar.
+          </p>
+        </div>
+
+        <div class="lg:col-span-2 flex flex-col gap-3">
+          @for (faq of faqs; track faq.question; let i = $index) {
             <div
-              [id]="'faq-answer-' + i"
-              role="region"
-              class="collapse-content text-sm text-base-content/70 leading-relaxed"
+              class="collapse collapse-plus rounded-2xl border border-base-300 bg-base-100"
+              [class.collapse-open]="openFaqIndex() === i"
             >
-              <p>{{ faq.answer }}</p>
+              <button
+                type="button"
+                class="collapse-title text-left font-semibold text-base-content"
+                [attr.aria-expanded]="openFaqIndex() === i"
+                [attr.aria-controls]="'faq-answer-' + i"
+                (click)="toggleFaq(i)"
+              >
+                {{ faq.question }}
+              </button>
+              <div
+                [id]="'faq-answer-' + i"
+                role="region"
+                class="collapse-content text-sm text-base-content/70 leading-relaxed"
+              >
+                <p>{{ faq.answer }}</p>
+              </div>
             </div>
-          </div>
-        }
+          }
+        </div>
       </div>
+    </section>
+
+    <!-- ── Chamada final ────────────────────────────────────────────────── -->
+    <section
+      class="mt-14 md:mt-20 rounded-3xl bg-neutral text-neutral-content px-6 py-10 md:px-12 md:py-14 flex flex-col md:flex-row md:items-center md:justify-between gap-6"
+      aria-labelledby="cta-title"
+    >
+      <div class="max-w-lg">
+        <h2 id="cta-title" class="font-destaque text-2xl md:text-3xl font-bold mb-2">
+          Pronto para organizar seu clube?
+        </h2>
+        <p class="text-neutral-content/80">
+          Escolha um plano e cadastre suas quadras hoje mesmo.
+        </p>
+      </div>
+
+      <button
+        type="button"
+        class="btn btn-primary btn-lg text-white rounded-lg shrink-0"
+        (click)="goToPlans()"
+      >
+        Ver planos
+      </button>
     </section>
   </div>
 </div>
