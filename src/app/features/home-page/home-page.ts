@@ -20,12 +20,12 @@ import { ImageCarousel } from '../../shared/components/image-carousel/image-caro
 import { PlayerService } from '../../core/services/player-service';
 import { SportDTO } from '../../core/models/model-sport';
 import { catchError, of } from 'rxjs';
+import { ServiceGeolocation } from '../../core/services/service-geolocation'; 
 
 @Component({
   selector: 'app-home-page',
   imports: [RouterLink, ProfileAlertModal, ImageCarousel],
   templateUrl: './home-page.html',
-  // NOTA: standalone: true é o padrão no Angular v20+, então não o declaramos.
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomePage implements OnInit {
@@ -34,6 +34,7 @@ export class HomePage implements OnInit {
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly playerService = inject(PlayerService);
+  private readonly geo = inject(ServiceGeolocation);
 
   readonly isLoggedIn = this.authService.isAuthenticated;
 
@@ -50,6 +51,9 @@ export class HomePage implements OnInit {
   readonly localClubs = signal<ResponseClubDTO[]>([]);
   readonly featuredClubs = signal<ResponseClubDTO[]>([]);
   readonly recommendedSportName = signal<string | null>(null);
+  
+  // Opcional: caso queira usar sugestão de cidade também na Home igual à listagem
+  readonly suggestedCity = signal<string | null>(null);
 
   ngOnInit(): void {
     this.authService
@@ -65,24 +69,25 @@ export class HomePage implements OnInit {
       });
   }
 
-  private initAuthenticatedArea(): void {
-    this.resolveInitialCity().then((city) => {
-      if (city) {
-        this.detectedCity.set(city);
-        this.loadLocalClubs(city);
-      }
-    });
+  private async initAuthenticatedArea(): Promise<void> {
+    if ((await this.geo.getPermissionState()) === 'denied') return;
+
+    const city = await this.geo.resolveCity();
+    if (city) {
+      this.detectedCity.set(city);
+      this.loadLocalClubs(city);
+    }
   }
+
   private loadRecommendedClubs(): void {
     this.playerService
       .getFavoriteSports()
       .pipe(
-        catchError(() => of([] as SportDTO[])), // erro na chamada → fallback genérico
+        catchError(() => of([] as SportDTO[])),
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe((sports) => {
         if (sports.length === 0) {
-          // usuário sem esportes favoritos → fallback genérico
           this.recommendedSportName.set(null);
           this.loadFeaturedClubs();
           return;
@@ -91,6 +96,7 @@ export class HomePage implements OnInit {
         this.tryLoadBySport(this.shuffle(sports), 0);
       });
   }
+
   private tryLoadBySport(sports: SportDTO[], index: number): void {
     if (index >= sports.length) {
       this.recommendedSportName.set(null);
@@ -155,54 +161,11 @@ export class HomePage implements OnInit {
   getCoverImage(club: ResponseClubDTO): string {
     return club.images && club.images.length > 0
       ? club.images[0].thumbUrl
-      : 'assets/placeholder-club.jpg'; // Substitua pelo caminho do seu placeholder padrão
+      : 'assets/placeholder-club.jpg';
   }
 
   formatLocation(club: ResponseClubDTO): string {
     return `${club.city}, ${club.state}`;
-  }
-
-  // --- Lógica de Geolocalização ---
-
-  private resolveInitialCity(): Promise<string | null> {
-    return new Promise((resolve) => {
-      if (!navigator?.geolocation) return resolve(null);
-
-      const timer = setTimeout(() => resolve(null), 4000);
-
-      navigator.geolocation.getCurrentPosition(
-        async ({ coords }) => {
-          clearTimeout(timer);
-          try {
-            const city = await this.reverseGeocode(coords.latitude, coords.longitude);
-            resolve(city);
-          } catch {
-            resolve(null);
-          }
-        },
-        () => {
-          clearTimeout(timer);
-          resolve(null);
-        },
-        { timeout: 4000, maximumAge: 5 * 60 * 1000 },
-      );
-    });
-  }
-
-  private async reverseGeocode(lat: number, lng: number): Promise<string | null> {
-    const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`;
-    const res = await fetch(url, {
-      headers: { 'Accept-Language': 'pt-BR', 'User-Agent': 'CluberaApp/1.0' },
-    });
-    if (!res.ok) return null;
-    const data = await res.json();
-    return (
-      data.address?.city ??
-      data.address?.town ??
-      data.address?.municipality ??
-      data.address?.village ??
-      null
-    );
   }
 
   goToRegister(): void {

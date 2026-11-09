@@ -420,7 +420,10 @@ protected readonly countryOptions = Object.values(CountryEnum);
     const club = this.clubService.selectedClub();
     if (!club) return;
     this.clubService.delete(this.clubId).subscribe({
-      next: () => this.deleteConfirmOpen.set(false),
+      next: () => {
+        this.deleteConfirmOpen.set(false);
+        this.router.navigate(['/admin/clubs']);
+      },
       error: () => {
         this.toast.set({
           message: this.clubService.error() ?? 'Erro ao excluir o clube.',
