@@ -81,7 +81,7 @@ export class ServiceCourt {
     dto.sportIds.forEach((id) => formData.append('SportIds', id));
     formData.append('surface', dto.surface.toString());
     formData.append('isCovered', String(dto.isCovered));
-    formData.append('description', dto.description);
+    formData.append('description', dto.description? dto.description : '');
     formData.append('clubId', dto.clubId);
     dto.images.forEach((img) => formData.append('images', img));
 

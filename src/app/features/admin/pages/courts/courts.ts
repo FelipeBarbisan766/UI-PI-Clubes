@@ -67,7 +67,6 @@ function priceValidator(control: AbstractControl): ValidationErrors | null {
     Modal,
     RouterLink,
     ToastAlert,
-    NgxMaskDirective,
     NgOptimizedImage,
     ImageCarousel,
   ],
@@ -165,7 +164,7 @@ export class Courts implements OnInit {
     name: ['', [Validators.required, Validators.minLength(3)]],
     surface: [null as SurfaceEnum | null, Validators.required],
     isCovered: [false],
-    description: ['', Validators.required],
+    description: [''],
   });
 
   private readonly formStatus = toSignal(this.form.statusChanges, {
@@ -451,7 +450,7 @@ export class Courts implements OnInit {
           sportIds: this.selectedSportIds(),
           surface: surface!,
           isCovered: isCovered!,
-          description: description!,
+          description: description? description : '',
           clubId: this.currentClubId,
           images: this.newPhotos().map((p) => p.file),
         })
@@ -493,7 +492,7 @@ export class Courts implements OnInit {
         sportIds: this.selectedSportIds(),
         surface: surface!,
         isCovered: isCovered!,
-        description: description!,
+        description: description? description : '',
       }),
     ];
 

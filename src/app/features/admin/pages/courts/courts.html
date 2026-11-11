@@ -511,14 +511,8 @@
             id="description"
             formControlName="description"
             class="textarea textarea-bordered textarea-sm h-16 resize-none w-full"
-            [class.textarea-error]="fieldInvalid('description')"
             placeholder="Detalhes da quadra..."
           ></textarea>
-          @if (fieldInvalid('description')) {
-            <span role="alert" class="block text-error text-[11px] mt-1 font-medium px-1"
-              >Obrigatória</span
-            >
-          }
         </div>
       </div>
 

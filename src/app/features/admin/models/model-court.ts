@@ -22,7 +22,7 @@ export interface CreateCourtDTO {
   sportIds: string[];
   surface: SurfaceEnum;
   isCovered: boolean;
-  description: string;
+  description?: string;
   clubId: string;
   images: File[];
 }
@@ -32,7 +32,7 @@ export interface UpdateCourtDTO {
   sportIds: string[];
   surface: SurfaceEnum;
   isCovered: boolean;
-  description: string;
+  description?: string;
 }
 
 export interface ResponseCourtDTO {
@@ -43,7 +43,7 @@ export interface ResponseCourtDTO {
   isCovered: boolean;
   minPrice : number;
   maxPrice : number;
-  description: string;
+  description?: string;
   isCourtActive: boolean;
   clubId: string;
   images: ImageDTO[];
