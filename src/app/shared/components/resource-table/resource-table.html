@@ -1,0 +1,293 @@
+@if (toast(); as t) {
+  <app-toast-alert [message]="t.message" [type]="t.type" (dismiss)="dismissToast()" />
+}
+
+<section class="space-y-6" aria-labelledby="resource-title">
+  <header class="flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <h1 id="resource-title" class="text-2xl font-bold text-base-content">{{ heading() }}</h1>
+      <p class="text-sm text-base-content/60">{{ subtitle() }}</p>
+    </div>
+
+    <div class="flex flex-wrap gap-2">
+      <label class="input input-bordered flex w-60 items-center gap-2">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-4 shrink-0 opacity-50"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.3-4.3" />
+        </svg>
+        <input
+          type="search"
+          class="grow"
+          placeholder="Buscar..."
+          aria-label="Buscar registros"
+          [value]="query()"
+          (input)="onSearch($event)"
+        />
+      </label>
+
+      @if (newItem()) {
+        <button type="button" class="btn btn-primary rounded-full text-white" (click)="openNew()">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 4v16m8-8H4"
+            />
+          </svg>
+          Novo
+        </button>
+      }
+    </div>
+  </header>
+
+  <div class="card bg-base-100 border border-base-200 shadow-sm">
+    <div class="overflow-x-auto">
+      <table class="table table-zebra w-full" [attr.aria-label]="heading()">
+        <thead>
+          <tr>
+            @for (f of visibleFields(); track f.key) {
+              <th scope="col">{{ f.label }}</th>
+            }
+            @if (showActions()) {
+              <th scope="col" class="text-right">Ações</th>
+            }
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (row of filtered(); track row.id) {
+            <tr class="hover">
+              @for (f of visibleFields(); track f.key) {
+                <td>
+                  @switch (f.display) {
+                    @case ('status') {
+                      <span [class]="statusClass(cellText(row, f))">{{ cellText(row, f) }}</span>
+                    }
+                    @case ('code') {
+                      <code class="rounded bg-base-200 px-1.5 py-0.5 text-xs">{{
+                        cellText(row, f)
+                      }}</code>
+                    }
+                    @case ('progress') {
+                      <div class="flex w-32 items-center gap-2">
+                        <progress
+                          class="progress progress-primary h-1.5"
+                          [value]="progressValue(row, f)"
+                          max="100"
+                          [attr.aria-label]="f.label"
+                        ></progress>
+                        <span class="text-xs">{{ cellText(row, f) }}</span>
+                      </div>
+                    }
+                    @default {
+                      {{ cellText(row, f) }}
+                    }
+                  }
+                </td>
+              }
+              @if (showActions()) {
+                <td>
+                  <div class="flex items-center justify-end gap-1">
+                    @if (canEdit()) {
+                      <button
+                        type="button"
+                        class="btn btn-ghost btn-sm btn-square"
+                        [attr.aria-label]="'Editar ' + primaryLabel(row)"
+                        title="Editar"
+                        (click)="openEdit(row)"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          aria-hidden="true"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                          />
+                        </svg>
+                      </button>
+                    }
+                    @if (canDelete()) {
+                      <button
+                        type="button"
+                        class="btn btn-ghost btn-sm btn-square text-error"
+                        [attr.aria-label]="'Excluir ' + primaryLabel(row)"
+                        title="Excluir"
+                        (click)="requestDelete(row)"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          aria-hidden="true"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                          />
+                        </svg>
+                      </button>
+                    }
+                  </div>
+                </td>
+              }
+            </tr>
+          } @empty {
+            <tr>
+              <td [attr.colspan]="colSpan()" class="py-8 text-center text-base-content/50">
+                Nenhum registro encontrado.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <p class="text-xs text-base-content/60" aria-live="polite">
+    {{ filtered().length }} de {{ rows().length }} registros
+  </p>
+</section>
+
+<!-- ── Modal criar/editar ─────────────────────────────────────────────────── -->
+<dialog #editDialog class="modal" aria-labelledby="edit-title" (close)="onEditClosed()">
+  <div class="modal-box rounded-3xl">
+    <h3 id="edit-title" class="mb-4 text-xl font-bold text-base-content">
+      {{ isNew() ? 'Novo registro' : 'Editar registro' }}
+    </h3>
+
+    @if (form(); as f) {
+      <form [formGroup]="f" (ngSubmit)="save()" class="grid gap-4" novalidate>
+        @for (field of formFields(); track field.key) {
+          <div class="flex flex-col gap-1">
+            <label
+              class="text-xs font-semibold text-base-content/60 uppercase tracking-wide"
+              [for]="'field-' + field.key"
+            >
+              {{ field.label }}
+            </label>
+
+            @switch (field.type) {
+              @case ('boolean') {
+                <div>
+                  <input
+                    type="checkbox"
+                    class="toggle toggle-primary"
+                    [id]="'field-' + field.key"
+                    [formControlName]="field.key"
+                  />
+                </div>
+              }
+              @case ('select') {
+                <select
+                  class="select select-bordered w-full"
+                  [id]="'field-' + field.key"
+                  [formControlName]="field.key"
+                >
+                  @for (option of field.options ?? []; track option) {
+                    <option [value]="option">{{ option }}</option>
+                  }
+                </select>
+              }
+              @case ('number') {
+                <input
+                  type="number"
+                  min="0"
+                  class="input input-bordered w-full"
+                  [class.input-error]="fieldInvalid(field.key)"
+                  [id]="'field-' + field.key"
+                  [formControlName]="field.key"
+                  [attr.aria-invalid]="fieldInvalid(field.key)"
+                />
+              }
+              @default {
+                <input
+                  type="text"
+                  class="input input-bordered w-full"
+                  [class.input-error]="fieldInvalid(field.key)"
+                  [id]="'field-' + field.key"
+                  [formControlName]="field.key"
+                  [attr.aria-invalid]="fieldInvalid(field.key)"
+                />
+              }
+            }
+
+            @if (fieldInvalid(field.key)) {
+              <span role="alert" class="px-1 text-[11px] font-medium text-error"
+                >Valor inválido ou obrigatório</span
+              >
+            }
+          </div>
+        }
+
+        <div class="modal-action mt-2">
+          <button type="button" class="btn btn-ghost rounded-full" (click)="closeEdit()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary rounded-full text-white">Salvar</button>
+        </div>
+      </form>
+    }
+  </div>
+
+  <form method="dialog" class="modal-backdrop">
+    <button aria-label="Fechar janela">Fechar</button>
+  </form>
+</dialog>
+
+<!-- ── Modal confirmar exclusão ───────────────────────────────────────────── -->
+<dialog
+  #deleteDialog
+  class="modal"
+  aria-labelledby="delete-title"
+  aria-describedby="delete-desc"
+  (close)="onDeleteClosed()"
+>
+  <div class="modal-box rounded-3xl max-w-md">
+    <h3 id="delete-title" class="mb-2 text-xl font-bold text-base-content">Excluir registro?</h3>
+    <p id="delete-desc" class="text-sm text-base-content/70">
+      "{{ toDelete() ? primaryLabel(toDelete()!) : '' }}" será removido permanentemente.
+    </p>
+
+    <div class="modal-action">
+      <button type="button" class="btn btn-ghost rounded-full" (click)="closeDelete()">
+        Cancelar
+      </button>
+      <button type="button" class="btn btn-error rounded-full text-white" (click)="confirmDelete()">
+        Excluir
+      </button>
+    </div>
+  </div>
+
+  <form method="dialog" class="modal-backdrop">
+    <button aria-label="Fechar janela">Fechar</button>
+  </form>
+</dialog>

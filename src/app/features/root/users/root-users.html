@@ -1,0 +1,23 @@
+<div class="p-6 max-w-7xl mx-auto">
+  @if (userService.loading()) {
+    <div class="flex justify-center mb-4" aria-live="polite" aria-busy="true">
+      <span class="loading loading-spinner loading-md text-primary"></span>
+      <span class="sr-only">Carregando usuários...</span>
+    </div>
+  }
+
+  <app-resource-table
+    heading="Usuários"
+    subtitle="Jogadores, donos de clube e administradores."
+    primaryKey="name"
+    [initial]="userService.users()"
+    [fields]="fields"
+    [searchKeys]="searchKeys"
+    [canEdit]="false"
+    [canDelete]="false"
+  />
+</div>
+
+@if (toast(); as t) {
+  <app-toast-alert [message]="t.message" [type]="t.type" (dismiss)="dismissToast()" />
+}

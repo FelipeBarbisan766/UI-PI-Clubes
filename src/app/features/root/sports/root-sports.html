@@ -1,0 +1,26 @@
+<div class="p-6 max-w-7xl mx-auto">
+  @if (sportService.loading()) {
+    <div class="flex justify-center mb-4" aria-live="polite" aria-busy="true">
+      <span class="loading loading-spinner loading-md text-primary"></span>
+      <span class="sr-only">Carregando esportes...</span>
+    </div>
+  }
+
+  <app-resource-table
+    heading="Esportes"
+    subtitle="Modalidades disponíveis para clubes e jogadores."
+    primaryKey="name"
+    [initial]="sportService.sports()"
+    [fields]="fields"
+    [searchKeys]="searchKeys"
+    [newItem]="newSport"
+    [remote]="true"
+    [canEdit]="false"
+    (create)="onCreate($event)"
+    (delete)="onDelete($event)"
+  />
+</div>
+
+@if (toast(); as t) {
+  <app-toast-alert [message]="t.message" [type]="t.type" (dismiss)="dismissToast()" />
+}

@@ -104,7 +104,6 @@ export class AuthService {
       }),
       map(({ isAuthenticated, user }) => (isAuthenticated ? user : null)),
       catchError((err: HttpErrorResponse) => {
-        // Agora só cai aqui em erro real (500, rede, etc.) — não mais em "não autenticado"
         this.me.set(null);
         this.authStatus.set('unauthenticated');
         return of(null);
