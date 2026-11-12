@@ -8,7 +8,7 @@
   <!-- Tamanho fixo: não muda ao selecionar horário ou confirmar -->
   <div class="modal-box rounded-3xl w-11/12 max-w-5xl h-[44rem] max-h-[90vh] p-0 flex flex-col overflow-hidden">
     <!-- Cabeçalho -->
-    <header class="flex items-start justify-between gap-4 px-6 pt-6 pb-4 border-b border-base-200 shrink-0">
+    <header class="flex items-start justify-between gap-4 px-4 sm:px-6 pt-6 pb-4 border-b border-base-200 shrink-0">
       <div class="min-w-0">
         <h3 id="reserve-modal-title" class="font-bold text-xl text-base-content truncate">
           Horários — {{ court().name }}
@@ -37,33 +37,213 @@
     </header>
 
     <!-- Corpo: no mobile rola inteiro; no desktop cada coluna rola sozinha -->
-    <div class="flex-1 min-h-0 overflow-y-auto lg:overflow-hidden px-6 py-5">
+    <div class="flex-1 min-h-0 overflow-y-auto lg:overflow-hidden px-4 sm:px-6 py-5">
       <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:h-full">
         <!-- Datas e horários -->
         <section
           aria-label="Escolha de data e horário"
           class="min-w-0 lg:min-h-0 lg:overflow-y-auto lg:pr-1"
         >
-          <div
-            class="flex gap-2 overflow-x-auto pb-2 snap-x"
-            role="group"
-            aria-label="Selecione uma data"
+          <!-- Botão que abre o calendário (popover) -->
+          <button
+            type="button"
+            class="btn btn-sm rounded-full w-full sm:w-auto justify-between sm:justify-start gap-2"
+            popovertarget="reserve-calendar"
+            style="anchor-name: --reserve-calendar-anchor"
+            aria-haspopup="dialog"
+            [disabled]="isConfirming()"
           >
-            @for (date of availableDates; track date) {
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="size-4 shrink-0"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"
+              />
+            </svg>
+            <span class="capitalize truncate">{{ formatDate(selectedDate()) }}</span>
+            <span class="text-base-content/50 text-xs hidden sm:inline">Abrir calendário</span>
+          </button>
+
+          <!-- Calendário em popover -->
+          <div
+            #calendarPopover
+            id="reserve-calendar"
+            popover
+            class="dropdown rounded-2xl border border-base-200 bg-base-100 p-3 shadow-lg w-72 max-w-[calc(100vw-2rem)]"
+            style="position-anchor: --reserve-calendar-anchor"
+            role="dialog"
+            aria-label="Calendário de datas"
+          >
+            <!-- Navegação do mês -->
+            <div class="flex items-center justify-between mb-2">
               <button
                 type="button"
-                class="btn btn-sm rounded-full shrink-0 snap-start"
-                [class.btn-primary]="selectedDate() === date"
-                [class.text-white]="selectedDate() === date"
-                [class.btn-ghost]="selectedDate() !== date"
-                (click)="selectDate(date)"
-                [disabled]="isConfirming()"
-                [attr.aria-pressed]="selectedDate() === date"
-                [attr.aria-label]="'Ver horários de ' + formatDate(date)"
+                class="btn btn-sm btn-circle btn-ghost"
+                (click)="shiftMonth(-1)"
+                [disabled]="!canGoPrevMonth()"
+                aria-label="Mês anterior"
               >
-                {{ formatDate(date) }}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="size-4"
+                  aria-hidden="true"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                </svg>
               </button>
-            }
+
+              <p class="font-semibold capitalize text-sm" aria-live="polite">{{ monthLabel() }}</p>
+
+              <button
+                type="button"
+                class="btn btn-sm btn-circle btn-ghost"
+                (click)="shiftMonth(1)"
+                [disabled]="!canGoNextMonth()"
+                aria-label="Próximo mês"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="size-4"
+                  aria-hidden="true"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                </svg>
+              </button>
+            </div>
+
+            <!-- Dias da semana -->
+            <div class="grid grid-cols-7 gap-1 mb-1 text-center text-xs font-medium text-base-content/60">
+              @for (weekday of weekdays; track $index) {
+                <abbr [attr.title]="weekday.full" class="no-underline">{{ weekday.short }}</abbr>
+              }
+            </div>
+
+            <!-- Dias do mês (dias anteriores a hoje ficam desabilitados) -->
+            <div
+              class="grid grid-cols-7 gap-1"
+              role="group"
+              [attr.aria-label]="'Selecione uma data em ' + monthLabel()"
+            >
+              @for (cell of calendarCells(); track $index) {
+                @if (cell) {
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-circle w-full aspect-square h-auto font-normal"
+                    [class.btn-primary]="selectedDate() === cell.date"
+                    [class.text-white]="selectedDate() === cell.date"
+                    [class.btn-ghost]="selectedDate() !== cell.date"
+                    [class.border-primary]="cell.isToday && selectedDate() !== cell.date"
+                    [class.font-bold]="cell.isToday"
+                    [class.line-through]="cell.disabled"
+                    [disabled]="cell.disabled"
+                    [attr.aria-pressed]="selectedDate() === cell.date"
+                    [attr.aria-current]="cell.isToday ? 'date' : null"
+                    [attr.aria-label]="formatDateLong(cell.date)"
+                    (click)="selectDate(cell.date); calendarPopover.hidePopover()"
+                  >
+                    {{ cell.day }}
+                  </button>
+                } @else {
+                  <span aria-hidden="true"></span>
+                }
+              }
+            </div>
+
+            <div class="mt-3 flex justify-end border-t border-base-200 pt-3">
+              <button
+                type="button"
+                class="btn btn-xs btn-ghost"
+                (click)="goToToday(); calendarPopover.hidePopover()"
+              >
+                Hoje
+              </button>
+            </div>
+          </div>
+
+          <!-- Chips: 7 dias da semana da data selecionada -->
+          <div class="mt-3 flex items-center gap-1">
+            <button
+              type="button"
+              class="btn btn-sm btn-circle btn-ghost shrink-0"
+              (click)="shiftWeek(-1)"
+              [disabled]="!canGoPrevWeek() || isConfirming()"
+              aria-label="Semana anterior"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-4"
+                aria-hidden="true"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+              </svg>
+            </button>
+
+            <div
+              class="grid grid-cols-7 gap-1 flex-1 min-w-0"
+              role="group"
+              aria-label="Dias da semana selecionada"
+            >
+              @for (day of weekDays(); track day.date) {
+                <button
+                  type="button"
+                  class="btn h-auto min-h-0 min-w-0 flex-col gap-0 rounded-xl px-0 py-2"
+                  [class.btn-primary]="selectedDate() === day.date"
+                  [class.text-white]="selectedDate() === day.date"
+                  [class.btn-ghost]="selectedDate() !== day.date"
+                  [class.border-primary]="day.isToday && selectedDate() !== day.date"
+                  [disabled]="day.disabled || isConfirming()"
+                  [attr.aria-pressed]="selectedDate() === day.date"
+                  [attr.aria-current]="day.isToday ? 'date' : null"
+                  [attr.aria-label]="formatDateLong(day.date)"
+                  (click)="selectDate(day.date)"
+                >
+                  <span class="text-[10px] uppercase font-medium opacity-80 leading-tight">{{
+                    day.weekday
+                  }}</span>
+                  <span class="text-sm sm:text-base font-semibold leading-tight">{{ day.day }}</span>
+                </button>
+              }
+            </div>
+
+            <button
+              type="button"
+              class="btn btn-sm btn-circle btn-ghost shrink-0"
+              (click)="shiftWeek(1)"
+              [disabled]="!canGoNextWeek() || isConfirming()"
+              aria-label="Próxima semana"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-4"
+                aria-hidden="true"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+              </svg>
+            </button>
           </div>
 
           @if (slotsLoading()) {
