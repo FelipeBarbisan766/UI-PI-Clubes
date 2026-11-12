@@ -1,0 +1,158 @@
+<div class="p-6 max-w-7xl mx-auto space-y-6">
+  <header>
+    <h1 class="text-2xl font-bold text-base-content">Visão do sistema</h1>
+    <p class="text-sm text-base-content/60">
+      Acompanhe a saúde da plataforma e os pagamentos recentes.
+    </p>
+  </header>
+
+  @if (overviewService.error()) {
+    <div role="alert" class="alert alert-error">
+      <span>Erro ao carregar o resumo: {{ overviewService.error() }}</span>
+      <button type="button" class="btn btn-sm" (click)="loadOverview()">Tentar novamente</button>
+    </div>
+  }
+
+  <ul
+    class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5"
+    aria-label="Resumo da plataforma"
+    [attr.aria-busy]="overviewService.loading()"
+  >
+    @for (s of stats(); track s.label) {
+      <li>
+        <a
+          [routerLink]="s.url"
+          class="card bg-base-100 border border-base-200 shadow-sm transition-colors hover:border-primary/50"
+        >
+          <div class="card-body flex-row items-center justify-between p-4">
+            <div>
+              <p class="text-xs text-base-content/60">{{ s.label }}</p>
+              <p class="text-2xl font-bold text-base-content" [class.animate-pulse]="overviewService.loading()">
+                {{ s.value ?? '—' }}
+              </p>
+            </div>
+
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6 text-primary"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              @switch (s.icon) {
+                @case ('users') {
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                }
+                @case ('clubs') {
+                  <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" />
+                  <path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" />
+                  <path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" />
+                  <path d="M10 6h4" /><path d="M10 10h4" /><path d="M10 14h4" /><path d="M10 18h4" />
+                }
+                @case ('plans') {
+                  <rect width="20" height="14" x="2" y="5" rx="2" />
+                  <line x1="2" x2="22" y1="10" y2="10" />
+                }
+                @case ('sports') {
+                  <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+                  <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+                  <path d="M4 22h16" />
+                  <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+                  <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+                  <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+                }
+                @case ('flags') {
+                  <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
+                  <line x1="4" x2="4" y1="22" y2="15" />
+                }
+              }
+            </svg>
+          </div>
+        </a>
+      </li>
+    }
+  </ul>
+
+  <section class="card bg-base-100 border border-base-200 shadow-sm" aria-labelledby="payments-title">
+    <div class="card-body gap-3">
+      <h2 id="payments-title" class="flex items-center gap-2 text-base font-semibold text-base-content">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-4 text-primary"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          aria-hidden="true"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+          />
+        </svg>
+        Últimos pagamentos
+      </h2>
+
+      @if (paymentService.error()) {
+        <div role="alert" class="alert alert-error">
+          <span>Erro ao carregar pagamentos: {{ paymentService.error() }}</span>
+          <button type="button" class="btn btn-sm" (click)="loadPayments()">Tentar novamente</button>
+        </div>
+      }
+
+      @if (paymentService.loading()) {
+        <div class="flex justify-center py-6" aria-live="polite" aria-busy="true">
+          <span class="loading loading-spinner loading-md text-primary"></span>
+          <span class="sr-only">Carregando pagamentos...</span>
+        </div>
+      } @else if (!paymentService.error()) {
+        <div class="overflow-x-auto">
+          <table class="table table-zebra w-full" aria-label="Últimos pagamentos">
+            <thead>
+              <tr>
+                <th scope="col">Data</th>
+                <th scope="col">Valor</th>
+                <th scope="col">Método</th>
+                <th scope="col">Status</th>
+                <th scope="col" class="hidden lg:table-cell">ID Mercado Pago</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (p of recentPayments(); track p.id) {
+                <tr class="hover">
+                  <td class="whitespace-nowrap">{{ formatDate(p.date) }}</td>
+                  <td class="whitespace-nowrap font-medium">{{ formatAmount(p.amount) }}</td>
+                  <td>{{ methodLabel(p) }}</td>
+                  <td>
+                    <span [class]="statusClass(p.status)">{{ p.status }}</span>
+                  </td>
+                  <td class="hidden lg:table-cell">
+                    @if (p.mercadoPagoPaymentId) {
+                      <code class="rounded bg-base-200 px-1.5 py-0.5 text-xs">{{ p.mercadoPagoPaymentId }}</code>
+                    } @else {
+                      —
+                    }
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="5" class="py-8 text-center text-base-content/50">
+                    Nenhum pagamento registrado ainda.
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  </section>
+</div>

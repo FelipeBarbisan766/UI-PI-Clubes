@@ -22,5 +22,10 @@
     <h6 class="footer-title">Para clubes</h6>
     <a [routerLink]="['/register-club']" class="link link-hover">Cadastre seu clube</a>
     <a [routerLink]="['/register-club']" class="link link-hover">Gerencie suas quadras</a>
+    @if (isRoot()) {
+      <br>
+      <h6 class="footer-title">Para Administradores do Sistema</h6>
+      <a [routerLink]="['/root']" class="link link-hover">Painel do Sistema</a>
+    }
   </nav>
 </footer>

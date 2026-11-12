@@ -1,0 +1,210 @@
+<div class="p-6 max-w-7xl mx-auto space-y-6">
+  <header>
+    <h1 class="text-2xl font-bold text-base-content">Clubes</h1>
+    <p class="text-sm text-base-content/60">Todos os clubes cadastrados na plataforma.</p>
+  </header>
+
+  <!-- Filtros -->
+  <form
+    [formGroup]="filters"
+    (ngSubmit)="onSearch()"
+    class="flex flex-wrap items-end gap-3"
+    role="search"
+  >
+    <div class="flex flex-col gap-1">
+      <label for="filter-name" class="text-xs font-semibold text-base-content/60 uppercase tracking-wide">Nome</label>
+      <input id="filter-name" type="search" formControlName="name" class="input input-bordered w-56" placeholder="Buscar por nome" />
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label for="filter-city" class="text-xs font-semibold text-base-content/60 uppercase tracking-wide">Cidade</label>
+      <input id="filter-city" type="search" formControlName="city" class="input input-bordered w-48" placeholder="Buscar por cidade" />
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label for="filter-sport" class="text-xs font-semibold text-base-content/60 uppercase tracking-wide">Esporte</label>
+      <select id="filter-sport" formControlName="sportId" class="select select-bordered w-48">
+        <option value="">Todos os esportes</option>
+        @for (sport of sportService.sports(); track sport.id) {
+          <option [value]="sport.id">{{ sport.name }}</option>
+        }
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary rounded-full text-white">Buscar</button>
+    <button type="button" class="btn btn-ghost rounded-full" (click)="clearFilters()">Limpar</button>
+  </form>
+
+  @if (clubService.loading() && !detailLoading()) {
+    <div class="flex justify-center" aria-live="polite" aria-busy="true">
+      <span class="loading loading-spinner loading-md text-primary"></span>
+      <span class="sr-only">Carregando clubes...</span>
+    </div>
+  }
+
+  <!-- Tabela -->
+  <div class="card bg-base-100 border border-base-200 shadow-sm">
+    <div class="overflow-x-auto">
+      <table class="table table-zebra w-full" aria-label="Clubes">
+        <thead>
+          <tr>
+            <th scope="col">Clube</th>
+            <th scope="col">Cidade</th>
+            <th scope="col">Esportes</th>
+            <th scope="col">Quadras</th>
+            <th scope="col">A partir de</th>
+            <th scope="col">Status</th>
+            <th scope="col" class="text-right">Ações</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (club of clubService.clubs(); track club.id) {
+            <tr class="hover">
+              <td>
+                <div class="flex items-center gap-3">
+                  @if (firstThumb(club); as thumb) {
+                    <img [src]="thumb" alt="" loading="lazy" class="h-10 w-10 shrink-0 rounded-lg object-cover" />
+                  } @else {
+                    <div class="h-10 w-10 shrink-0 rounded-lg bg-base-200" aria-hidden="true"></div>
+                  }
+                  <span class="font-medium">{{ club.name }}</span>
+                </div>
+              </td>
+              <td class="whitespace-nowrap">{{ club.city }}/{{ club.state }}</td>
+              <td>
+                <div class="flex flex-wrap gap-1">
+                  @for (sport of club.sports; track sport.id) {
+                    <span class="badge badge-soft badge-neutral text-xs">{{ sport.name }}</span>
+                  }
+                </div>
+              </td>
+              <td>{{ club.courtCount }}</td>
+              <td class="whitespace-nowrap">{{ formatPrice(club.minPrice) }}</td>
+              <td>
+                @if (club.isClubActive) {
+                  <span class="badge badge-soft badge-success">ativo</span>
+                } @else {
+                  <span class="badge badge-soft badge-warning">inativo</span>
+                }
+              </td>
+              <td>
+                <div class="flex justify-end">
+                  <button
+                    type="button"
+                    class="btn btn-outline btn-sm rounded-full"
+                    [attr.aria-label]="'Ver detalhes de ' + club.name"
+                    (click)="openDetail(club)"
+                  >
+                    Detalhes
+                  </button>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="py-8 text-center text-base-content/50">Nenhum clube encontrado.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Paginação -->
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <p class="text-xs text-base-content/60" aria-live="polite">
+      {{ clubService.totalCount() }} clubes · página {{ clubService.page() }} de {{ clubService.totalPages() }}
+    </p>
+    <div class="join">
+      <button type="button" class="btn btn-sm join-item" [disabled]="!hasPrev()" (click)="goToPage(clubService.page() - 1)">
+        Anterior
+      </button>
+      <button type="button" class="btn btn-sm join-item" [disabled]="!hasNext()" (click)="goToPage(clubService.page() + 1)">
+        Próxima
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Painel de detalhe ──────────────────────────────────────────────────── -->
+<dialog #detailDialog class="modal modal-end" aria-labelledby="detail-title" (close)="onDetailClosed()">
+  <div class="modal-box h-full max-h-none w-full max-w-xl rounded-none sm:rounded-l-3xl">
+    <div class="mb-4 flex items-center justify-between border-b border-base-200 pb-3">
+      <h3 id="detail-title" class="text-xl font-bold text-base-content">
+        {{ clubService.selectedClub()?.name ?? 'Detalhes do clube' }}
+      </h3>
+      <button type="button" class="btn btn-ghost btn-sm btn-circle" aria-label="Fechar painel" (click)="closeDetail()">✕</button>
+    </div>
+
+    @if (detailLoading()) {
+      <div class="flex justify-center py-10" aria-live="polite" aria-busy="true">
+        <span class="loading loading-spinner loading-lg text-primary"></span>
+        <span class="sr-only">Carregando clube...</span>
+      </div>
+    }
+
+    @if (clubService.selectedClub(); as club) {
+      <div class="space-y-6">
+        @if (detailImages().length > 0) {
+          <div class="flex gap-2 overflow-x-auto">
+            @for (img of detailImages(); track img.thumbUrl) {
+              <img [src]="img.mediumUrl" alt="Foto de {{ club.name }}" loading="lazy" class="h-28 w-40 shrink-0 rounded-xl object-cover" />
+            }
+          </div>
+        }
+
+        <section aria-labelledby="info-title" class="space-y-1 text-sm">
+          <h4 id="info-title" class="text-xs font-semibold uppercase tracking-widest text-base-content/40">Informações</h4>
+          @if (club.description) {
+            <p class="text-base-content/70">{{ club.description }}</p>
+          }
+          <p><span class="text-base-content/60">Telefone:</span> {{ club.phoneNumber || '—' }}</p>
+          <p>
+            <span class="text-base-content/60">Endereço:</span>
+            {{ club.street }}@if (club.number) {, {{ club.number }}}@if (club.complement) { - {{ club.complement }}}
+          </p>
+          <p>{{ club.neighborhood }} · {{ club.city }}/{{ club.state }} · {{ club.country }}</p>
+          <p><span class="text-base-content/60">CEP:</span> {{ club.zipCode }}</p>
+        </section>
+
+        <section aria-labelledby="courts-title" class="space-y-3">
+          <h4 id="courts-title" class="text-xs font-semibold uppercase tracking-widest text-base-content/40">
+            Quadras ({{ club.courts.length }})
+          </h4>
+
+          @for (court of club.courts; track court.id) {
+            <div class="rounded-xl border border-base-200 p-3 text-sm">
+              <div class="flex items-start justify-between gap-2">
+                <p class="font-semibold">{{ court.name }}</p>
+                @if (!court.isCourtActive) {
+                  <span class="badge badge-soft badge-warning text-xs">Inativa</span>
+                }
+              </div>
+              <div class="mt-2 flex flex-wrap gap-1">
+                @for (sport of court.sports; track sport.id) {
+                  <span class="badge badge-soft badge-neutral text-xs">{{ sport.name }}</span>
+                }
+                <span class="badge badge-soft badge-neutral text-xs">{{ court.isCovered ? 'Coberta' : 'Descoberta' }}</span>
+              </div>
+              <p class="mt-2 text-base-content/60">Superfície: {{ surfaceLabel(court.surface) }}</p>
+              <p class="mt-1 font-semibold text-primary">
+                  {{ formatPrice(court.minPrice) }}
+              </p>
+            </div>
+          } @empty {
+            <p class="text-sm text-base-content/50">Nenhuma quadra cadastrada.</p>
+          }
+        </section>
+      </div>
+    }
+  </div>
+
+  <form method="dialog" class="modal-backdrop">
+    <button aria-label="Fechar painel">Fechar</button>
+  </form>
+</dialog>
+
+@if (toast(); as t) {
+  <app-toast-alert [message]="t.message" [type]="t.type" (dismiss)="dismissToast()" />
+}

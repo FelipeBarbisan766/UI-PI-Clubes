@@ -11,6 +11,8 @@ import { clubNameResolver } from './shared/components/resolvers/club-name.resolv
 import { courtNameResolver } from './shared/components/resolvers/court-name.resolver';
 import { clubCityResolver } from './shared/components/resolvers/club-city.resolver';
 import { completeProfileGuard } from './core/guards/complete-profile-guard';
+import { RootLayout } from './layout/root-layout/root-layout';
+import { rootGuard } from './core/guards/root-guard';
 
 export const routes: Routes = [
   {
@@ -23,7 +25,8 @@ export const routes: Routes = [
       },
       {
         path: 'terms',
-        loadComponent: () => import('./shared/components/termspgae/termspgae').then((m) => m.Termspgae)
+        loadComponent: () =>
+          import('./shared/components/termspgae/termspgae').then((m) => m.Termspgae),
       },
       {
         path: 'clubs',
@@ -205,6 +208,41 @@ export const routes: Routes = [
           ),
         canActivate: [completeProfileGuard],
       },
+      {
+        path: 'root',
+        component: RootLayout,
+        canActivate: [rootGuard],
+        children: [
+          {
+            path: '',
+            pathMatch: 'full',
+            loadComponent: () =>
+              import('./features/root/overview/root-overview').then((m) => m.RootOverview),
+          },
+          {
+            path: 'usuarios',
+            loadComponent: () => import('./features/root/users/root-users').then((m) => m.RootUsers),
+          },
+          {
+            path: 'clubes',
+            loadComponent: () => import('./features/root/clubs/root-clubs').then((m) => m.RootClubs),
+          },
+          {
+            path: 'planos',
+            loadComponent: () => import('./features/root/plans/root-plans').then((m) => m.RootPlans),
+          },
+          {
+            path: 'esportes',
+            loadComponent: () =>
+              import('./features/root/sports/root-sports').then((m) => m.RootSports),
+          },
+          {
+            path: 'flags',
+            loadComponent: () => import('./features/root/flags/root-flags').then((m) => m.RootFlags),
+          },
+        ],
+      },
+
       // {
       //   path: '**',
       //   redirectTo: '',
