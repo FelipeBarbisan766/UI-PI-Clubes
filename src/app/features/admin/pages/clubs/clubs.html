@@ -189,6 +189,7 @@
                       type="button"
                       class="btn btn-outline btn-sm gap-2 shrink-0"
                       [attr.aria-label]="'Selecionar clube ' + club.name"
+                      [disabled]="club.isClubActive === false"
                       (click)="goToCourts(club.id)"
                     >
                       Selecionar
