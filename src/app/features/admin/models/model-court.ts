@@ -16,6 +16,22 @@ export enum SurfaceEnum {
     TerraBatida = 'TerraBatida',
     PisoModular = 'PisoModular'
 }
+export const SURFACE_LABELS: Record<SurfaceEnum, string> = {
+  [SurfaceEnum.None]: 'Outro',
+  [SurfaceEnum.Saibro]: 'Saibro',
+  [SurfaceEnum.PisoDuro]: 'Piso Duro',
+  [SurfaceEnum.GramaNatural]: 'Grama Natural',
+  [SurfaceEnum.GramaSintética]: 'Grama Sintética',
+  [SurfaceEnum.Madeira]: 'Madeira',
+  [SurfaceEnum.PisoVinílico]: 'Piso Vinílico',
+  [SurfaceEnum.PisoAcrílico]: 'Piso Acrílico',
+  [SurfaceEnum.PisoEmborrachado]: 'Piso Emborrachado',
+  [SurfaceEnum.Areia]: 'Areia',
+  [SurfaceEnum.Carpete]: 'Carpete',
+  [SurfaceEnum.Asfalto]: 'Asfalto',
+  [SurfaceEnum.TerraBatida]: 'Terra Batida',
+  [SurfaceEnum.PisoModular]: 'Piso Modular',
+};
 
 export interface CreateCourtDTO {
   name: string;

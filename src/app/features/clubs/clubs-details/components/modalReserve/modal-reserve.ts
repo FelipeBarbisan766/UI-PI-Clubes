@@ -11,7 +11,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { EMPTY, catchError, map, switchMap, tap } from 'rxjs';
 import { ResponseClubByIdDTO } from '../../../models/model-club';
@@ -57,6 +57,7 @@ export interface WeekDay {
 
 /** Quantos dias à frente (a partir de hoje) é possível reservar. */
 const BOOKING_WINDOW_DAYS = 60;
+const RESTORE_UNAVAILABLE_MESSAGE = 'Esse horário não está mais disponível. Escolha outro horário.';
 
 const WEEKDAYS = [
   { short: 'D', full: 'Domingo' },
@@ -180,8 +181,7 @@ function toMinutes(time: string): number {
 /** Ordena por horário de início e, em caso de empate, pelo de término. */
 function compareSlotsByTime(a: TimeSlot, b: TimeSlot): number {
   return (
-    toMinutes(a.startTime) - toMinutes(b.startTime) ||
-    toMinutes(a.endTime) - toMinutes(b.endTime)
+    toMinutes(a.startTime) - toMinutes(b.startTime) || toMinutes(a.endTime) - toMinutes(b.endTime)
   );
 }
 
@@ -216,7 +216,7 @@ export class ModalReserve {
   private readonly authService = inject(AuthService);
   private readonly authRequiredModal = inject(AuthRequiredModalService);
   private readonly courtAvailabilitySignalR = inject(ServiceCourtAvailabilitySignalR);
-
+  private readonly route = inject(ActivatedRoute);
   // ── Inputs / Outputs ──
   readonly club = input.required<ResponseClubByIdDTO>();
   readonly court = input.required<ResponseCourtDTO>();
@@ -235,11 +235,12 @@ export class ModalReserve {
   readonly maxDate = addDays(this.minDate, BOOKING_WINDOW_DAYS);
   readonly weekdays = WEEKDAYS;
 
-  readonly selectedDate = signal<string>(this.minDate);
-  readonly viewMonth = signal<CalendarMonth>({
-    year: this.now.getFullYear(),
-    month: this.now.getMonth(),
-  });
+  /** Data/horário vindos do returnUrl após o login (lidos uma única vez). */
+  private pendingRestore = this.readRestoreParams();
+  readonly slotNotice = signal<string | null>(null);
+
+  readonly selectedDate = signal<string>(this.initialDate());
+  readonly viewMonth = signal<CalendarMonth>(this.monthOf(this.selectedDate()));
 
   readonly monthLabel = computed(() => {
     const { year, month } = this.viewMonth();
@@ -256,16 +257,14 @@ export class ModalReserve {
   readonly canGoPrevMonth = computed(() => {
     const min = new Date(`${this.minDate}T12:00:00`);
     return (
-      monthIndex(this.viewMonth()) >
-      monthIndex({ year: min.getFullYear(), month: min.getMonth() })
+      monthIndex(this.viewMonth()) > monthIndex({ year: min.getFullYear(), month: min.getMonth() })
     );
   });
 
   readonly canGoNextMonth = computed(() => {
     const max = new Date(`${this.maxDate}T12:00:00`);
     return (
-      monthIndex(this.viewMonth()) <
-      monthIndex({ year: max.getFullYear(), month: max.getMonth() })
+      monthIndex(this.viewMonth()) < monthIndex({ year: max.getFullYear(), month: max.getMonth() })
     );
   });
 
@@ -312,6 +311,19 @@ export class ModalReserve {
   }));
 
   constructor() {
+    const pending = this.pendingRestore;
+    if (pending) {
+      void this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { date: null, slot: null },
+        queryParamsHandling: 'merge',
+        replaceUrl: true,
+      });
+      if (!this.isSelectableDate(pending.date)) {
+        this.pendingRestore = null;
+        this.slotNotice.set(RESTORE_UNAVAILABLE_MESSAGE);
+      }
+    }
     afterNextRender(() => {
       const dialog = this.dialog().nativeElement;
       if (!dialog.open) dialog.showModal();
@@ -334,7 +346,10 @@ export class ModalReserve {
         }),
         takeUntilDestroyed(this.destroyRef),
       )
-      .subscribe((slots) => this.slotsForDate.set(slots));
+      .subscribe((slots) => {
+        this.slotsForDate.set(slots);
+        this.applyPendingRestore(slots);
+      });
 
     this.courtAvailabilitySignalR.reserveStatusChanged$
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -346,10 +361,17 @@ export class ModalReserve {
   /** Seleciona a data (nunca antes de hoje nem além da janela) e sincroniza o calendário. */
   selectDate(date: string): void {
     if (date < this.minDate || date > this.maxDate) return;
+    this.pendingRestore = null;
+    this.slotNotice.set(null);
     this.selectedDate.set(date);
+    this.viewMonth.set(this.monthOf(date));
+  }
 
-    const selected = new Date(`${date}T12:00:00`);
-    this.viewMonth.set({ year: selected.getFullYear(), month: selected.getMonth() });
+  selectSlot(slot: TimeSlot): void {
+    if (!slot.available || this.isConfirming() || this.bookingSuccess()) return;
+    this.slotNotice.set(null);
+    this.bookingError.set(null);
+    this.selectedSlotId.set(slot.id);
   }
 
   /** Navega o mês exibido no calendário (popover). */
@@ -375,12 +397,6 @@ export class ModalReserve {
     this.selectDate(this.minDate);
   }
 
-  selectSlot(slot: TimeSlot): void {
-    if (!slot.available || this.isConfirming() || this.bookingSuccess()) return;
-    this.bookingError.set(null);
-    this.selectedSlotId.set(slot.id);
-  }
-
   /** Fecha o <dialog>; o evento `close` do template emite `closed` para o pai. */
   requestClose(): void {
     if (this.isConfirming()) return;
@@ -398,10 +414,11 @@ export class ModalReserve {
 
   confirmBooking(): void {
     if (!this.authService.isAuthenticated()) {
+      const returnUrl = this.buildReturnUrl();
       this.forceClose();
       this.authRequiredModal.show(
         'Você precisa estar logado para fazer reservas neste clube.',
-        this.router.url,
+        returnUrl,
       );
       return;
     }
@@ -477,5 +494,47 @@ export class ModalReserve {
           : slot,
       ),
     );
+  }
+  private buildReturnUrl(): string {
+    const court = this.court();
+    const queryParams: Record<string, string> = { date: this.selectedDate() };
+    const slotId = this.selectedSlotId();
+    if (slotId) queryParams['slot'] = slotId;
+
+    return this.router.serializeUrl(
+      this.router.createUrlTree(['/clubs', court.clubId, 'court', court.id], { queryParams }),
+    );
+  }
+
+  private readRestoreParams(): { date: string; slotId: string | null } | null {
+    const snapshot = this.route.snapshot;
+    const date = snapshot.queryParamMap.get('date');
+    if (!date || !snapshot.paramMap.get('courtId')) return null;
+    return { date, slotId: snapshot.queryParamMap.get('slot') };
+  }
+
+  private isSelectableDate(date: string): boolean {
+    return /^\d{4}-\d{2}-\d{2}$/.test(date) && date >= this.minDate && date <= this.maxDate;
+  }
+
+  private initialDate(): string {
+    const pending = this.pendingRestore;
+    return pending && this.isSelectableDate(pending.date) ? pending.date : this.minDate;
+  }
+
+  private monthOf(date: string): CalendarMonth {
+    const d = new Date(`${date}T12:00:00`);
+    return { year: d.getFullYear(), month: d.getMonth() };
+  }
+
+  /** Só avisa; nunca seleciona o horário sozinho. */
+  private applyPendingRestore(slots: TimeSlot[]): void {
+    const pending = this.pendingRestore;
+    if (!pending || pending.date !== this.selectedDate()) return;
+    this.pendingRestore = null;
+
+    if (!pending.slotId) return;
+    const slot = slots.find((s) => s.id === pending.slotId);
+    if (!slot || !slot.available) this.slotNotice.set(RESTORE_UNAVAILABLE_MESSAGE);
   }
 }

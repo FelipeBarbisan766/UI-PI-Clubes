@@ -21,7 +21,7 @@ import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { NgxMaskDirective } from 'ngx-mask';
 import { ServiceCourt } from '../../services/service-court';
-import { SurfaceEnum, ResponseCourtDTO } from '../../models/model-court';
+import { SurfaceEnum, ResponseCourtDTO, SURFACE_LABELS } from '../../models/model-court';
 import { ExistingPhoto, ImageDTO, NewPhoto } from '../../models/model-club';
 import { ServiceSport } from '../../../../core/services/service-sport';
 import { Modal } from '../../../../shared/components/modal/modal';
@@ -62,14 +62,7 @@ function priceValidator(control: AbstractControl): ValidationErrors | null {
 
 @Component({
   selector: 'app-court',
-  imports: [
-    ReactiveFormsModule,
-    Modal,
-    RouterLink,
-    ToastAlert,
-    NgOptimizedImage,
-    ImageCarousel,
-  ],
+  imports: [ReactiveFormsModule, Modal, RouterLink, ToastAlert, NgOptimizedImage, ImageCarousel],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './courts.html',
 })
@@ -117,9 +110,10 @@ export class Courts implements OnInit {
   }
 
   // --- Enum options for selects ---
-  protected readonly surfaceOptions = Object.entries(SurfaceEnum)
-    .filter(([, v]) => typeof v === 'string')
-    .map(([label, value]) => ({ label, value: value as string }));
+  protected readonly surfaceOptions = Object.values(SurfaceEnum).map((value) => ({
+    value,
+    label: SURFACE_LABELS[value],
+  }));
 
   // --- Local state ---
   protected readonly formMode = signal<FormMode>(null);
@@ -379,46 +373,46 @@ export class Courts implements OnInit {
     return this.togglingIds().has(court.id) || (!court.isCourtActive && this.limitReached());
   }
   protected onToggleActive(court: ResponseCourtDTO, event: Event): void {
-  const input = event.target as HTMLInputElement;
+    const input = event.target as HTMLInputElement;
 
-  if (this.isToggleBlocked(court)) {
-    input.checked = court.isCourtActive;
-    return;
+    if (this.isToggleBlocked(court)) {
+      input.checked = court.isCourtActive;
+      return;
+    }
+
+    this.togglingIds.update((ids) => new Set(ids).add(court.id));
+
+    this.courtService
+      .toggleActive(court.id)
+      .pipe(
+        finalize(() =>
+          this.togglingIds.update((ids) => {
+            const next = new Set(ids);
+            next.delete(court.id);
+            return next;
+          }),
+        ),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: () => {
+          this.usageService.refresh();
+          this.toast.set({
+            message: court.isCourtActive ? 'Quadra desativada.' : 'Quadra ativada.',
+            type: 'success',
+          });
+        },
+        error: (err: unknown) => {
+          // o checkbox já mudou visualmente; volta para o valor real
+          input.checked = court.isCourtActive;
+          this.courtService.clearError();
+          this.toast.set({
+            message: getApiErrorMessage(err),
+            type: isLimitExceededError(err) ? 'warning' : 'error',
+          });
+        },
+      });
   }
-
-  this.togglingIds.update((ids) => new Set(ids).add(court.id));
-
-  this.courtService
-    .toggleActive(court.id)
-    .pipe(
-      finalize(() =>
-        this.togglingIds.update((ids) => {
-          const next = new Set(ids);
-          next.delete(court.id);
-          return next;
-        }),
-      ),
-      takeUntilDestroyed(this.destroyRef),
-    )
-    .subscribe({
-      next: () => {
-        this.usageService.refresh();
-        this.toast.set({
-          message: court.isCourtActive ? 'Quadra desativada.' : 'Quadra ativada.',
-          type: 'success',
-        });
-      },
-      error: (err: unknown) => {
-        // o checkbox já mudou visualmente; volta para o valor real
-        input.checked = court.isCourtActive;
-        this.courtService.clearError();
-        this.toast.set({
-          message: getApiErrorMessage(err),
-          type: isLimitExceededError(err) ? 'warning' : 'error',
-        });
-      },
-    });
-}
   // --- Esportes ---
 
   protected toggleSport(id: string): void {
@@ -442,7 +436,6 @@ export class Courts implements OnInit {
 
     const { name, surface, isCovered, description } = this.form.getRawValue();
 
-    
     if (this.formMode() === 'create') {
       this.courtService
         .create({
@@ -450,7 +443,7 @@ export class Courts implements OnInit {
           sportIds: this.selectedSportIds(),
           surface: surface!,
           isCovered: isCovered!,
-          description: description? description : '',
+          description: description ? description : '',
           clubId: this.currentClubId,
           images: this.newPhotos().map((p) => p.file),
         })
@@ -492,7 +485,7 @@ export class Courts implements OnInit {
         sportIds: this.selectedSportIds(),
         surface: surface!,
         isCovered: isCovered!,
-        description: description? description : '',
+        description: description ? description : '',
       }),
     ];
 
@@ -554,7 +547,7 @@ export class Courts implements OnInit {
   // --- Helpers ---
 
   protected getSurfaceName(value: string): string {
-    return SurfaceEnum[value as keyof typeof SurfaceEnum] ?? 'Desconhecido';
+    return SURFACE_LABELS[value as SurfaceEnum] ?? 'Desconhecido';
   }
 
   protected fieldInvalid(field: string): boolean {

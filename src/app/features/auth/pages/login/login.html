@@ -33,7 +33,9 @@
     <div class="card-body p-6 md:p-8">
       <div class="text-center mb-6">
         <h1 class="text-2xl md:text-3xl font-bold text-base-content mb-2">Faça seu login</h1>
-        <p class="text-base-content/60 text-sm">Entre com suas credenciais para acessar sua conta.</p>
+        <p class="text-base-content/60 text-sm">
+          Entre com suas credenciais para acessar sua conta.
+        </p>
       </div>
 
       <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
@@ -111,15 +113,42 @@
               [attr.aria-pressed]="showPassword()"
             >
               @if (showPassword()) {
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
+                  />
                 </svg>
               } @else {
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                  />
                 </svg>
               }
             </button>
@@ -186,4 +215,53 @@
       </form>
     </div>
   </div>
+  <dialog
+    class="modal"
+    [class.modal-open]="showCreateAccountModal()"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="create-account-title"
+  >
+    <div class="modal-box rounded-3xl max-w-sm text-center">
+      <h3 id="create-account-title" class="font-bold text-lg text-base-content mb-2">
+        Não encontramos sua conta
+      </h3>
+      <p class="text-sm text-base-content/60 mb-6">Criar com este Google?</p>
+
+      <div class="flex gap-3">
+        <button
+          type="button"
+          class="btn btn-ghost rounded-lg flex-1"
+          [disabled]="isCreatingAccount()"
+          (click)="closeCreateAccountModal()"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary text-white rounded-lg flex-1"
+          [disabled]="isCreatingAccount()"
+          [attr.aria-busy]="isCreatingAccount()"
+          (click)="confirmCreateGoogleAccount()"
+        >
+          @if (isCreatingAccount()) {
+            <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+            <span class="sr-only">Criando conta...</span>
+          } @else {
+            Criar conta
+          }
+        </button>
+      </div>
+    </div>
+
+    <form method="dialog" class="modal-backdrop">
+      <button
+        [disabled]="isCreatingAccount()"
+        (click)="closeCreateAccountModal()"
+        aria-label="Fechar janela"
+      >
+        Fechar
+      </button>
+    </form>
+  </dialog>
 </div>

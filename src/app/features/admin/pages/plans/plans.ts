@@ -186,6 +186,7 @@ export class Plans implements OnInit {
     this.isLoading.set(true);
     this.errorMessage.set('');
 
+    if (this.currentUserId()) {
     forkJoin({
       plans: this.subscriptionService.getPlans(),
       active: this.subscriptionService.getActiveSubscription().pipe(catchError(() => of(null))),
@@ -202,5 +203,17 @@ export class Plans implements OnInit {
           this.errorMessage.set(err.message);
         },
       });
+    } else {
+      this.subscriptionService.getPlans().pipe(take(1), takeUntilDestroyed(this.destroyRef)).subscribe({
+        next: (plans) => {
+          this.plans.set(plans);
+          this.isLoading.set(false);
+        },
+        error: (err: Error) => {
+          this.isLoading.set(false);
+          this.errorMessage.set(err.message);
+        },
+      });
+    }
   }
 }

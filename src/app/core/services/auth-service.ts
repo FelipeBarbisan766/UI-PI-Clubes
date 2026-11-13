@@ -12,7 +12,12 @@ import {
 } from '../models/auth-model';
 
 type AuthStatus = 'unknown' | 'authenticated' | 'unauthenticated';
-
+export class GoogleAccountNotFoundError extends Error {
+  constructor() {
+    super('Nenhuma conta encontrada com esse e-mail.');
+    this.name = 'GoogleAccountNotFoundError';
+  }
+}
 @Injectable({
   providedIn: 'root',
 })
@@ -73,7 +78,12 @@ export class AuthService {
           this.authStatus.set('authenticated');
           this.meRequest$ = null;
         }),
-        catchError(this.handleHttpError('Erro ao realizar login com Google.')),
+        catchError((error: unknown) => {
+          if (this.isAccountNotFound(error)) {
+            return throwError(() => new GoogleAccountNotFoundError());
+          }
+          return this.handleHttpError('Erro ao realizar login com Google.')(error);
+        }),
       );
   }
 
@@ -229,5 +239,10 @@ export class AuthService {
       }
       return throwError(() => new Error(fallback));
     };
+  }
+  private isAccountNotFound(error: unknown): boolean {
+    if (!(error instanceof HttpErrorResponse) || error.status !== 401) return false;
+    const body = typeof error.error === 'string' ? error.error : JSON.stringify(error.error ?? '');
+    return body.toLowerCase().includes('nenhuma conta encontrada');
   }
 }

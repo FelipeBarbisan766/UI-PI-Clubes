@@ -212,6 +212,7 @@
                   class="btn btn-outline btn-sm gap-2"
                   aria-label="Gerenciar horários da quadra"
                   title="Gerenciar Horários"
+                  [disabled]="court.isCourtActive === false"
                   (click)="goToSchedules(court.id)"
                 >
                   <svg

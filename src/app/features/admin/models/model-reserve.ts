@@ -1,5 +1,7 @@
 // ── API response shape (espelha ResponseReserveDetailDTO do backend) ─────────
 
+import { SportDTO } from "../../../core/models/model-sport";
+
 export interface ResponseReserveDetailDTO {
   id: string;
   date: string; 
@@ -17,15 +19,15 @@ export interface ApiPlayer {
 }
 
 export interface ApiSchedule {
-  startTime: string; // TimeOnly → "HH:mm:ss"
+  startTime: string;
   endTime: string;
-  price: number; // preço do horário
+  price: number;       
   court: ApiCourt;
 }
 
 export interface ApiCourt {
   name: string;
-  type: string;
+  sports: SportDTO[];   // era: pricePerHour + type
 }
 
 export enum StatusEnum {

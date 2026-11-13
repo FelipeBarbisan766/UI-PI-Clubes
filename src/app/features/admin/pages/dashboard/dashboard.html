@@ -1,66 +1,164 @@
-<main class="flex-1 p-8">
+<section class="p-6 max-w-7xl mx-auto" aria-labelledby="dashboard-title">
   <header class="mb-8">
-    <h1 class="text-3xl font-bold text-base-900">Visão Geral</h1>
-    <p class="text-base-500">Acompanhe o desempenho do seu clube.</p>
+    <h1 id="dashboard-title" class="text-3xl font-bold text-base-content">Visão Geral</h1>
+    <p class="text-base-content/60 mt-1">Acompanhe o desempenho do seu clube.</p>
   </header>
 
   @if (loading()) {
-    <div class="flex justify-center py-16">
-      <span class="loading loading-spinner loading-lg text-orange-500"></span>
+    <div class="flex justify-center my-16" role="status" aria-live="polite" aria-busy="true">
+      <span class="loading loading-spinner loading-lg text-primary" aria-hidden="true"></span>
+      <span class="sr-only">Carregando painel...</span>
     </div>
   } @else if (error()) {
-    <div class="alert alert-error mb-8">
+    <div role="alert" class="alert alert-error mb-8">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="stroke-current shrink-0 h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
       <span>{{ error() }}</span>
+      <button type="button" class="btn btn-sm btn-ghost" (click)="load()">
+        Tentar novamente
+      </button>
     </div>
   } @else if (dashboard(); as data) {
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-      <div class="bg-base p-6 rounded-xl border border-base-100 shadow-sm relative">
-        <p class="text-sm font-medium text-base-500 mb-2">Quadras</p>
-        <p class="text-3xl font-bold">{{ data.quantCourt }}</p>
-        <i class="fa-solid fa-location-dot absolute top-6 right-6 text-orange-500 opacity-80"></i>
+    <!-- Indicadores -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8" aria-label="Indicadores do clube">
+      <div class="card bg-base-100 card-border shadow-sm">
+        <div class="card-body p-5 flex-row items-center gap-4">
+          <div
+            class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary"
+            aria-hidden="true"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-base-content/60">Quadras</p>
+            <p class="text-3xl font-bold text-base-content">{{ data.quantCourt }}</p>
+          </div>
+        </div>
       </div>
-      <div class="bg-base p-6 rounded-xl border border-base-100 shadow-sm relative">
-        <p class="text-sm font-medium text-base-500 mb-2">Reservas para Hoje</p>
-        <p class="text-3xl font-bold">{{ data.quantReserveToday }}</p>
-        <i class="fa-regular fa-calendar absolute top-6 right-6 text-orange-500 opacity-80"></i>
-      </div>
-      <div class="bg-base p-6 rounded-xl border border-base-100 shadow-sm relative">
-        <p class="text-sm font-medium text-base-500 mb-2">Jogadores</p>
-        <p class="text-3xl font-bold">{{ data.countPlayers }}</p>
-        <i class="fa-solid fa-users absolute top-6 right-6 text-green-500 opacity-80"></i>
-      </div>
-    </div>
 
-    <div class="bg-base rounded-xl border border-base-200 shadow-sm overflow-hidden">
-      <div class="p-6 border-b border-base-50">
-        <h2 class="text-lg font-bold text-base-900">Reservas Recentes</h2>
+      <div class="card bg-base-100 card-border shadow-sm">
+        <div class="card-body p-5 flex-row items-center gap-4">
+          <div
+            class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary"
+            aria-hidden="true"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M8 2v4" />
+              <path d="M16 2v4" />
+              <rect width="18" height="18" x="3" y="4" rx="2" />
+              <path d="M3 10h18" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-base-content/60">Reservas para hoje</p>
+            <p class="text-3xl font-bold text-base-content">{{ data.quantReserveToday }}</p>
+          </div>
+        </div>
       </div>
 
-      <div class="divide-y bg-base-100">
-        @for (reserve of data.clubReserve; track reserve.id) {
-          <div class="p-5 flex justify-between items-center hover:bg-base-50 transition">
-            <div>
-              <p class="font-semibold">{{ reserve.name }}</p>
-              <p class="text-xs font-medium">{{ courtLabel(reserve) }}</p>
+      <div class="card bg-base-100 card-border shadow-sm">
+        <div class="card-body p-5 flex-row items-center gap-4">
+          <div
+            class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary"
+            aria-hidden="true"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-base-content/60">Jogadores</p>
+            <p class="text-3xl font-bold text-base-content">{{ data.countPlayers }}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Reservas recentes -->
+    <section class="card bg-base-100 card-border shadow-sm" aria-labelledby="recent-title">
+      <div class="px-6 py-4 border-b border-base-200">
+        <h2 id="recent-title" class="text-lg font-bold text-base-content">Reservas recentes</h2>
+      </div>
+
+      <ul class="divide-y divide-base-200">
+        @for (reserve of recentReserves(); track reserve.id) {
+          <li
+            class="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between hover:bg-base-200/50 transition-colors"
+          >
+            <div class="min-w-0">
+              <p class="font-semibold text-base-content truncate">{{ reserve.playerName }}</p>
+              <div class="mt-1 flex flex-wrap items-center gap-2 text-xs text-base-content/60">
+                <span>{{ reserve.courtName }}</span>
+                @for (sport of reserve.sports; track sport) {
+                  <span
+                    class="badge badge-neutral badge-outline bg-base-200 border-none text-xs font-semibold text-base-content/70"
+                  >
+                    {{ sport }}
+                  </span>
+                }
+              </div>
             </div>
-            <div class="text-right">
-              <p class="text-sm mb-1">
-                {{ formatReserveDate(reserve.date) }} • {{ timeRange(reserve) }}
+
+            <div class="flex items-center justify-between gap-3 sm:flex-col sm:items-end sm:gap-1">
+              <p class="text-sm text-base-content/70">
+                {{ reserve.dateLabel }} • {{ reserve.timeLabel }}
               </p>
-              <span
-                class="px-3 py-1 text-xs font-bold rounded-full border"
-                [class]="statusBadgeClasses(reserve.status)"
-              >
-                {{ reserve.status }}
+              <span class="badge badge-soft" [class]="reserve.statusBadgeClass">
+                {{ reserve.statusLabel }}
               </span>
             </div>
-          </div>
+          </li>
         } @empty {
-          <div class="p-8 text-center text-sm">
+          <li class="p-8 text-center text-sm text-base-content/50">
             Nenhuma reserva recente encontrada.
-          </div>
+          </li>
         }
-      </div>
-    </div>
+      </ul>
+    </section>
   }
-</main>
+</section>
