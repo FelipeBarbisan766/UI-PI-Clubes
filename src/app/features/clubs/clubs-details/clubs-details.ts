@@ -281,12 +281,12 @@ export class ClubsDetail {
   }
 
   openRatingModal(current: number | null = null): void {
-    this.myRating.set(current);
-    this.selectedRatingValue.set(current ?? 0);
-    this.reevaluating.set(false);
-    this.reviewError.set(null);
-    this.ratingModalOpen.set(true);
-  }
+  this.myRating.set(current);
+  this.selectedRatingValue.set(current ?? 0);
+  this.reevaluating.set(false);
+  this.reviewError.set(null);
+  this.ratingModalOpen.set(true);
+}
 
   startReevaluation(): void {
     this.selectedRatingValue.set(0);

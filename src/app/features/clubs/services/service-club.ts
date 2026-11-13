@@ -79,13 +79,18 @@ export class ServiceClub {
     );
   }
   getMyRating(clubId: string): Observable<number | null> {
-    return this.http
-      .get<number | null>(`${this.apiUrl}/${clubId}/reviews/verify`, { withCredentials: true })
-      .pipe(
-        map((rating) => (rating == null || rating <= 0 ? null : rating)),
-        catchError((err) => this.handleError(err)),
-      );
-  }
+  return this.http
+    .get<{ rating: number | null }>(`${this.apiUrl}/${clubId}/reviews/verify`, {
+      withCredentials: true,
+    })
+    .pipe(
+      map((res) => {
+        const rating = res?.rating;
+        return rating == null || rating <= 0 ? null : rating;
+      }),
+      catchError((err) => this.handleError(err)),
+    );
+}
 
   rate(clubId: string, rating: number): Observable<ResponseClubReviewSummaryDTO> {
     const dto: CreateClubReviewDTO = { rating };
