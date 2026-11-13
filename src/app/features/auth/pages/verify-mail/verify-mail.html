@@ -1,135 +1,217 @@
-<main
-  class="min-h-screen w-full pattern-background flex items-center justify-center px-4 py-12 pt-20"
->
-  <section class="card bg-base-100 shadow-sm w-full max-w-2xl" aria-labelledby="verify-mail-title">
-    <div class="card-body">
-      <header class="text-center mb-6 max-w-xl mx-auto">
-        <h1 id="verify-mail-title" class="text-3xl md:text-4xl font-bold mb-3">
-          Verificação de e-mail
-        </h1>
+<div class="w-full min-h-[calc(100vh-var(--nav-h))] pattern-background flex items-center justify-center px-4 py-12">
+  <section
+    class="card w-full max-w-lg bg-base-100 shadow-xl rounded-3xl overflow-hidden border border-base-300"
+    aria-labelledby="verify-mail-title"
+  >
+    <div class="card-body p-6 md:p-8">
 
-        @if (status() === 'pending') {
+      <!-- ───────────── STATUS: pending ───────────── -->
+      @if (status() === 'pending') {
+        <header class="text-center mb-6">
+          <div class="flex justify-center mb-4" aria-hidden="true">
+            <div class="bg-primary/10 rounded-full p-4">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+            </div>
+          </div>
+          <h1 id="verify-mail-title" class="text-2xl md:text-3xl font-bold text-base-content mb-2">
+            Verifique seu e-mail
+          </h1>
           @if (isEmailChange()) {
-            <p class="text-sm md:text-base" aria-live="polite">
+            <p class="text-base-content/60 text-sm" aria-live="polite">
               Enviamos um link de confirmação para o seu novo e-mail. Clique nele para concluir a
               alteração. Até lá, não será possível entrar na sua conta.
             </p>
           } @else {
-            <p class="text-sm md:text-base" aria-live="polite">
+            <p class="text-base-content/60 text-sm" aria-live="polite">
               Enviamos um link de verificação para seu e-mail. Acesse sua caixa de entrada e clique
               no link para ativar sua conta.
             </p>
           }
-        }
+        </header>
 
-        @if (status() === 'loading') {
-          <p class="text-sm md:text-base" aria-live="polite">
-            Validando seu link de verificação...
-          </p>
-        }
-
-        @if (status() === 'success') {
-          <p class="text-sm md:text-base text-success" aria-live="polite">
-            {{ successMessage() }}
-          </p>
-        }
-
-        @if (status() === 'error') {
-          <p class="text-sm md:text-base text-error" aria-live="assertive">
-            {{ errorMessage() }}
-          </p>
-        }
-
-        @if (status() === 'InputResendEmail') {
-          <p class="text-sm md:text-base text-base" aria-live="polite">
-            Para poder reenviar o link de verificação, Precisamos que digite seu e-mail novamente.
-          </p>
-          <form [formGroup]="emailForm" class="flex flex-col gap-4 w-full max-w-md mx-auto">
-            <input
-              type="email"
-              formControlName="email"
-              placeholder="Digite seu e-mail"
-              class="input input-bordered w-full"
-              required
-            />
+        <div class="flex flex-col gap-4">
+          @if (!isEmailChange()) {
             <button
               type="button"
-              (click)="resendVerificationEmail()"
-              class="btn btn-primary rounded-full text-white w-full"
-              aria-label="Reenviar verificação"
+              class="btn btn-primary w-full rounded-lg font-semibold text-white shadow-lg hover:shadow-primary/30 transition-all duration-300"
+              (click)="requestResendEmail()"
             >
               Reenviar verificação
             </button>
-          </form>
-        }
+          }
+          <div class="text-center">
+            <button type="button" class="link link-primary no-underline font-semibold hover:underline text-sm" (click)="goBack()">
+              {{ backLabel() }}
+            </button>
+          </div>
+        </div>
+      }
 
-        @if (status() === 'resendSuccess') {
-          <p class="text-sm md:text-base text-success" aria-live="polite">
+      <!-- ───────────── STATUS: loading (validando token) ───────────── -->
+      @if (status() === 'loading') {
+        <header class="text-center mb-2">
+          <div class="flex justify-center mb-4">
+            <span class="loading loading-spinner loading-lg text-primary" role="status" aria-label="Carregando"></span>
+          </div>
+          <h1 id="verify-mail-title" class="text-2xl md:text-3xl font-bold text-base-content mb-2">
+            Validando link
+          </h1>
+          <p class="text-base-content/60 text-sm" aria-live="polite" aria-busy="true">
+            Validando seu link de verificação...
+          </p>
+        </header>
+      }
+
+      <!-- ───────────── STATUS: success ───────────── -->
+      @if (status() === 'success') {
+        <header class="text-center mb-6">
+          <div class="flex justify-center mb-4" aria-hidden="true">
+            <div class="bg-success/10 rounded-full p-4">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+          </div>
+          <h1 id="verify-mail-title" class="text-2xl md:text-3xl font-bold text-base-content mb-2">
+            E-mail verificado!
+          </h1>
+          <p class="text-base-content/60 text-sm" aria-live="polite">{{ successMessage() }}</p>
+        </header>
+
+        <button
+          type="button"
+          class="btn btn-primary w-full rounded-lg font-semibold text-white shadow-lg hover:shadow-primary/30 transition-all duration-300"
+          (click)="finish()"
+        >
+          {{ finishLabel() }}
+        </button>
+      }
+
+      <!-- ───────────── STATUS: error ───────────── -->
+      @if (status() === 'error') {
+        <header class="text-center mb-6">
+          <div class="flex justify-center mb-4" aria-hidden="true">
+            <div class="bg-error/10 rounded-full p-4">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+              </svg>
+            </div>
+          </div>
+          <h1 id="verify-mail-title" class="text-2xl md:text-3xl font-bold text-base-content mb-2">
+            Não foi possível verificar
+          </h1>
+          <p class="text-error text-sm" aria-live="assertive">{{ errorMessage() }}</p>
+        </header>
+
+        <div class="flex flex-col gap-4">
+          @if (!isEmailChange()) {
+            <button
+              type="button"
+              class="btn btn-primary w-full rounded-lg font-semibold text-white shadow-lg hover:shadow-primary/30 transition-all duration-300"
+              (click)="requestResendEmail()"
+            >
+              Reenviar verificação
+            </button>
+          }
+          <div class="text-center">
+            <button type="button" class="link link-primary no-underline font-semibold hover:underline text-sm" (click)="goBack()">
+              {{ backLabel() }}
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- ───────────── STATUS: input-resend-email / resending ───────────── -->
+      @if (status() === 'input-resend-email' || status() === 'resending') {
+        <header class="text-center mb-6">
+          <h1 id="verify-mail-title" class="text-2xl md:text-3xl font-bold text-base-content mb-2">
+            Reenviar verificação
+          </h1>
+          <p class="text-base-content/60 text-sm">
+            Para reenviar o link de verificação, digite seu e-mail novamente.
+          </p>
+        </header>
+
+        <form [formGroup]="emailForm" (ngSubmit)="resendVerificationEmail()" novalidate class="flex flex-col gap-4">
+          <div class="form-group">
+            <label for="email" class="text-sm font-medium text-base-content block pb-2">E-mail</label>
+            <div class="input w-full" [class.input-error]="emailError()">
+              <input
+                id="email"
+                type="email"
+                formControlName="email"
+                class="grow text-sm"
+                placeholder="seu@email.com"
+                autocomplete="email"
+                [attr.aria-invalid]="emailError() ? 'true' : null"
+                [attr.aria-describedby]="emailError() ? 'email-error' : null"
+                EmailDirective
+              />
+            </div>
+            <div class="h-5 mt-1 px-3">
+              @if (emailError()) {
+                <p id="email-error" class="text-error text-xs" role="alert">{{ emailError() }}</p>
+              }
+            </div>
+          </div>
+
+          <div class="mt-2 pt-2">
+            <button
+              type="submit"
+              class="btn btn-primary w-full rounded-lg font-semibold text-white shadow-lg hover:shadow-primary/30 transition-all duration-300"
+              [disabled]="status() === 'resending'"
+              [attr.aria-busy]="status() === 'resending'"
+            >
+              @if (status() === 'resending') {
+                <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+                <span class="sr-only">Enviando...</span>
+              } @else {
+                Reenviar verificação
+              }
+            </button>
+          </div>
+
+          <div class="text-center pt-1">
+            <button type="button" class="link link-primary no-underline font-semibold hover:underline text-sm" (click)="cancelResend()">
+              Cancelar
+            </button>
+          </div>
+        </form>
+      }
+
+      <!-- ───────────── STATUS: resend-success ───────────── -->
+      @if (status() === 'resend-success') {
+        <header class="text-center mb-6">
+          <div class="flex justify-center mb-4" aria-hidden="true">
+            <div class="bg-success/10 rounded-full p-4">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+            </div>
+          </div>
+          <h1 id="verify-mail-title" class="text-2xl md:text-3xl font-bold text-base-content mb-2">
+            E-mail reenviado!
+          </h1>
+          <p class="text-base-content/60 text-sm" aria-live="polite">
             Enviamos um novo link de verificação para seu e-mail. Acesse sua caixa de entrada e
             clique no link para ativar sua conta.
           </p>
-        }
-      </header>
+        </header>
 
-      <div class="grid grid-cols-1 gap-4 w-full max-w-md mx-auto">
-        @if (status() === 'pending') {
-          <a
-            (click)="goToLogin()"
-            class="btn btn-outline rounded-full w-full"
-            aria-label="Ir para login"
-          >
-            Ir para login
-          </a>
-          @if (!isEmailChange()) {
-            <a
-              (click)="requestResendEmail()"
-              class="btn btn-primary rounded-full text-white w-full"
-              aria-label="Reenviar verificação"
-            >
-              Reenviar verificação
-            </a>
-          }
-        }
+        <button
+          type="button"
+          class="btn btn-primary w-full rounded-lg font-semibold text-white shadow-lg hover:shadow-primary/30 transition-all duration-300"
+          (click)="goBack()"
+        >
+          {{ backLabel() }}
+        </button>
+      }
 
-        @if (status() === 'loading') {
-          <button
-            type="button"
-            class="btn btn-primary rounded-full text-white w-full"
-            disabled
-            aria-busy="true"
-            aria-label="Validação em andamento"
-          >
-            Validando...
-          </button>
-        }
-
-        @if (status() === 'success') {
-          <a
-            (click)="goToLogin()"
-            class="btn btn-primary rounded-full text-white w-full"
-            aria-label="Ir para login"
-          >
-            Ir para login
-          </a>
-        }
-
-        @if (status() === 'error') {
-          <a
-            class="btn btn-primary rounded-full text-white w-full"
-            aria-label="Reenviar verificação"
-          >
-            Reenviar verificação
-          </a>
-
-          <a
-            (click)="goToLogin()"
-            class="btn btn-outline rounded-full w-full"
-            aria-label="Voltar para login"
-          >
-            Voltar para login
-          </a>
-        }
-      </div>
     </div>
   </section>
-</main>
+</div>
