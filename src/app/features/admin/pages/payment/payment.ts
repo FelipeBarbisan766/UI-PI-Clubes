@@ -15,7 +15,6 @@ import {
   SubscriptionApiError,
 } from '../../services/service-subscription';
 import { AuthService } from '../../../../core/services/auth-service';
-import { ToastAlert } from '../../../../shared/components/toast-alert/toast-alert';
 import { PaymentStatus, Plan } from '../../models/model-plan-payment';
 
 type PaymentStep = 'review' | 'redirecting' | 'success' | 'pending' | 'failure';
@@ -27,7 +26,6 @@ const MAX_POLL_ATTEMPTS = 20; // 20 × 3 s ≈ 60 s
 
 @Component({
   selector: 'app-payment',
-  imports: [ToastAlert],
   templateUrl: './payment.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -41,7 +39,7 @@ export class Payment implements OnInit {
   // ─── State signals ──────────────────────────────────────────────────────
   readonly step = signal<PaymentStep>('review');
   readonly isLoading = signal(false);
-  readonly errorMessage = signal<string | null>(null);
+  readonly errorMessage = signal('');
   readonly hasActiveSubscriptionConflict = signal(false);
   readonly selectedPlan = signal<Plan | null>(null);
 
@@ -79,7 +77,7 @@ export class Payment implements OnInit {
     }
 
     this.isLoading.set(true);
-    this.errorMessage.set(null);
+    this.errorMessage.set('');
     this.hasActiveSubscriptionConflict.set(false);
     this.step.set('redirecting');
 

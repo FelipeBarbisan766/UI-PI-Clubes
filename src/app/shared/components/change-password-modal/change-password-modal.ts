@@ -46,6 +46,11 @@ export class ChangePasswordModal {
 
   readonly hasPassword = computed(() => this.authService.me()?.hasPassword);
 
+  // Signals para controlar a visibilidade dos campos de senha
+  readonly showOldPassword = signal(false);
+  readonly showNewPassword = signal(false);
+  readonly showConfirmPassword = signal(false);
+
   readonly form = this.fb.group(
     {
       oldPassword: ['', [Validators.required]],
@@ -63,6 +68,18 @@ export class ChangePasswordModal {
 
   readonly success = output<string>();
   readonly failed = output<string>();
+
+  toggleShowOldPassword(): void {
+    this.showOldPassword.update((v) => !v);
+  }
+
+  toggleShowNewPassword(): void {
+    this.showNewPassword.update((v) => !v);
+  }
+
+  toggleShowConfirmPassword(): void {
+    this.showConfirmPassword.update((v) => !v);
+  }
 
   open(): void {
     this.form.reset();

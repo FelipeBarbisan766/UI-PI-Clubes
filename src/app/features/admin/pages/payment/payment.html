@@ -1,26 +1,23 @@
-<div class="w-full min-h-[calc(100vh-var(--nav-h))] pattern-background flex items-center justify-center px-4 py-12">
-  <section
-    class="card w-full max-w-lg bg-base-100 shadow-xl rounded-3xl overflow-hidden border border-base-300"
-    aria-labelledby="payment-title"
-  >
-    <div class="card-body p-6 md:p-8">
+<main
+  class="min-h-screen w-full pattern-background flex items-center justify-center px-4 py-12 pt-20"
+>
+  <section class="card bg-base-100 shadow-sm w-full max-w-2xl" aria-labelledby="payment-title">
+    <div class="card-body">
 
-      <!-- ───────────── STEP: review ───────────── -->
+      <!-- STEP: review -->
       @if (step() === 'review') {
-        <header class="text-center mb-6">
-          <h1 id="payment-title" class="text-2xl md:text-3xl font-bold text-base-content mb-2">
-            Finalizar assinatura
-          </h1>
-          <p class="text-base-content/60 text-sm">
+        <header class="text-center mb-6 max-w-xl mx-auto">
+          <h1 id="payment-title" class="text-3xl md:text-4xl font-bold mb-3">Finalizar assinatura</h1>
+          <p class="text-sm md:text-base text-base-content/70">
             Confira o plano escolhido. Você vai escolher a forma de pagamento na tela do Mercado Pago.
           </p>
         </header>
 
         @if (selectedPlan(); as plan) {
-          <div class="bg-base-200 border border-base-300 rounded-2xl p-4 mb-6 w-full">
+          <div class="bg-base-200 rounded-2xl p-4 mb-6 max-w-md mx-auto w-full">
             <div class="flex items-center justify-between gap-4 flex-wrap">
               <div>
-                <p class="font-semibold text-base-content">{{ plan.name }}</p>
+                <p class="font-semibold">{{ plan.name }}</p>
                 <p class="text-xs text-base-content/60">
                   {{ plan.quantClub }} {{ plan.quantClub === 1 ? 'clube' : 'clubes' }}
                   · {{ plan.quantCourt }} quadras por clube
@@ -36,20 +33,28 @@
           </div>
         }
 
-        <div class="flex flex-col gap-4">
-          @if (hasActiveSubscriptionConflict()) {
-            <button
-              type="button"
-              class="btn btn-outline w-full rounded-lg font-semibold"
-              (click)="goToSubscription()"
-            >
+        @if (errorMessage()) {
+          <div class="alert alert-error max-w-md mx-auto w-full mb-4" role="alert" aria-live="assertive">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+            </svg>
+            <span>{{ errorMessage() }}</span>
+          </div>
+        }
+
+        @if (hasActiveSubscriptionConflict()) {
+          <div class="grid grid-cols-1 gap-3 w-full max-w-md mx-auto mb-4">
+            <button type="button" class="btn btn-outline rounded-full w-full" (click)="goToSubscription()">
               Ver minha assinatura
             </button>
-          }
+          </div>
+        }
 
+        <div class="grid grid-cols-1 gap-3 w-full max-w-md mx-auto">
           <button
             type="button"
-            class="btn btn-primary w-full rounded-lg font-semibold text-white shadow-lg hover:shadow-primary/30 transition-all duration-300"
+            class="btn btn-primary rounded-full text-white w-full"
             [disabled]="!canSubmit()"
             [attr.aria-busy]="isLoading()"
             (click)="initiatePayment()"
@@ -59,27 +64,23 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
             </svg>
           </button>
-
-          <div class="text-center">
-            <button type="button" class="link link-primary no-underline font-semibold hover:underline text-sm" (click)="goToPricing()">
-              Voltar para planos
-            </button>
-          </div>
+          <button type="button" class="btn btn-outline rounded-full w-full" (click)="goToPricing()">
+            Voltar para planos
+          </button>
         </div>
       }
 
-      <!-- ───────────── STEP: redirecting ───────────── -->
+      <!-- STEP: redirecting -->
       @if (step() === 'redirecting') {
-        <div class="flex flex-col items-center justify-center py-12 gap-4 text-center" role="status" aria-live="polite">
+        <div class="flex flex-col items-center justify-center py-12 gap-4" role="status" aria-live="polite">
           <span class="loading loading-spinner loading-lg text-primary" aria-hidden="true"></span>
-          <h1 id="payment-title" class="text-2xl md:text-3xl font-bold text-base-content">Redirecionando...</h1>
-          <p class="text-base-content/60 text-sm">Levando você para o Mercado Pago.</p>
+          <p class="text-base-content/70 text-sm">Redirecionando para o Mercado Pago...</p>
         </div>
       }
 
-      <!-- ───────────── STEP: success (retorno; quem confirma é o webhook) ───────────── -->
+      <!-- STEP: success (página de retorno; só acompanha, quem confirma é o webhook) -->
       @if (step() === 'success') {
-        <header class="text-center mb-6">
+        <header class="text-center mb-6 max-w-xl mx-auto">
           <div class="flex justify-center mb-4" aria-hidden="true">
             @switch (paymentStatus()) {
               @case ('Confirmed') {
@@ -110,7 +111,7 @@
             }
           </div>
 
-          <h1 id="payment-title" class="text-2xl md:text-3xl font-bold text-base-content mb-2">
+          <h1 id="payment-title" class="text-3xl md:text-4xl font-bold mb-3">
             @switch (paymentStatus()) {
               @case ('Confirmed') { Assinatura ativada! }
               @case ('Failed') { Pagamento não aprovado }
@@ -122,52 +123,52 @@
           <div aria-live="polite">
             @switch (paymentStatus()) {
               @case ('Confirmed') {
-                <p class="text-success text-sm">Seu pagamento foi confirmado e sua assinatura está ativa.</p>
+                <p class="text-sm md:text-base text-success">
+                  Seu pagamento foi confirmado e sua assinatura está ativa.
+                </p>
               }
               @case ('Failed') {
-                <p class="text-error text-sm">O pagamento não foi aprovado. Você pode tentar novamente.</p>
+                <p class="text-sm md:text-base text-error">
+                  O pagamento não foi aprovado. Você pode tentar novamente.
+                </p>
               }
               @case ('Unknown') {
-                <p class="text-base-content/60 text-sm">
+                <p class="text-sm md:text-base text-base-content/70">
                   Não encontramos um pagamento para acompanhar. Veja sua assinatura ou escolha um plano.
                 </p>
               }
               @default {
                 @if (pollTimedOut()) {
-                  <p class="text-base-content/60 text-sm">
+                  <p class="text-sm md:text-base text-base-content/70">
                     Ainda estamos aguardando a confirmação. Você pode acompanhar em
                     "Minha assinatura", no histórico de pagamentos.
                   </p>
                 } @else {
-                  <p class="text-base-content/60 text-sm">Isso pode levar alguns segundos.</p>
+                  <p class="text-sm md:text-base text-base-content/70">
+                    Isso pode levar alguns segundos.
+                  </p>
                 }
               }
             }
           </div>
         </header>
 
-        @if (paymentStatus() === 'Failed') {
-          <button
-            type="button"
-            class="btn btn-primary w-full rounded-lg font-semibold text-white shadow-lg hover:shadow-primary/30 transition-all duration-300"
-            (click)="retryPayment()"
-          >
-            Tentar novamente
-          </button>
-        } @else if (paymentStatus() === 'Confirmed' || paymentStatus() === 'Unknown' || pollTimedOut()) {
-          <button
-            type="button"
-            class="btn btn-primary w-full rounded-lg font-semibold text-white shadow-lg hover:shadow-primary/30 transition-all duration-300"
-            (click)="goToSubscription()"
-          >
-            Ver minha assinatura
-          </button>
-        }
+        <div class="grid grid-cols-1 gap-3 w-full max-w-md mx-auto">
+          @if (paymentStatus() === 'Failed') {
+            <button type="button" class="btn btn-primary rounded-full text-white w-full" (click)="retryPayment()">
+              Tentar novamente
+            </button>
+          } @else if (paymentStatus() === 'Confirmed' || paymentStatus() === 'Unknown' || pollTimedOut()) {
+            <button type="button" class="btn btn-primary rounded-full text-white w-full" (click)="goToSubscription()">
+              Ver minha assinatura
+            </button>
+          }
+        </div>
       }
 
-      <!-- ───────────── STEP: pending (Pix/boleto aguardando) ───────────── -->
+      <!-- STEP: pending (Pix/boleto aguardando) -->
       @if (step() === 'pending') {
-        <header class="text-center mb-6">
+        <header class="text-center mb-6 max-w-xl mx-auto">
           <div class="flex justify-center mb-4" aria-hidden="true">
             <div class="bg-warning/10 rounded-full p-4">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-warning" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -175,32 +176,25 @@
               </svg>
             </div>
           </div>
-          <h1 id="payment-title" class="text-2xl md:text-3xl font-bold text-base-content mb-2">Pagamento pendente</h1>
-          <p class="text-base-content/60 text-sm" aria-live="polite">
+          <h1 id="payment-title" class="text-3xl md:text-4xl font-bold mb-3">Pagamento pendente</h1>
+          <p class="text-sm md:text-base text-base-content/70" aria-live="polite">
             Seu pagamento está em análise ou aguardando (Pix/boleto). Assim que for confirmado, a
             assinatura é ativada automaticamente. Acompanhe pelo histórico de pagamentos.
           </p>
         </header>
-
-        <div class="flex flex-col gap-4">
-          <button
-            type="button"
-            class="btn btn-primary w-full rounded-lg font-semibold text-white shadow-lg hover:shadow-primary/30 transition-all duration-300"
-            (click)="goToSubscription()"
-          >
+        <div class="grid grid-cols-1 gap-3 w-full max-w-md mx-auto">
+          <button type="button" class="btn btn-primary rounded-full text-white w-full" (click)="goToSubscription()">
             Ver minha assinatura
           </button>
-          <div class="text-center">
-            <button type="button" class="link link-primary no-underline font-semibold hover:underline text-sm" (click)="goToPricing()">
-              Voltar para planos
-            </button>
-          </div>
+          <button type="button" class="btn btn-outline rounded-full w-full" (click)="goToPricing()">
+            Voltar para planos
+          </button>
         </div>
       }
 
-      <!-- ───────────── STEP: failure ───────────── -->
+      <!-- STEP: failure -->
       @if (step() === 'failure') {
-        <header class="text-center mb-6">
+        <header class="text-center mb-6 max-w-xl mx-auto">
           <div class="flex justify-center mb-4" aria-hidden="true">
             <div class="bg-error/10 rounded-full p-4">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -209,32 +203,21 @@
               </svg>
             </div>
           </div>
-          <h1 id="payment-title" class="text-2xl md:text-3xl font-bold text-base-content mb-2">Pagamento não concluído</h1>
-          <p class="text-error text-sm" aria-live="assertive">
+          <h1 id="payment-title" class="text-3xl md:text-4xl font-bold mb-3">Pagamento não concluído</h1>
+          <p class="text-sm md:text-base text-base-content/70" aria-live="assertive">
             Não foi possível processar o seu pagamento. Tente novamente.
           </p>
         </header>
-
-        <div class="flex flex-col gap-4">
-          <button
-            type="button"
-            class="btn btn-primary w-full rounded-lg font-semibold text-white shadow-lg hover:shadow-primary/30 transition-all duration-300"
-            (click)="retryPayment()"
-          >
+        <div class="grid grid-cols-1 gap-3 w-full max-w-md mx-auto">
+          <button type="button" class="btn btn-primary rounded-full text-white w-full" (click)="retryPayment()">
             Tentar novamente
           </button>
-          <div class="text-center">
-            <button type="button" class="link link-primary no-underline font-semibold hover:underline text-sm" (click)="goToPricing()">
-              Voltar para planos
-            </button>
-          </div>
+          <button type="button" class="btn btn-outline rounded-full w-full" (click)="goToPricing()">
+            Voltar para planos
+          </button>
         </div>
       }
 
     </div>
   </section>
-</div>
-
-@if (errorMessage(); as msg) {
-  <app-toast-alert [message]="msg" type="error" (dismiss)="errorMessage.set(null)" />
-}
+</main>
