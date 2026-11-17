@@ -221,15 +221,18 @@ export const routes: Routes = [
           },
           {
             path: 'usuarios',
-            loadComponent: () => import('./features/root/users/root-users').then((m) => m.RootUsers),
+            loadComponent: () =>
+              import('./features/root/users/root-users').then((m) => m.RootUsers),
           },
           {
             path: 'clubes',
-            loadComponent: () => import('./features/root/clubs/root-clubs').then((m) => m.RootClubs),
+            loadComponent: () =>
+              import('./features/root/clubs/root-clubs').then((m) => m.RootClubs),
           },
           {
             path: 'planos',
-            loadComponent: () => import('./features/root/plans/root-plans').then((m) => m.RootPlans),
+            loadComponent: () =>
+              import('./features/root/plans/root-plans').then((m) => m.RootPlans),
           },
           {
             path: 'esportes',
@@ -238,15 +241,16 @@ export const routes: Routes = [
           },
           {
             path: 'flags',
-            loadComponent: () => import('./features/root/flags/root-flags').then((m) => m.RootFlags),
+            loadComponent: () =>
+              import('./features/root/flags/root-flags').then((m) => m.RootFlags),
           },
         ],
       },
 
       {
         path: '**',
-        redirectTo: '',
-        pathMatch: 'full',
+        title: 'Página não encontrada',
+        loadComponent: () => import('./features/not-found/not-found').then((m) => m.NotFound),
       },
     ],
   },
